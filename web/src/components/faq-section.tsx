@@ -16,11 +16,11 @@ function faqJsonLd(): string {
 
 export const FaqSection: React.FC = () => {
   return (
-    <section id="faq" aria-labelledby="faq-titre" className="py-16 sm:py-20">
+    <section id="faq" aria-labelledby="faq-titre" className="py-20 sm:py-28">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd() }} />
       <div className="mx-auto grid w-full max-w-page gap-8 px-4 sm:px-6 lg:grid-cols-12 lg:gap-12">
         <h2 id="faq-titre" className="font-display text-4xl font-semibold tracking-tight sm:text-5xl lg:col-span-4">
-          Les réponses aux questions qu'on nous pose le plus
+          Questions fréquentes
         </h2>
         <ul className="border-t-2 border-rule lg:col-span-8">
           {FAQ.map((item) => (

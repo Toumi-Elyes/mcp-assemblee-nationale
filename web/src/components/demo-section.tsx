@@ -272,8 +272,8 @@ export const DemoSection: React.FC<{ suggestions: Suggestions }> = ({ suggestion
   return (
     <Section
       id="demo"
-      title="Comment a voté un député sur un sujet ?"
-      intro="C'est la question que votre assistant se pose en coulisses. Choisissez un député et un sujet : les résultats viennent des mêmes données, avec le lien de chaque source."
+      title="Essayez par vous-même"
+      intro="Choisissez un député et un sujet. Les résultats viennent des mêmes données que le connecteur, avec la source de chaque vote."
     >
       <div className="flex flex-col gap-10">
         <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6">

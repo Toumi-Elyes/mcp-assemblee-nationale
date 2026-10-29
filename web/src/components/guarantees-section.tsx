@@ -9,7 +9,7 @@ const ITEMS = [
 
 export const GuaranteesSection: React.FC = () => {
   return (
-    <section id="garanties" aria-labelledby="garanties-titre" className="border-t border-line py-14 sm:py-16">
+    <section id="garanties" aria-labelledby="garanties-titre" className="border-t border-line py-16 sm:py-20">
       <div className="mx-auto grid w-full max-w-page gap-8 px-4 sm:px-6 lg:grid-cols-12 lg:gap-12">
         <div className="flex flex-col gap-3 lg:col-span-4">
           <h2 id="garanties-titre" className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">

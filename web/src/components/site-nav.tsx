@@ -11,8 +11,7 @@ type NavItem = { href: string; label: string };
 
 const ITEMS: readonly NavItem[] = [
   { href: "/#en-direct", label: "Cette semaine" },
-  { href: "/#tendances", label: "Données en direct" },
-  { href: "/#demo", label: "Démonstration" },
+  { href: "/#demo", label: "Essayer" },
   { href: "/#installer", label: "Installer" },
   { href: "/#faq", label: "Questions" },
 ];
@@ -58,21 +57,12 @@ export const SiteNav: React.FC = () => {
       </div>
       <div className="border-b border-line">
         <div className="mx-auto flex w-full max-w-page flex-wrap items-center justify-between gap-x-8 gap-y-2 px-4 py-3 sm:px-6">
-          <Link href="/" className="flex flex-col py-1 no-underline">
+          <Link href="/" aria-current={isHome ? "page" : undefined} className="flex flex-col py-1 no-underline">
             <span className="font-display text-2xl font-bold leading-none tracking-tight">{SITE_NAME}</span>
             <span className="text-sm text-ink-soft">Les votes des députés, dans votre assistant IA</span>
           </Link>
           <nav aria-label="Navigation principale" className="w-full lg:w-auto">
             <ul className="-mx-1 flex items-center gap-x-4 overflow-x-auto sm:flex-wrap sm:gap-x-5">
-              <li>
-                <Link
-                  href="/"
-                  aria-current={isHome ? "page" : undefined}
-                  className={cn(linkClass, isHome ? "border-rule" : undefined)}
-                >
-                  Accueil
-                </Link>
-              </li>
               {ITEMS.map((item) => (
                 <li key={item.href}>
                   <Link href={item.href} className={linkClass}>

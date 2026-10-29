@@ -13,7 +13,7 @@ export const HeroProof: React.FC = () => {
   const figure = formatNumber(scrutins);
   return (
     <div className="flex flex-col gap-3">
-      <Flap value={figure} label={`${figure} scrutins`} className="text-5xl font-semibold sm:text-6xl" />
+      <Flap value={figure} label={`${figure} scrutins`} className="text-4xl font-semibold sm:text-5xl" />
       <p className="text-sm text-ink-soft">
         scrutins enregistrés sous la {legislature ?? 17}e législature.
         <br />

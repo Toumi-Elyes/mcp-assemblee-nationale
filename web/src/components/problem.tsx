@@ -22,8 +22,8 @@ export const Problem: React.FC = () => {
   return (
     <Section
       id="pourquoi"
-      title="Vérifier un vote prend une heure. Se fier à une réponse de mémoire, c'est risqué."
-      intro="Savoir comment un député a voté oblige à fouiller assemblee-nationale.fr, scrutin par scrutin. Et un assistant IA, seul, peut répondre avec aplomb sans avoir les bons chiffres."
+      title="Vérifier un vote prend du temps. Une réponse de mémoire peut être fausse."
+      intro="Il faut chercher sur assemblee-nationale.fr, scrutin par scrutin. Et un assistant IA seul peut répondre avec assurance sans avoir les bons chiffres."
     >
       <table className="w-full border-collapse text-left">
         <caption className="sr-only">Un assistant seul comparé à un assistant avec le connecteur</caption>

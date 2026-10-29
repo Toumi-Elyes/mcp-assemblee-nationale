@@ -19,10 +19,11 @@ export const TrendsSection: React.FC<{ trends: TrendsData }> = ({ trends }) => {
   const partial = !perDay.coverage.complete;
   return (
     <div className="flex flex-col gap-6">
-      <p className="max-w-measure text-base text-ink-soft">
-        Tendances calculées sur les scrutins lus en direct.
-        {partial ? ` Fenêtre partielle, à partir du ${formatShortDay(perDay.coverage.from)}.` : ""}
-      </p>
+      {partial ? (
+        <p className="max-w-measure text-base text-ink-soft">
+          Période partielle : à partir du {formatShortDay(perDay.coverage.from)}.
+        </p>
+      ) : null}
       <div className="grid gap-x-12 gap-y-14 lg:grid-cols-12">
         <Plate number={1} title="Scrutins par jour" note={`${perDay.total} scrutins sur la période.`} className="lg:col-span-7">
           <VotesPerDayChart data={perDay} />
