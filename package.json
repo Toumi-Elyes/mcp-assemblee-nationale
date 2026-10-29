@@ -1,0 +1,57 @@
+{
+  "name": "mcp-assemblee-nationale",
+  "version": "0.1.0",
+  "description": "Serveur MCP pour interroger les votes de l'Assemblée nationale (données CIVIX) depuis Claude, ChatGPT ou Gemini.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "mcp-assemblee-nationale": "dist/stdio.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "tsc -p tsconfig.build.json",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "start:stdio": "tsx src/stdio.ts",
+    "inspector": "npx @modelcontextprotocol/inspector tsx src/stdio.ts",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:live": "CIVIX_LIVE=1 vitest run test/live"
+  },
+  "keywords": [
+    "mcp",
+    "assemblee-nationale",
+    "deputes",
+    "scrutins",
+    "civix",
+    "open-data",
+    "claude",
+    "chatgpt"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Toumi-Elyes/mcp-assemblee-nationale.git"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261001.0",
+    "@eslint/js": "^10.0.0",
+    "@types/node": "^22.0.0",
+    "eslint": "^10.13.0",
+    "tsx": "^4.23.15",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.0.5",
+    "wrangler": "^4.150.0"
+  }
+}

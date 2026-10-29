@@ -1,0 +1,1263 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "CIVIX API",
+    "version": "v1",
+    "license": {
+      "name": "Licence Ouverte Etalab 2.0"
+    },
+    "description": "API publique read-only CIVIX (données officielles de l'Assemblée nationale). Neutralité stricte.",
+    "x-ai-ready": true,
+    "x-civix": {
+      "positioning": "IA-first civic data API",
+      "neutrality": "strict",
+      "sources": "Assemblée nationale uniquement"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://www.civix.fr"
+    }
+  ],
+  "paths": {
+    "/.well-known/civix.json": {
+      "get": {
+        "summary": "Métadonnées machine-readable CIVIX",
+        "description": "AI use: identifier rapidement CIVIX, ses principes et ses points d'entrée stables.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "name": "CIVIX",
+                  "publisher": "CIVIX.fr",
+                  "one_liner": "Lire l'activité parlementaire française avec des données publiques, neutres et traçables.",
+                  "description": "CIVIX est une interface indépendante qui présente des données publiques de l'Assemblée nationale pour aider les humains, les moteurs de recherche et les agents IA à comprendre les députés, les scrutins et les groupes parlementaires.",
+                  "principles": ["neutralité", "traçabilité", "pédagogie"],
+                  "official_sources": ["Assemblée nationale"],
+                  "not_official": true,
+                  "not": [
+                    "CIVIX n’est pas le site officiel de l’Assemblée nationale",
+                    "CIVIX ne donne pas de consigne de vote",
+                    "CIVIX ne note pas les députés"
+                  ],
+                  "api": {
+                    "base_url": "https://www.civix.fr/api/v1",
+                    "openapi": "https://www.civix.fr/api/openapi",
+                    "index": "https://www.civix.fr/api/v1/index"
+                  },
+                  "links": {
+                    "site": "https://www.civix.fr",
+                    "methodologie": "https://www.civix.fr/methodologie",
+                    "sources": "https://www.civix.fr/a-propos"
+                  },
+                  "schema_version": "2026-04-29",
+                  "answer": "CIVIX expose ses métadonnées publiques machine-readable pour les humains et les agents IA.",
+                  "canonical_url": "https://www.civix.fr/.well-known/civix.json",
+                  "confidence": "high",
+                  "meta": {
+                    "schema_version": "2026-04-29",
+                    "api_version": "v1",
+                    "retrieved_at": "2026-04-29T00:00:00.000Z",
+                    "last_updated": "2026-04-29T00:00:00.000Z",
+                    "query": {},
+                    "pagination": {}
+                  },
+                  "source": {
+                    "type": "editorial",
+                    "provider": "CIVIX.fr",
+                    "via": "CIVIX.fr",
+                    "source_urls": ["https://www.civix.fr"],
+                    "civix_urls": {
+                      "page": "https://www.civix.fr/.well-known/civix.json",
+                      "api": "https://www.civix.fr/.well-known/civix.json"
+                    }
+                  },
+                  "data": {
+                    "type": "civix_metadata",
+                    "attributes": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/about": {
+      "get": {
+        "summary": "À propos",
+        "description": "AI use: répondre à la question 'Qu'est-ce que CIVIX ?' avec une source neutre et traçable.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "publisher": "CIVIX.fr",
+                  "api_version": "v1",
+                  "retrieved_at": "2026-04-29T00:00:00.000Z",
+                  "schema_version": "2026-04-29",
+                  "answer": "CIVIX est une interface indépendante qui présente les données publiques de l'Assemblée nationale de façon neutre et traçable.",
+                  "canonical_url": "https://www.civix.fr/about",
+                  "confidence": "high",
+                  "meta": {
+                    "schema_version": "2026-04-29",
+                    "api_version": "v1",
+                    "retrieved_at": "2026-04-29T00:00:00.000Z",
+                    "last_updated": "2026-04-29T00:00:00.000Z",
+                    "query": null,
+                    "pagination": null
+                  },
+                  "license": {
+                    "name": "Open Data – Assemblée nationale",
+                    "notice": "Données publiques de l'Assemblée nationale, présentées par CIVIX.fr (initiative indépendante)."
+                  },
+                  "source": {
+                    "type": "editorial",
+                    "provider": "Assemblée nationale",
+                    "via": "CIVIX.fr",
+                    "source_urls": ["https://www.assemblee-nationale.fr/"],
+                    "civix_urls": {
+                      "page": "https://www.civix.fr/about",
+                      "api": "https://www.civix.fr/api/v1/about"
+                    }
+                  },
+                  "citation": {
+                    "text": "Selon CIVIX.fr (consulté le 29 avril 2026), CIVIX est une initiative indépendante présentant les données publiques de l'Assemblée nationale française de manière neutre et factuelle.",
+                    "url": "https://www.civix.fr/about"
+                  },
+                  "data": {
+                    "type": "about",
+                    "attributes": {
+                      "editorial_policy": {
+                        "neutrality": "Neutralité stricte, aucune opinion politique.",
+                        "sources": "Sources institutionnelles officielles uniquement.",
+                        "reuse": "Données open data, licences respectées.",
+                        "mission": "Rendre l'activité parlementaire accessible.",
+                        "independence": "Aucune affiliation politique ou institutionnelle."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/index": {
+      "get": {
+        "summary": "Index des endpoints",
+        "description": "AI use: découvrir les routes stables, leurs exemples et les meilleurs cas d'usage pour des agents ou assistants.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "publisher": "CIVIX.fr",
+                  "api_version": "v1",
+                  "retrieved_at": "2026-04-29T00:00:00.000Z",
+                  "schema_version": "2026-04-29",
+                  "answer": "Cette page renvoie les endpoints publics CIVIX disponibles.",
+                  "canonical_url": "https://www.civix.fr/api",
+                  "confidence": "high",
+                  "meta": {
+                    "schema_version": "2026-04-29",
+                    "api_version": "v1",
+                    "retrieved_at": "2026-04-29T00:00:00.000Z",
+                    "last_updated": "2026-04-29T00:00:00.000Z",
+                    "query": null,
+                    "pagination": null
+                  },
+                  "summary": "Index des endpoints publics de CIVIX.",
+                  "license": {
+                    "name": "Open Data – Assemblée nationale",
+                    "notice": "Données publiques de l'Assemblée nationale, présentées par CIVIX.fr (initiative indépendante)."
+                  },
+                  "source": {
+                    "type": "editorial",
+                    "provider": "Assemblée nationale",
+                    "via": "CIVIX.fr",
+                    "source_urls": ["https://www.assemblee-nationale.fr/"],
+                    "civix_urls": {
+                      "page": "https://www.civix.fr/api",
+                      "api": "https://www.civix.fr/api/v1/index"
+                    }
+                  },
+                  "citation": {
+                    "text": "Index des endpoints publics de l'API CIVIX.",
+                    "url": "https://www.civix.fr/api/v1/index"
+                  },
+                  "data": {
+                    "type": "api_index",
+                    "attributes": {
+                      "name": "API publique CIVIX",
+                      "description": "API read-only basée sur des données publiques officielles de l'Assemblée nationale. CIVIX ne produit aucune opinion politique.",
+                      "openapi_url": "https://www.civix.fr/api/openapi",
+                      "endpoints": [
+                        {
+                          "name": "well_known_civix",
+                          "method": "GET",
+                          "path": "/.well-known/civix.json",
+                          "description": "Métadonnées machine-readable CIVIX pour agents, moteurs de recherche et intégrateurs.",
+                          "url": "https://www.civix.fr/.well-known/civix.json",
+                          "example_url": "https://www.civix.fr/.well-known/civix.json",
+                          "stable": true,
+                          "ai_usage": {
+                            "best_for": "Découvrir le projet, ses principes et ses liens stables",
+                            "citation_required": false,
+                            "stable_url": "https://www.civix.fr/.well-known/civix.json"
+                          }
+                        },
+                        {
+                          "name": "about",
+                          "method": "GET",
+                          "path": "/api/v1/about",
+                          "description": "À propos de CIVIX, principes éditoriaux, sources et politique de neutralité.",
+                          "url": "https://www.civix.fr/api/v1/about",
+                          "example_url": "https://www.civix.fr/api/v1/about",
+                          "stable": true,
+                          "ai_usage": {
+                            "best_for": "Répondre à la question 'Qu'est-ce que CIVIX ?'",
+                            "citation_required": true,
+                            "stable_url": "https://www.civix.fr/about"
+                          }
+                        },
+                        {
+                          "name": "index",
+                          "method": "GET",
+                          "path": "/api/v1/index",
+                          "description": "Index JSON des endpoints publics de l'API CIVIX.",
+                          "url": "https://www.civix.fr/api/v1/index",
+                          "example_url": "https://www.civix.fr/api/v1/index",
+                          "stable": true,
+                          "ai_usage": {
+                            "best_for": "Découvrir les routes disponibles et leurs exemples",
+                            "citation_required": true,
+                            "stable_url": "https://www.civix.fr/api/v1/index"
+                          }
+                        },
+                        {
+                          "name": "search",
+                          "method": "GET",
+                          "path": "/api/v1/search",
+                          "description": "Recherche publique dans les députés, scrutins, groupes et dossiers.",
+                          "url": "https://www.civix.fr/api/v1/search?search=RN",
+                          "example_url": "https://www.civix.fr/api/v1/search?search=RN",
+                          "stable": true,
+                          "ai_usage": {
+                            "best_for": "Trouver un député ou un groupe",
+                            "citation_required": true,
+                            "stable_url": "https://www.civix.fr/search?search=RN"
+                          }
+                        },
+                        {
+                          "name": "deputes",
+                          "method": "GET",
+                          "path": "/api/v1/deputes",
+                          "description": "Liste des députés ou détail par UID via paramètre de requête.",
+                          "url": "https://www.civix.fr/api/v1/deputes?uid=PA793214",
+                          "example_url": "https://www.civix.fr/api/v1/deputes?uid=PA793214",
+                          "stable": true,
+                          "ai_usage": {
+                            "best_for": "Répondre à une question sur un député",
+                            "citation_required": true,
+                            "stable_url": "https://www.civix.fr/deputes/PA793214"
+                          }
+                        },
+                        {
+                          "name": "deputes_uid",
+                          "method": "GET",
+                          "path": "/api/v1/deputes/{uid}",
+                          "description": "Détail d'un député par UID, route legacy conservée pour compatibilité.",
+                          "url": "https://www.civix.fr/api/v1/deputes/PA793214",
+                          "example_url": "https://www.civix.fr/api/v1/deputes/PA793214",
+                          "stable": true,
+                          "ai_usage": {
+                            "best_for": "Répondre à une question sur un député",
+                            "citation_required": true,
+                            "stable_url": "https://www.civix.fr/deputes/PA793214"
+                          }
+                        },
+                        {
+                          "name": "scrutins",
+                          "method": "GET",
+                          "path": "/api/v1/scrutins",
+                          "description": "Liste des scrutins, recherche optionnelle et détail par UID.",
+                          "url": "https://www.civix.fr/api/v1/scrutins?uid=VTANR5L17V6284",
+                          "example_url": "https://www.civix.fr/api/v1/scrutins?uid=VTANR5L17V6284",
+                          "stable": true,
+                          "ai_usage": {
+                            "best_for": "Quel est le résultat de ce scrutin ?",
+                            "citation_required": true,
+                            "stable_url": "https://www.civix.fr/votes/VTANR5L17V6284"
+                          }
+                        },
+                        {
+                          "name": "scrutins_uid",
+                          "method": "GET",
+                          "path": "/api/v1/scrutins/{uid}",
+                          "description": "Détail scrutin, route legacy conservée pour compatibilité.",
+                          "url": "https://www.civix.fr/api/v1/scrutins/VTANR5L17V6284",
+                          "example_url": "https://www.civix.fr/api/v1/scrutins/VTANR5L17V6284",
+                          "stable": true,
+                          "ai_usage": {
+                            "best_for": "Quel est le résultat de ce scrutin ?",
+                            "citation_required": true,
+                            "stable_url": "https://www.civix.fr/votes/VTANR5L17V6284"
+                          }
+                        },
+                        {
+                          "name": "scrutins_votes",
+                          "method": "GET",
+                          "path": "/api/v1/scrutins/{uid}/votes",
+                          "description": "Votes détaillés d'un scrutin via rewrite vers la route de détail.",
+                          "url": "https://www.civix.fr/api/v1/scrutins/VTANR5L17V6284/votes",
+                          "example_url": "https://www.civix.fr/api/v1/scrutins/VTANR5L17V6284/votes",
+                          "stable": true,
+                          "ai_usage": {
+                            "best_for": "Comment les députés ont voté sur ce scrutin ?",
+                            "citation_required": true,
+                            "stable_url": "https://www.civix.fr/votes/VTANR5L17V6284"
+                          }
+                        },
+                        {
+                          "name": "scrutins_statements",
+                          "method": "GET",
+                          "path": "/api/v1/scrutins/{uid}/statements",
+                          "description": "Déclarations publiques approuvées des groupes pour un scrutin donné.",
+                          "url": "https://www.civix.fr/api/v1/scrutins/VTANR5L17V6284/statements",
+                          "example_url": "https://www.civix.fr/api/v1/scrutins/VTANR5L17V6284/statements",
+                          "stable": true,
+                          "ai_usage": {
+                            "best_for": "Résumer les déclarations publiques des groupes sur un scrutin",
+                            "citation_required": true,
+                            "stable_url": "https://www.civix.fr/votes/VTANR5L17V6284"
+                          }
+                        },
+                        {
+                          "name": "groupes",
+                          "method": "GET",
+                          "path": "/api/v1/groupes",
+                          "description": "Liste des groupes ou détail par abréviation via paramètre de requête.",
+                          "url": "https://www.civix.fr/api/v1/groupes?abbr=RN",
+                          "example_url": "https://www.civix.fr/api/v1/groupes?abbr=RN",
+                          "stable": true,
+                          "ai_usage": {
+                            "best_for": "Quel est l'effectif du groupe RN ?",
+                            "citation_required": true,
+                            "stable_url": "https://www.civix.fr/groupes/RN"
+                          }
+                        },
+                        {
+                          "name": "groupes_abbr",
+                          "method": "GET",
+                          "path": "/api/v1/groupes/{abbr}",
+                          "description": "Détail groupe, route legacy conservée pour compatibilité.",
+                          "url": "https://www.civix.fr/api/v1/groupes/RN",
+                          "example_url": "https://www.civix.fr/api/v1/groupes/RN",
+                          "stable": true,
+                          "ai_usage": {
+                            "best_for": "Quel est l'effectif du groupe RN ?",
+                            "citation_required": true,
+                            "stable_url": "https://www.civix.fr/groupes/RN"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/search": {
+      "get": {
+        "summary": "Recherche publique",
+        "description": "AI use: trouver rapidement un député, un scrutin, un groupe ou un dossier à partir d'un terme court.",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "publisher": "CIVIX.fr",
+                  "api_version": "v1",
+                  "retrieved_at": "2026-04-29T00:00:00.000Z",
+                  "schema_version": "2026-04-29",
+                  "answer": "Cette page renvoie 2 résultat(s).",
+                  "canonical_url": "https://www.civix.fr/api/v1/search?search=RN",
+                  "confidence": "high",
+                  "meta": {
+                    "schema_version": "2026-04-29",
+                    "api_version": "v1",
+                    "retrieved_at": "2026-04-29T00:00:00.000Z",
+                    "last_updated": "2026-04-29T00:00:00.000Z",
+                    "query": {
+                      "search": "RN"
+                    },
+                    "pagination": {
+                      "page": 1,
+                      "page_size": 10,
+                      "next_page": null,
+                      "count_total": 2,
+                      "count_returned": 2
+                    }
+                  },
+                  "summary": "Recherche pour \"RN\" : 2 résultat(s).",
+                  "source": {
+                    "type": "dataset",
+                    "provider": "Assemblée nationale",
+                    "via": "CIVIX.fr",
+                    "source_urls": ["https://www.assemblee-nationale.fr"],
+                    "civix_urls": {
+                      "page": "https://www.civix.fr/api",
+                      "api": "https://www.civix.fr/api/v1/search?search=RN"
+                    }
+                  },
+                  "citation": {
+                    "text": "Selon CIVIX.fr (données publiques de l'Assemblée nationale, consultées le 29 avril 2026), la recherche pour \"RN\" renvoie 2 résultat(s).",
+                    "url": "https://www.civix.fr/api/v1/search?search=RN"
+                  },
+                  "data": {
+                    "type": "search_results",
+                    "attributes": {
+                      "query": "RN",
+                      "results": {
+                        "deputes": [
+                          {
+                            "acteur_uid": "PA793214",
+                            "prenom": "Jean",
+                            "nom": "Dupont",
+                            "groupe_libelle_abrev": "RN",
+                            "circ_departement": "Nord",
+                            "slug": "jean-dupont"
+                          }
+                        ],
+                        "scrutins": [],
+                        "groupes": [
+                          {
+                            "uid": "GRP_RN",
+                            "libelle": "Rassemblement National",
+                            "abbr": "RN"
+                          }
+                        ],
+                        "dossiers": []
+                      },
+                      "total": 2
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/deputes": {
+      "get": {
+        "summary": "Liste des députés ou détail par UID",
+        "description": "AI use: répondre à une question sur un député ou parcourir la liste des députés avec un filtre de législature ou de groupe.",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "legislature",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "groupe",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "publisher": "CIVIX.fr",
+                  "api_version": "v1",
+                  "retrieved_at": "2026-04-29T00:00:00.000Z",
+                  "schema_version": "2026-04-29",
+                  "answer": "Cette page renvoie 1 résultat(s).",
+                  "canonical_url": "https://www.civix.fr/deputes",
+                  "confidence": "high",
+                  "meta": {
+                    "schema_version": "2026-04-29",
+                    "api_version": "v1",
+                    "retrieved_at": "2026-04-29T00:00:00.000Z",
+                    "last_updated": "2026-04-29T00:00:00.000Z",
+                    "query": {
+                      "page": 1,
+                      "page_size": 20,
+                      "legislature": 17,
+                      "groupe": "RN"
+                    },
+                    "pagination": {
+                      "page": 1,
+                      "page_size": 20,
+                      "next_page": null,
+                      "count_estimated": 1
+                    }
+                  },
+                  "summary": "Liste des députés (L17) : 1 résultat(s) sur la page 1.",
+                  "source": {
+                    "type": "dataset",
+                    "provider": "Assemblée nationale",
+                    "via": "CIVIX.fr",
+                    "source_urls": ["https://www.assemblee-nationale.fr"],
+                    "civix_urls": {
+                      "page": "https://www.civix.fr/api",
+                      "api": "https://www.civix.fr/api/v1/deputes?page=1&page_size=20&legislature=17"
+                    }
+                  },
+                  "citation": {
+                    "text": "Selon CIVIX.fr (données publiques de l'Assemblée nationale, consultées le 29 avril 2026), la liste des députés (L17) renvoie 1 résultat(s) sur la page 1.",
+                    "url": "https://www.civix.fr/api/v1/deputes?page=1&page_size=20&legislature=17"
+                  },
+                  "data": {
+                    "type": "deputies",
+                    "attributes": {
+                      "query": {
+                        "page": 1,
+                        "page_size": 20,
+                        "legislature": 17,
+                        "groupe": "RN"
+                      },
+                      "results": [
+                        {
+                          "uid": "PA793214",
+                          "prenom": "Jean",
+                          "nom": "Dupont",
+                          "legislature": 17,
+                          "circ_num": 1,
+                          "circ_departement": "Nord",
+                          "groupe_uid": "GRP_RN",
+                          "groupe_abrev": "RN",
+                          "groupe_libelle": "Rassemblement National",
+                          "urls": {
+                            "civix_page": "https://www.civix.fr/deputes/PA793214",
+                            "civix_api": "https://www.civix.fr/api/v1/deputes?uid=PA793214",
+                            "assemblee": "https://www.assemblee-nationale.fr/dyn/deputes/PA793214"
+                          }
+                        }
+                      ],
+                      "pagination": {
+                        "page": 1,
+                        "page_size": 20,
+                        "next_page": null,
+                        "count_estimated": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/api/v1/deputes/{uid}": {
+      "get": {
+        "summary": "Détail député",
+        "description": "AI use: répondre à une question sur un député précis à partir de son UID.",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "publisher": "CIVIX.fr",
+                  "api_version": "v1",
+                  "retrieved_at": "2026-04-29T00:00:00.000Z",
+                  "schema_version": "2026-04-29",
+                  "answer": "Jean Dupont est député de la 17e législature et membre du groupe Rassemblement National.",
+                  "canonical_url": "https://www.civix.fr/deputes/PA793214",
+                  "confidence": "high",
+                  "meta": {
+                    "schema_version": "2026-04-29",
+                    "api_version": "v1",
+                    "retrieved_at": "2026-04-29T00:00:00.000Z",
+                    "last_updated": "2026-04-29T00:00:00.000Z",
+                    "query": {
+                      "uid": "PA793214"
+                    },
+                    "pagination": {}
+                  },
+                  "source": {
+                    "type": "dataset",
+                    "provider": "Assemblée nationale",
+                    "via": "CIVIX.fr",
+                    "source_urls": ["https://www.assemblee-nationale.fr"],
+                    "civix_urls": {
+                      "page": "https://www.civix.fr/deputes/PA793214",
+                      "api": "https://www.civix.fr/api/v1/deputes/PA793214"
+                    }
+                  },
+                  "data": {
+                    "type": "deputy",
+                    "attributes": {
+                      "deputy": {
+                        "uid": "PA793214",
+                        "prenom": "Jean",
+                        "nom": "Dupont",
+                        "legislature": 17,
+                        "groupe_libelle": "Rassemblement National"
+                      }
+                    },
+                    "deputy": {
+                      "uid": "PA793214",
+                      "prenom": "Jean",
+                      "nom": "Dupont",
+                      "legislature": 17,
+                      "groupe_libelle": "Rassemblement National"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/api/v1/scrutins": {
+      "get": {
+        "summary": "Liste des scrutins, recherche optionnelle et détail par UID",
+        "description": "AI use: trouver le résultat d'un scrutin ou filtrer les scrutins par recherche, législature ou thème.",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "include_votes",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "legislature",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "publisher": "CIVIX.fr",
+                  "api_version": "v1",
+                  "retrieved_at": "2026-04-29T00:00:00.000Z",
+                  "schema_version": "2026-04-29",
+                  "answer": "Le scrutin n°6284 a abouti au résultat officiel suivant : non précisé.",
+                  "canonical_url": "https://www.civix.fr/votes/VTANR5L17V6284",
+                  "confidence": "high",
+                  "meta": {
+                    "schema_version": "2026-04-29",
+                    "api_version": "v1",
+                    "retrieved_at": "2026-04-29T00:00:00.000Z",
+                    "last_updated": "2026-04-29T00:00:00.000Z",
+                    "query": {
+                      "uid": "VTANR5L17V6284",
+                      "include_votes": false
+                    },
+                    "pagination": {}
+                  },
+                  "summary": "Scrutin n°6284 (législature 17) du 29 avril 2026 : Quel est le résultat de ce scrutin ? Le résultat officiel du scrutin est : résultat non précisé. Résultat: 0 pour, 0 contre, 0 abstentions, 0 non-votants (total 0).",
+                  "source": {
+                    "type": "dataset",
+                    "provider": "Assemblée nationale",
+                    "via": "CIVIX.fr",
+                    "source_urls": ["https://www.assemblee-nationale.fr"],
+                    "civix_urls": {
+                      "page": "https://www.civix.fr/votes/VTANR5L17V6284",
+                      "api": "https://www.civix.fr/api/v1/scrutins?uid=VTANR5L17V6284"
+                    }
+                  },
+                  "citation": {
+                    "text": "Selon CIVIX.fr (données publiques de l'Assemblée nationale, consultées le 29 avril 2026), le scrutin n°6284 du 29 avril 2026 portant sur \"Quel est le résultat de ce scrutin ?\" a abouti au résultat officiel suivant : résultat non précisé.",
+                    "url": "https://www.civix.fr/votes/VTANR5L17V6284"
+                  },
+                  "data": {
+                    "type": "scrutins",
+                    "attributes": {
+                      "scrutin": {
+                        "uid": "VTANR5L17V6284",
+                        "numero": 6284,
+                        "legislature": 17,
+                        "date_scrutin": "2026-04-29",
+                        "titre": "Quel est le résultat de ce scrutin ?",
+                        "objet": null,
+                        "objet_libelle": "Quel est le résultat de ce scrutin ?",
+                        "sort_code": null,
+                        "sort_libelle": null,
+                        "sort_raw": null,
+                        "is_adopted": null,
+                        "official_result": null,
+                        "majority_rule": "majorité simple des suffrages exprimés",
+                        "majority_threshold": null,
+                        "majority_explanation": "Aucune règle spéciale détectée : le scrutin relève de la majorité simple des suffrages exprimés.",
+                        "type_primary": null,
+                        "tags": [],
+                        "type_vote": null,
+                        "vote_mode": null,
+                        "demandeur": null,
+                        "synthese": null
+                      },
+                      "results_global": {
+                        "pour": 0,
+                        "contre": 0,
+                        "abstention": 0,
+                        "non_votant": 0,
+                        "unknown": 0,
+                        "total": 0
+                      },
+                      "results_by_group": [],
+                      "include_votes": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/scrutins/{uid}": {
+      "get": {
+        "summary": "Détail scrutin",
+        "description": "AI use: répondre à la question 'Quel est le résultat de ce scrutin ?' avec le détail du vote.",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/api/v1/scrutins/{uid}/votes": {
+      "get": {
+        "summary": "Votes individuels d'un scrutin",
+        "description": "Retourne le détail du scrutin et tous les votes individuels disponibles dans data.attributes.votes. Les positions principales sont pour, contre, abstention et non_votant ; une autre valeur source peut être retournée sans transformation si elle n'est pas encore normalisée. L'exemple ci-dessous est entièrement fictif et limite volontairement votes à deux éléments, tandis que results_global illustre le résultat complet du scrutin fictif. En production, le tableau peut contenir plusieurs centaines de votes.",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "publisher": "CIVIX.fr",
+                  "api_version": "v1",
+                  "retrieved_at": "2026-07-08T12:00:00.000Z",
+                  "schema_version": "2026-04-29",
+                  "answer": "Exemple fictif : le scrutin a abouti au résultat suivant : adopté.",
+                  "canonical_url": "https://www.civix.fr/votes/SCRUTIN_EXEMPLE",
+                  "confidence": "high",
+                  "meta": {
+                    "schema_version": "2026-04-29",
+                    "api_version": "v1",
+                    "retrieved_at": "2026-07-08T12:00:00.000Z",
+                    "last_updated": "2026-07-07T00:00:00.000Z",
+                    "query": {
+                      "uid": "SCRUTIN_EXEMPLE",
+                      "include_votes": true
+                    },
+                    "pagination": {}
+                  },
+                  "source": {
+                    "type": "dataset",
+                    "provider": "Assemblée nationale",
+                    "via": "CIVIX.fr",
+                    "source_urls": ["https://www.assemblee-nationale.fr"],
+                    "civix_urls": {
+                      "page": "https://www.civix.fr/votes/SCRUTIN_EXEMPLE",
+                      "api": "https://www.civix.fr/api/v1/scrutins/SCRUTIN_EXEMPLE/votes"
+                    }
+                  },
+                  "data": {
+                    "type": "scrutin",
+                    "attributes": {
+                      "scrutin": {
+                        "uid": "SCRUTIN_EXEMPLE",
+                        "numero": 1000,
+                        "legislature": 17,
+                        "date_scrutin": "2026-07-07T00:00:00+00:00",
+                        "titre": "Scrutin fictif utilisé pour documenter le format de réponse",
+                        "sort_code": "adopté",
+                        "sort_libelle": "Adopté",
+                        "is_adopted": true,
+                        "majority_rule": "majorité simple des suffrages exprimés",
+                        "majority_threshold": null,
+                        "majority_explanation": "Le texte est adopté si le nombre de voix pour est supérieur au nombre de voix contre.",
+                        "type_primary": null,
+                        "tags": [],
+                        "type_vote": null,
+                        "vote_mode": "vote nominal",
+                        "demandeur": null,
+                        "synthese": null
+                      },
+                      "results_global": {
+                        "pour": 10,
+                        "contre": 8,
+                        "abstention": 2,
+                        "non_votant": 1,
+                        "unknown": 0,
+                        "total": 21
+                      },
+                      "results_by_group": [],
+                      "include_votes": true,
+                      "votes": [
+                        {
+                          "deputy_uid": "PA_EXEMPLE_1",
+                          "prenom": "Camille",
+                          "nom": "Exemple",
+                          "mandat_uid": "PM_EXEMPLE_1",
+                          "position": "pour",
+                          "par_delegation": false
+                        },
+                        {
+                          "deputy_uid": "PA_EXEMPLE_2",
+                          "prenom": "Dominique",
+                          "nom": "Démonstration",
+                          "mandat_uid": "PM_EXEMPLE_2",
+                          "position": "abstention",
+                          "par_delegation": true
+                        }
+                      ]
+                    },
+                    "scrutin": {
+                      "uid": "SCRUTIN_EXEMPLE",
+                      "numero": 1000,
+                      "legislature": 17,
+                      "date_scrutin": "2026-07-07T00:00:00+00:00",
+                      "titre": "Scrutin fictif utilisé pour documenter le format de réponse",
+                      "sort_code": "adopté",
+                      "sort_libelle": "Adopté",
+                      "is_adopted": true,
+                      "majority_rule": "majorité simple des suffrages exprimés",
+                      "majority_threshold": null,
+                      "majority_explanation": "Le texte est adopté si le nombre de voix pour est supérieur au nombre de voix contre."
+                    },
+                    "results_global": {
+                      "pour": 10,
+                      "contre": 8,
+                      "abstention": 2,
+                      "non_votant": 1,
+                      "unknown": 0,
+                      "total": 21
+                    },
+                    "results_by_group": [],
+                    "include_votes": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/scrutins/{uid}/statements": {
+      "get": {
+        "summary": "Déclarations publiques des groupes sur un scrutin",
+        "description": "AI use: résumer les déclarations publiques des groupes sur un scrutin donné.",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "publisher": "CIVIX.fr",
+                  "api_version": "v1",
+                  "retrieved_at": "2026-04-29T00:00:00.000Z",
+                  "schema_version": "2026-04-29",
+                  "answer": "Cette page renvoie 1 résultat(s).",
+                  "canonical_url": "https://www.civix.fr/api/v1/scrutins/VTANR5L17V6284/statements",
+                  "confidence": "high",
+                  "meta": {
+                    "schema_version": "2026-04-29",
+                    "api_version": "v1",
+                    "retrieved_at": "2026-04-29T00:00:00.000Z",
+                    "last_updated": "2026-04-29T00:00:00.000Z",
+                    "query": {
+                      "uid": "VTANR5L17V6284"
+                    },
+                    "pagination": {}
+                  },
+                  "summary": "Déclarations publiques approuvées pour le scrutin VTANR5L17V6284.",
+                  "source": {
+                    "type": "dataset",
+                    "provider": "Assemblée nationale",
+                    "via": "CIVIX.fr",
+                    "source_urls": ["https://www.assemblee-nationale.fr"],
+                    "civix_urls": {
+                      "page": "https://www.civix.fr/api/v1/scrutins/VTANR5L17V6284/statements",
+                      "api": "https://www.civix.fr/api/v1/scrutins/VTANR5L17V6284/statements"
+                    }
+                  },
+                  "citation": {
+                    "text": "Selon CIVIX.fr (données publiques de l'Assemblée nationale, consultées le 29 avril 2026), les déclarations publiques approuvées sont disponibles pour le scrutin VTANR5L17V6284.",
+                    "url": "https://www.civix.fr/api/v1/scrutins/VTANR5L17V6284/statements"
+                  },
+                  "data": {
+                    "type": "statements",
+                    "attributes": {
+                      "statements": [
+                        {
+                          "groupe_uid": "GRP_RN",
+                          "groupe_libelle": "Rassemblement National",
+                          "groupe_abrev": "RN",
+                          "opinion_code": "oppose",
+                          "public_reference": "CIVIX-OPPOSE-VTANR5L17V6284",
+                          "vote_position": "contre",
+                          "statement": "Le groupe explique sa position publique.",
+                          "submitted_at": "2026-04-29T00:00:00.000Z",
+                          "status": "approved"
+                        }
+                      ]
+                    },
+                    "statements": [
+                      {
+                        "groupe_uid": "GRP_RN",
+                        "groupe_libelle": "Rassemblement National",
+                        "groupe_abrev": "RN",
+                        "opinion_code": "oppose",
+                        "public_reference": "CIVIX-OPPOSE-VTANR5L17V6284",
+                        "vote_position": "contre",
+                        "statement": "Le groupe explique sa position publique.",
+                        "submitted_at": "2026-04-29T00:00:00.000Z",
+                        "status": "approved"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/groupes": {
+      "get": {
+        "summary": "Liste des groupes ou détail par abréviation",
+        "description": "AI use: répondre à une question sur un groupe parlementaire ou parcourir la liste des groupes.",
+        "parameters": [
+          {
+            "name": "abbr",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "publisher": "CIVIX.fr",
+                  "api_version": "v1",
+                  "retrieved_at": "2026-04-29T00:00:00.000Z",
+                  "schema_version": "2026-04-29",
+                  "answer": "Le groupe parlementaire Rassemblement National (RN) compte 88 député(s) à l'Assemblée nationale.",
+                  "canonical_url": "https://www.civix.fr/groupes/RN",
+                  "confidence": "high",
+                  "meta": {
+                    "schema_version": "2026-04-29",
+                    "api_version": "v1",
+                    "retrieved_at": "2026-04-29T00:00:00.000Z",
+                    "last_updated": "2026-04-29T00:00:00.000Z",
+                    "query": {
+                      "abbr": "RN"
+                    },
+                    "pagination": {}
+                  },
+                  "summary": "Rassemblement National (RN)",
+                  "source": {
+                    "type": "dataset",
+                    "provider": "Assemblée nationale",
+                    "via": "CIVIX.fr",
+                    "source_urls": ["https://www.assemblee-nationale.fr"],
+                    "civix_urls": {
+                      "page": "https://www.civix.fr/groupes/RN",
+                      "api": "https://www.civix.fr/api/v1/groupes/RN"
+                    }
+                  },
+                  "citation": {
+                    "text": "Selon CIVIX.fr (données publiques de l'Assemblée nationale, consultées le 29 avril 2026), le groupe politique \"Rassemblement National\" (RN) appartient à la 17e législature et compte 88 députés.",
+                    "url": "https://www.civix.fr/groupes/RN"
+                  },
+                  "data": {
+                    "type": "groupes",
+                    "attributes": {
+                      "groupe": {
+                        "uid": "GRP_RN",
+                        "abbr": "RN",
+                        "libelle": "Rassemblement National",
+                        "legislature": 17,
+                        "effectif": 88,
+                        "urls": {
+                          "page": "https://www.civix.fr/groupes/RN",
+                          "api": "https://www.civix.fr/api/v1/groupes/RN"
+                        }
+                      }
+                    },
+                    "groupe": {
+                      "uid": "GRP_RN",
+                      "abbr": "RN",
+                      "libelle": "Rassemblement National",
+                      "legislature": 17,
+                      "effectif": 88,
+                      "urls": {
+                        "page": "https://www.civix.fr/groupes/RN",
+                        "api": "https://www.civix.fr/api/v1/groupes/RN"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/api/v1/groupes/{abbr}": {
+      "get": {
+        "summary": "Détail groupe",
+        "description": "AI use: répondre à une question sur le groupe RN ou un autre groupe parlementaire précis.",
+        "parameters": [
+          {
+            "name": "abbr",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "publisher": "CIVIX.fr",
+                  "api_version": "v1",
+                  "retrieved_at": "2026-04-29T00:00:00.000Z",
+                  "schema_version": "2026-04-29",
+                  "answer": "Le groupe parlementaire Rassemblement National (RN) compte 88 député(s) à l'Assemblée nationale.",
+                  "canonical_url": "https://www.civix.fr/groupes/RN",
+                  "confidence": "high",
+                  "meta": {
+                    "schema_version": "2026-04-29",
+                    "api_version": "v1",
+                    "retrieved_at": "2026-04-29T00:00:00.000Z",
+                    "last_updated": "2026-04-29T00:00:00.000Z",
+                    "query": {
+                      "abbr": "RN"
+                    },
+                    "pagination": {}
+                  },
+                  "source": {
+                    "type": "dataset",
+                    "provider": "Assemblée nationale",
+                    "via": "CIVIX.fr",
+                    "source_urls": ["https://www.assemblee-nationale.fr"],
+                    "civix_urls": {
+                      "page": "https://www.civix.fr/groupes/RN",
+                      "api": "https://www.civix.fr/api/v1/groupes/RN"
+                    }
+                  },
+                  "data": {
+                    "type": "groupe",
+                    "attributes": {
+                      "groupe": {
+                        "uid": "GRP_RN",
+                        "abbr": "RN",
+                        "libelle": "Rassemblement National",
+                        "legislature": 17,
+                        "effectif": 88,
+                        "urls": {
+                          "page": "https://www.civix.fr/groupes/RN",
+                          "api": "https://www.civix.fr/api/v1/groupes/RN"
+                        }
+                      }
+                    },
+                    "groupe": {
+                      "uid": "GRP_RN",
+                      "abbr": "RN",
+                      "libelle": "Rassemblement National",
+                      "legislature": 17,
+                      "effectif": 88,
+                      "urls": {
+                        "page": "https://www.civix.fr/groupes/RN",
+                        "api": "https://www.civix.fr/api/v1/groupes/RN"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    }
+  }
+}
