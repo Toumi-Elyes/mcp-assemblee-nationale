@@ -5,6 +5,7 @@ import { LINK_TEXT } from "./button-styles";
 import { ChatExample } from "./chat-example";
 import { CopyField } from "./copy-field";
 import { HeroProof } from "./hero-proof";
+import { VideoSection } from "./video-section";
 import { WeekSection } from "./week-section";
 
 type HeroProps = { chat: HeroChat | null; generatedAt: Date };
@@ -47,6 +48,7 @@ export const Hero: React.FC<HeroProps> = ({ chat, generatedAt }) => {
           </div>
         </div>
       </section>
+      <VideoSection />
       <div id="en-direct" className="border-t-2 border-rule pb-20 pt-14 sm:pb-24">
         <div className="mx-auto grid w-full max-w-page gap-12 px-4 sm:px-6 lg:grid-cols-12">
           <div className="lg:col-span-8">
