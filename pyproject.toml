@@ -50,7 +50,7 @@ ignore = ["PLR0913", "RUF001", "RUF002", "RUF003", "TC001", "TC002", "TC003"]
 python_version = "3.14"
 strict = true
 plugins = ["pydantic.mypy"]
-files = ["src", "tests"]
+files = ["src", "tests", "api"]
 
 [tool.pydantic-mypy]
 init_forbid_extra = true

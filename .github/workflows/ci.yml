@@ -36,6 +36,6 @@ jobs:
       - name: Ruff (format)
         run: poetry run ruff format --check .
       - name: Mypy
-        run: poetry run mypy src tests
+        run: poetry run mypy src tests api
       - name: Tests
         run: poetry run pytest
