@@ -6,6 +6,7 @@ from collections import OrderedDict
 from collections.abc import Callable, Mapping
 from http import HTTPStatus
 from typing import Any
+from urllib.parse import quote
 
 import httpx
 from pydantic import ValidationError
@@ -17,7 +18,7 @@ from assemblee_mcp.civix.errors import (
     CivixUnavailableError,
 )
 from assemblee_mcp.civix.models import (
-    AttributesT,
+    CivixModel,
     CivixResponse,
     DeputeDetailResponse,
     DeputeListResponse,
@@ -34,6 +35,11 @@ from assemblee_mcp.config import Settings
 QueryParams = Mapping[str, str | int | bool | None]
 CacheKey = tuple[str, tuple[tuple[str, str], ...]]
 MAX_ATTEMPTS = 2
+
+
+def segment(value: str) -> str:
+    """Encode une valeur insérée dans un chemin d'URL (`/`, `?`, `..` compris)."""
+    return quote(value, safe="")
 
 
 class CivixClient:
@@ -92,15 +98,15 @@ class CivixClient:
 
     async def get_scrutin(self, uid: str) -> ScrutinResponse:
         """Détail d'un scrutin avec décomptes."""
-        return await self._get(f"/scrutins/{uid}", {}, ScrutinResponse)
+        return await self._get(f"/scrutins/{segment(uid)}", {}, ScrutinResponse)
 
     async def get_votes(self, uid: str) -> ScrutinVotesResponse:
         """Votes individuels d'un scrutin."""
-        return await self._get(f"/scrutins/{uid}/votes", {}, ScrutinVotesResponse)
+        return await self._get(f"/scrutins/{segment(uid)}/votes", {}, ScrutinVotesResponse)
 
     async def get_statements(self, uid: str) -> StatementsResponse:
         """Déclarations publiques des groupes sur un scrutin."""
-        return await self._get(f"/scrutins/{uid}/statements", {}, StatementsResponse)
+        return await self._get(f"/scrutins/{segment(uid)}/statements", {}, StatementsResponse)
 
     async def list_deputes(
         self,
@@ -121,7 +127,7 @@ class CivixClient:
 
     async def get_depute(self, uid: str) -> DeputeDetailResponse:
         """Détail d'un député."""
-        return await self._get(f"/deputes/{uid}", {}, DeputeDetailResponse)
+        return await self._get(f"/deputes/{segment(uid)}", {}, DeputeDetailResponse)
 
     async def list_groupes(self) -> GroupeListResponse:
         """Liste des groupes parlementaires."""
@@ -129,9 +135,9 @@ class CivixClient:
 
     async def get_groupe(self, abbr: str) -> GroupeDetailResponse:
         """Détail d'un groupe."""
-        return await self._get(f"/groupes/{abbr}", {}, GroupeDetailResponse)
+        return await self._get(f"/groupes/{segment(abbr)}", {}, GroupeDetailResponse)
 
-    async def _get(
+    async def _get[AttributesT: CivixModel](
         self,
         path: str,
         params: QueryParams,

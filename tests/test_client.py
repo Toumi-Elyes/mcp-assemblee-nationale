@@ -2,7 +2,7 @@ import httpx
 import pytest
 import respx
 
-from assemblee_mcp.civix.client import CivixClient
+from assemblee_mcp.civix.client import CivixClient, segment
 from assemblee_mcp.civix.errors import CivixError, CivixNotFoundError, CivixUnavailableError
 from assemblee_mcp.config import Settings
 from tests.conftest import API, SCRUTIN_UID, CivixStub, load_fixture
@@ -124,3 +124,8 @@ def test_settings_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
     assert settings.base_url == "https://exemple.test/api"
     assert settings.timeout == 3.0
     assert settings.cache_ttl == 60.0
+
+
+def test_segment_encodes_path_traversal() -> None:
+    assert segment("../deputes?x=1") == "..%2Fdeputes%3Fx%3D1"
+    assert segment("VTANR5L17V7324") == "VTANR5L17V7324"

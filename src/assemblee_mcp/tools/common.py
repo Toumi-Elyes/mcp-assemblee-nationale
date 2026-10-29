@@ -2,7 +2,7 @@
 
 import functools
 from collections.abc import Awaitable, Callable
-from typing import Annotated, Literal, ParamSpec
+from typing import Annotated, Literal
 
 from fastmcp.exceptions import ToolError
 from pydantic import Field
@@ -43,8 +43,6 @@ GroupeAbbreviation = Annotated[
     ),
 ]
 PositionName = Literal["pour", "contre", "abstention", "non_votant"]
-
-P = ParamSpec("P")
 
 
 def civix_tool[**P](function: Callable[P, Awaitable[str]]) -> Callable[P, Awaitable[str]]:

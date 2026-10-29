@@ -6,7 +6,6 @@ directement sous `data`, ce que `extra="ignore"` écarte.
 
 from datetime import datetime
 from enum import StrEnum
-from typing import TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -94,9 +93,6 @@ class Citation(CivixModel):
 
     text: str | None = None
     url: str | None = None
-
-
-AttributesT = TypeVar("AttributesT", bound=CivixModel)
 
 
 class Data[AttributesT: CivixModel](CivixModel):

@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from assemblee_mcp.civix.models import (
-    AttributesT,
+    CivixModel,
     CivixResponse,
     Depute,
     DeputeDetail,
@@ -88,7 +88,7 @@ def source_line(civix_url: str | None, assemblee_url: str | None) -> str:
     return "Source : " + (" — ".join(parts) if parts else "CIVIX https://www.civix.fr")
 
 
-def response_source_line(response: CivixResponse[AttributesT]) -> str:
+def response_source_line[AttributesT: CivixModel](response: CivixResponse[AttributesT]) -> str:
     """Ligne « Source : » d'une réponse CIVIX."""
     civix = response.source.civix_page or response.canonical_url
     return source_line(civix, response.source.assemblee_url)
