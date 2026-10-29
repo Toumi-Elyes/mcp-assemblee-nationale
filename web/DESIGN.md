@@ -202,7 +202,7 @@ Layout **B, récit long**. Le produit ne se comprend pas depuis une capture : il
 6. **Révélation du slogan** (mot par mot au défilement)
 7. **Preuve en direct** : « Cette semaine à l'Assemblée », tendances (votes par jour sur 30 jours, textes les plus votés 7 et 30 jours, taux d'adoption par type de vote, derniers votes sur l'ensemble d'un texte), composition des groupes
 8. **Démo en direct** : « Comment a voté [député] sur [sujet] ? »
-9. **Ce que le connecteur sait faire** : 12 outils et 3 questions prêtes à l'emploi, formulés comme des questions
+9. **Ce que le connecteur sait faire** : 25 outils (23 par intention, plus `search` et `fetch` pour la recherche approfondie de ChatGPT) et 6 modèles de demande, formulés comme des questions, avec une mention du bloc « Méthode » et de l'absence de classement
 10. **Installer** (cible du CTA) : Claude, ChatGPT, Gemini, en local, avec copie de l'adresse
 11. **Garanties** (réduction du risque) : gratuit, sans compte, code ouvert, lecture seule
 12. **FAQ** (10 questions, JSON-LD FAQPage)
@@ -287,7 +287,7 @@ Vérifié par grep sur `src/` et par lecture. Pass sauf mention.
 Stratégie
 - Une offre, un public, une action : pass (CTA « Ajouter à mon assistant », cible `#installer`)
 - Pas de CTA concurrent au dessus de la ligne de flottaison : pass (le CTA de la barre est masqué sous `lg` via `max-lg:hidden`, GitHub en icône discrète)
-- Chiffres précis plutôt que verbes vagues : pass (compteurs lus en direct, 12 outils, 3 modèles)
+- Chiffres précis plutôt que verbes vagues : pass (compteurs lus en direct, 25 outils, 6 modèles)
 - Au moins une réduction de risque : pass (section garanties)
 - Preuve à côté de l'affirmation : pass (chiffres en direct dans les bénéfices et le hero)
 - Layout choisi : pass (B)
