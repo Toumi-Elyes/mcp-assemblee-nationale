@@ -1,0 +1,171 @@
+{
+ "publisher": "CIVIX.fr",
+ "api_version": "v1",
+ "retrieved_at": "2026-10-29T20:25:43.917Z",
+ "license": {
+  "name": "Open Data – Assemblée nationale",
+  "notice": "Données publiques de l'Assemblée nationale, présentées par CIVIX.fr (initiative indépendante)."
+ },
+ "schema_version": "2026-04-29",
+ "answer": "Cette page renvoie 3 résultat(s).",
+ "canonical_url": "https://www.civix.fr/deputes",
+ "confidence": "high",
+ "meta": {
+  "schema_version": "2026-04-29",
+  "api_version": "v1",
+  "retrieved_at": "2026-10-29T20:25:43.917Z",
+  "last_updated": "2026-10-29T20:25:43.917Z",
+  "query": {
+   "page": 1,
+   "page_size": 3,
+   "legislature": null,
+   "groupe": null
+  },
+  "pagination": {
+   "page": 1,
+   "page_size": 3,
+   "next_page": 2,
+   "count_estimated": 602
+  }
+ },
+ "summary": "Liste des députés : 3 résultat(s) sur la page 1.",
+ "source": {
+  "type": "dataset",
+  "provider": "Assemblée nationale",
+  "via": "CIVIX.fr",
+  "source_urls": [
+   "https://www.assemblee-nationale.fr"
+  ],
+  "civix_urls": {
+   "page": "https://www.civix.fr/api",
+   "api": "https://www.civix.fr/api/v1/deputes?page=1&page_size=3"
+  }
+ },
+ "citation": {
+  "text": "Selon CIVIX.fr (données publiques de l'Assemblée nationale, consultées le 29 octobre 2026), la liste des députés renvoie 3 résultat(s) sur la page 1.",
+  "url": "https://www.civix.fr/api/v1/deputes?page=1&page_size=3"
+ },
+ "data": {
+  "type": "deputies",
+  "attributes": {
+   "query": {
+    "page": 1,
+    "page_size": 3,
+    "legislature": null,
+    "groupe": null
+   },
+   "results": [
+    {
+     "uid": "PA793214",
+     "prenom": "Audrey",
+     "nom": "Abadie-Amiel",
+     "legislature": 17,
+     "circ_num": 2,
+     "circ_departement": "Ariège",
+     "groupe_uid": "PO845485",
+     "groupe_abrev": "LIOT",
+     "groupe_libelle": "Libertés, Indépendants, Outre-mer et Territoires",
+     "urls": {
+      "civix_page": "https://www.civix.fr/deputes/PA793214",
+      "civix_api": "https://www.civix.fr/api/v1/deputes?uid=PA793214",
+      "assemblee": "https://www.assemblee-nationale.fr/dyn/deputes/PA793214"
+     }
+    },
+    {
+     "uid": "PA795228",
+     "prenom": "Nadège",
+     "nom": "Abomangoli",
+     "legislature": 17,
+     "circ_num": 10,
+     "circ_departement": "Seine-Saint-Denis",
+     "groupe_uid": "PO845413",
+     "groupe_abrev": "LFI-NFP",
+     "groupe_libelle": "La France insoumise - Nouveau Front Populaire",
+     "urls": {
+      "civix_page": "https://www.civix.fr/deputes/PA795228",
+      "civix_api": "https://www.civix.fr/api/v1/deputes?uid=PA795228",
+      "assemblee": "https://www.assemblee-nationale.fr/dyn/deputes/PA795228"
+     }
+    },
+    {
+     "uid": "PA794278",
+     "prenom": "Xavier",
+     "nom": "Albertini",
+     "legislature": 17,
+     "circ_num": 1,
+     "circ_departement": "Marne",
+     "groupe_uid": "PO845470",
+     "groupe_abrev": "HOR",
+     "groupe_libelle": "Horizons & Indépendants",
+     "urls": {
+      "civix_page": "https://www.civix.fr/deputes/PA794278",
+      "civix_api": "https://www.civix.fr/api/v1/deputes?uid=PA794278",
+      "assemblee": "https://www.assemblee-nationale.fr/dyn/deputes/PA794278"
+     }
+    }
+   ],
+   "pagination": {
+    "page": 1,
+    "page_size": 3,
+    "next_page": 2,
+    "count_estimated": 602
+   }
+  },
+  "results": [
+   {
+    "uid": "PA793214",
+    "prenom": "Audrey",
+    "nom": "Abadie-Amiel",
+    "legislature": 17,
+    "circ_num": 2,
+    "circ_departement": "Ariège",
+    "groupe_uid": "PO845485",
+    "groupe_abrev": "LIOT",
+    "groupe_libelle": "Libertés, Indépendants, Outre-mer et Territoires",
+    "urls": {
+     "civix_page": "https://www.civix.fr/deputes/PA793214",
+     "civix_api": "https://www.civix.fr/api/v1/deputes?uid=PA793214",
+     "assemblee": "https://www.assemblee-nationale.fr/dyn/deputes/PA793214"
+    }
+   },
+   {
+    "uid": "PA795228",
+    "prenom": "Nadège",
+    "nom": "Abomangoli",
+    "legislature": 17,
+    "circ_num": 10,
+    "circ_departement": "Seine-Saint-Denis",
+    "groupe_uid": "PO845413",
+    "groupe_abrev": "LFI-NFP",
+    "groupe_libelle": "La France insoumise - Nouveau Front Populaire",
+    "urls": {
+     "civix_page": "https://www.civix.fr/deputes/PA795228",
+     "civix_api": "https://www.civix.fr/api/v1/deputes?uid=PA795228",
+     "assemblee": "https://www.assemblee-nationale.fr/dyn/deputes/PA795228"
+    }
+   },
+   {
+    "uid": "PA794278",
+    "prenom": "Xavier",
+    "nom": "Albertini",
+    "legislature": 17,
+    "circ_num": 1,
+    "circ_departement": "Marne",
+    "groupe_uid": "PO845470",
+    "groupe_abrev": "HOR",
+    "groupe_libelle": "Horizons & Indépendants",
+    "urls": {
+     "civix_page": "https://www.civix.fr/deputes/PA794278",
+     "civix_api": "https://www.civix.fr/api/v1/deputes?uid=PA794278",
+     "assemblee": "https://www.assemblee-nationale.fr/dyn/deputes/PA794278"
+    }
+   }
+  ],
+  "pagination": {
+   "page": 1,
+   "page_size": 3,
+   "next_page": 2,
+   "count_estimated": 602
+  }
+ }
+}

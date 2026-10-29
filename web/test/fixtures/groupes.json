@@ -1,0 +1,322 @@
+{
+ "publisher": "CIVIX.fr",
+ "api_version": "v1",
+ "retrieved_at": "2026-10-29T20:14:05.744Z",
+ "license": {
+  "name": "Open Data – Assemblée nationale",
+  "notice": "Données publiques de l'Assemblée nationale, présentées par CIVIX.fr (initiative indépendante)."
+ },
+ "schema_version": "2026-04-29",
+ "answer": "Cette page renvoie 12 résultat(s).",
+ "canonical_url": "https://www.civix.fr/groupes",
+ "confidence": "high",
+ "meta": {
+  "schema_version": "2026-04-29",
+  "api_version": "v1",
+  "retrieved_at": "2026-10-29T20:14:05.744Z",
+  "last_updated": "2026-10-29T20:14:05.744Z",
+  "query": {
+   "abbr": null
+  },
+  "pagination": {
+   "page": 1,
+   "page_size": 12,
+   "next_page": null,
+   "count_total": 12,
+   "count_returned": 12
+  }
+ },
+ "summary": "Liste des groupes parlementaires : 12 résultat(s).",
+ "source": {
+  "type": "dataset",
+  "provider": "Assemblée nationale",
+  "via": "CIVIX.fr",
+  "source_urls": [
+   "https://www.assemblee-nationale.fr"
+  ],
+  "civix_urls": {
+   "page": "https://www.civix.fr/groupes",
+   "api": "https://www.civix.fr/api/v1/groupes"
+  }
+ },
+ "citation": {
+  "text": "Selon CIVIX.fr (données publiques de l'Assemblée nationale, consultées le 29 octobre 2026), la liste des groupes parlementaires compte 12 résultat(s).",
+  "url": "https://www.civix.fr/api/v1/groupes"
+ },
+ "data": {
+  "type": "groupes",
+  "attributes": {
+   "query": {
+    "abbr": null
+   },
+   "groups": [
+    {
+     "uid": "PO845425",
+     "abbr": "DR",
+     "libelle": "Droite Républicaine",
+     "legislature": 17,
+     "effectif": 48,
+     "urls": {
+      "page": "https://www.civix.fr/groupes/DR",
+      "api": "https://www.civix.fr/api/v1/groupes/DR"
+     }
+    },
+    {
+     "uid": "PO845514",
+     "abbr": "GDR",
+     "libelle": "Gauche Démocrate et Républicaine",
+     "legislature": 17,
+     "effectif": 17,
+     "urls": {
+      "page": "https://www.civix.fr/groupes/GDR",
+      "api": "https://www.civix.fr/api/v1/groupes/GDR"
+     }
+    },
+    {
+     "uid": "PO845470",
+     "abbr": "HOR",
+     "libelle": "Horizons & Indépendants",
+     "legislature": 17,
+     "effectif": 35,
+     "urls": {
+      "page": "https://www.civix.fr/groupes/HOR",
+      "api": "https://www.civix.fr/api/v1/groupes/HOR"
+     }
+    },
+    {
+     "uid": "PO872880",
+     "abbr": "UDDPLR",
+     "libelle": "Union des droites pour la République",
+     "legislature": 17,
+     "effectif": 17,
+     "urls": {
+      "page": "https://www.civix.fr/groupes/UDDPLR",
+      "api": "https://www.civix.fr/api/v1/groupes/UDDPLR"
+     }
+    },
+    {
+     "uid": "PO845413",
+     "abbr": "LFI-NFP",
+     "libelle": "La France insoumise - Nouveau Front Populaire",
+     "legislature": 17,
+     "effectif": 71,
+     "urls": {
+      "page": "https://www.civix.fr/groupes/LFI-NFP",
+      "api": "https://www.civix.fr/api/v1/groupes/LFI-NFP"
+     }
+    },
+    {
+     "uid": "PO845407",
+     "abbr": "EPR",
+     "libelle": "Ensemble pour la République",
+     "legislature": 17,
+     "effectif": 91,
+     "urls": {
+      "page": "https://www.civix.fr/groupes/EPR",
+      "api": "https://www.civix.fr/api/v1/groupes/EPR"
+     }
+    },
+    {
+     "uid": "PO845401",
+     "abbr": "RN",
+     "libelle": "Rassemblement National",
+     "legislature": 17,
+     "effectif": 122,
+     "urls": {
+      "page": "https://www.civix.fr/groupes/RN",
+      "api": "https://www.civix.fr/api/v1/groupes/RN"
+     }
+    },
+    {
+     "uid": "PO845454",
+     "abbr": "DEM",
+     "libelle": "Les Démocrates",
+     "legislature": 17,
+     "effectif": 37,
+     "urls": {
+      "page": "https://www.civix.fr/groupes/DEM",
+      "api": "https://www.civix.fr/api/v1/groupes/DEM"
+     }
+    },
+    {
+     "uid": "PO840056",
+     "abbr": "NI",
+     "libelle": "Non inscrit",
+     "legislature": 17,
+     "effectif": 10,
+     "urls": {
+      "page": "https://www.civix.fr/groupes/NI",
+      "api": "https://www.civix.fr/api/v1/groupes/NI"
+     }
+    },
+    {
+     "uid": "PO845439",
+     "abbr": "ECOS",
+     "libelle": "Écologiste et Social",
+     "legislature": 17,
+     "effectif": 38,
+     "urls": {
+      "page": "https://www.civix.fr/groupes/ECOS",
+      "api": "https://www.civix.fr/api/v1/groupes/ECOS"
+     }
+    },
+    {
+     "uid": "PO845419",
+     "abbr": "SOC",
+     "libelle": "Socialistes et apparentés",
+     "legislature": 17,
+     "effectif": 68,
+     "urls": {
+      "page": "https://www.civix.fr/groupes/SOC",
+      "api": "https://www.civix.fr/api/v1/groupes/SOC"
+     }
+    },
+    {
+     "uid": "PO845485",
+     "abbr": "LIOT",
+     "libelle": "Libertés, Indépendants, Outre-mer et Territoires",
+     "legislature": 17,
+     "effectif": 23,
+     "urls": {
+      "page": "https://www.civix.fr/groupes/LIOT",
+      "api": "https://www.civix.fr/api/v1/groupes/LIOT"
+     }
+    }
+   ]
+  },
+  "groups": [
+   {
+    "uid": "PO845425",
+    "abbr": "DR",
+    "libelle": "Droite Républicaine",
+    "legislature": 17,
+    "effectif": 48,
+    "urls": {
+     "page": "https://www.civix.fr/groupes/DR",
+     "api": "https://www.civix.fr/api/v1/groupes/DR"
+    }
+   },
+   {
+    "uid": "PO845514",
+    "abbr": "GDR",
+    "libelle": "Gauche Démocrate et Républicaine",
+    "legislature": 17,
+    "effectif": 17,
+    "urls": {
+     "page": "https://www.civix.fr/groupes/GDR",
+     "api": "https://www.civix.fr/api/v1/groupes/GDR"
+    }
+   },
+   {
+    "uid": "PO845470",
+    "abbr": "HOR",
+    "libelle": "Horizons & Indépendants",
+    "legislature": 17,
+    "effectif": 35,
+    "urls": {
+     "page": "https://www.civix.fr/groupes/HOR",
+     "api": "https://www.civix.fr/api/v1/groupes/HOR"
+    }
+   },
+   {
+    "uid": "PO872880",
+    "abbr": "UDDPLR",
+    "libelle": "Union des droites pour la République",
+    "legislature": 17,
+    "effectif": 17,
+    "urls": {
+     "page": "https://www.civix.fr/groupes/UDDPLR",
+     "api": "https://www.civix.fr/api/v1/groupes/UDDPLR"
+    }
+   },
+   {
+    "uid": "PO845413",
+    "abbr": "LFI-NFP",
+    "libelle": "La France insoumise - Nouveau Front Populaire",
+    "legislature": 17,
+    "effectif": 71,
+    "urls": {
+     "page": "https://www.civix.fr/groupes/LFI-NFP",
+     "api": "https://www.civix.fr/api/v1/groupes/LFI-NFP"
+    }
+   },
+   {
+    "uid": "PO845407",
+    "abbr": "EPR",
+    "libelle": "Ensemble pour la République",
+    "legislature": 17,
+    "effectif": 91,
+    "urls": {
+     "page": "https://www.civix.fr/groupes/EPR",
+     "api": "https://www.civix.fr/api/v1/groupes/EPR"
+    }
+   },
+   {
+    "uid": "PO845401",
+    "abbr": "RN",
+    "libelle": "Rassemblement National",
+    "legislature": 17,
+    "effectif": 122,
+    "urls": {
+     "page": "https://www.civix.fr/groupes/RN",
+     "api": "https://www.civix.fr/api/v1/groupes/RN"
+    }
+   },
+   {
+    "uid": "PO845454",
+    "abbr": "DEM",
+    "libelle": "Les Démocrates",
+    "legislature": 17,
+    "effectif": 37,
+    "urls": {
+     "page": "https://www.civix.fr/groupes/DEM",
+     "api": "https://www.civix.fr/api/v1/groupes/DEM"
+    }
+   },
+   {
+    "uid": "PO840056",
+    "abbr": "NI",
+    "libelle": "Non inscrit",
+    "legislature": 17,
+    "effectif": 10,
+    "urls": {
+     "page": "https://www.civix.fr/groupes/NI",
+     "api": "https://www.civix.fr/api/v1/groupes/NI"
+    }
+   },
+   {
+    "uid": "PO845439",
+    "abbr": "ECOS",
+    "libelle": "Écologiste et Social",
+    "legislature": 17,
+    "effectif": 38,
+    "urls": {
+     "page": "https://www.civix.fr/groupes/ECOS",
+     "api": "https://www.civix.fr/api/v1/groupes/ECOS"
+    }
+   },
+   {
+    "uid": "PO845419",
+    "abbr": "SOC",
+    "libelle": "Socialistes et apparentés",
+    "legislature": 17,
+    "effectif": 68,
+    "urls": {
+     "page": "https://www.civix.fr/groupes/SOC",
+     "api": "https://www.civix.fr/api/v1/groupes/SOC"
+    }
+   },
+   {
+    "uid": "PO845485",
+    "abbr": "LIOT",
+    "libelle": "Libertés, Indépendants, Outre-mer et Territoires",
+    "legislature": 17,
+    "effectif": 23,
+    "urls": {
+     "page": "https://www.civix.fr/groupes/LIOT",
+     "api": "https://www.civix.fr/api/v1/groupes/LIOT"
+    }
+   }
+  ]
+ }
+}

@@ -26,8 +26,13 @@ jobs:
           node-version: 22
           cache: pnpm
           cache-dependency-path: web/pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm exec tsc --noEmit
-      - run: pnpm test
-      - run: pnpm build
+      - name: Installer les dépendances
+        run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm lint
+      - name: Types
+        run: pnpm exec tsc --noEmit
+      - name: Tests
+        run: pnpm test
+      - name: Build
+        run: pnpm build
