@@ -3,6 +3,12 @@
 import unicodedata
 
 
+def strip_accents(text: str) -> str:
+    """Retire les accents en gardant la casse et la ponctuation."""
+    decomposed = unicodedata.normalize("NFKD", text)
+    return "".join(char for char in decomposed if not unicodedata.combining(char))
+
+
 def fold(text: str) -> str:
     """Minuscules sans accents, pour comparer des noms."""
     decomposed = unicodedata.normalize("NFKD", text)

@@ -26,7 +26,15 @@ SCRUTIN_COLUMNS = (
     "dossier_libelle",
     "url_civix",
 )
-VOTE_COLUMNS = ("scrutin_uid", "depute_uid", "prenom", "nom", "position", "par_delegation")
+VOTE_COLUMNS = (
+    "scrutin_uid",
+    "depute_uid",
+    "prenom",
+    "nom",
+    "groupe",
+    "position",
+    "par_delegation",
+)
 
 
 def clean_cell(value: Cell) -> Cell:
@@ -50,7 +58,7 @@ def scrutin_row(item: ScrutinSummary) -> Row:
         "numero": item.numero,
         "date": day.isoformat() if day else None,
         "legislature": item.legislature,
-        "type": item.type,
+        "type": item.kind,
         "contexte": item.context,
         "resultat": item.sort_code or (item.sort.code if item.sort else None),
         "titre": item.titre,
@@ -60,13 +68,14 @@ def scrutin_row(item: ScrutinSummary) -> Row:
     }
 
 
-def vote_row(scrutin_uid: str, vote: Vote) -> Row:
-    """Ligne d'export d'un vote individuel."""
+def vote_row(scrutin_uid: str, vote: Vote, groupe: str | None = None) -> Row:
+    """Ligne d'export d'un vote individuel ; `groupe` est le sigle du groupe du député."""
     return {
         "scrutin_uid": scrutin_uid,
         "depute_uid": vote.deputy_uid,
         "prenom": vote.prenom,
         "nom": vote.nom,
+        "groupe": groupe,
         "position": vote.position.value,
         "par_delegation": vote.par_delegation,
     }

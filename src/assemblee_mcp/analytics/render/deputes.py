@@ -5,10 +5,13 @@ from assemblee_mcp.analytics.models import (
     DeputeComparison,
     Method,
 )
-from assemblee_mcp.analytics.render.shared import finish_analysis, percent, table
+from assemblee_mcp.analytics.render.shared import explained_percent, finish_analysis, table
 from assemblee_mcp.formatting import (
     field_text,
 )
+
+NO_COMPARABLE_VOTE = "aucun vote exprimé comparable à la position du groupe"
+NO_COMMON_SCRUTIN = "aucun scrutin où les deux ont voté"
 
 
 def render_bilan(result: DeputeBilan, method: Method) -> str:
@@ -32,7 +35,8 @@ def render_bilan(result: DeputeBilan, method: Method) -> str:
         "",
         f"- Votes exprimés par délégation : {result.by_delegation}",
         f"- Alignement sur la position majoritaire du groupe : {result.aligned} sur "
-        f"{result.comparable} votes comparables ({percent(result.alignment_rate)})",
+        f"{result.comparable} votes comparables "
+        f"({explained_percent(result.alignment_rate, NO_COMPARABLE_VOTE)})",
     ]
     return finish_analysis("\n".join(lines), method)
 
@@ -44,7 +48,8 @@ def render_comparison(result: DeputeComparison, method: Method) -> str:
         "",
         f"- Scrutins de l'échantillon : {result.scrutins}",
         f"- Scrutins où les deux ont exprimé un vote : {result.shared}",
-        f"- Même position sur : {result.agreed} ({percent(result.rate)})",
+        f"- Même position sur : {result.agreed} "
+        f"({explained_percent(result.rate, NO_COMMON_SCRUTIN)})",
         f"- Vote exprimé par {field_text(result.name_a)} seulement : {result.only_a}",
         f"- Vote exprimé par {field_text(result.name_b)} seulement : {result.only_b}",
     ]

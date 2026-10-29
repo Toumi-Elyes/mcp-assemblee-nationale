@@ -195,7 +195,11 @@ def make_item(
         type=kind,
         context=context,
         sort_code=sort,
-        titre=f"le scrutin {number} du {dossier}",
+        titre=(
+            f"l'ensemble du projet de loi {dossier} ({number})"
+            if kind == "texte"
+            else f"le scrutin {number} du {dossier}"
+        ),
     )
     item["objet"] = {
         "libelle": item["titre"],
@@ -242,4 +246,22 @@ def search_with_deputes(*deputes: DeputeStub) -> Payload:
         }
         for depute in deputes
     ]
+    return payload
+
+
+def deputes_payload(*deputes: DeputeStub, next_page: int | None = None) -> Payload:
+    """Réponse de `/deputes` (annuaire) ne contenant que les députés donnés."""
+    payload = load_fixture("deputes")
+    template = payload["data"]["attributes"]["results"][0]
+    payload["data"]["attributes"]["results"] = [
+        {
+            **template,
+            "uid": depute.uid,
+            "prenom": depute.prenom,
+            "nom": depute.nom,
+            "groupe_abrev": depute.groupe,
+        }
+        for depute in deputes
+    ]
+    payload["meta"]["pagination"].update(next_page=next_page, count_estimated=len(deputes))
     return payload

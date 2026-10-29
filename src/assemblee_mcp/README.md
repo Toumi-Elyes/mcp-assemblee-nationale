@@ -18,7 +18,7 @@ outil MCP (tools/)
 
 | Chemin | Rôle |
 |---|---|
-| `civix/` | Tout ce qui parle à CIVIX : `client`, `cache`, `models/` (une réponse = un modèle), `lookup` (députés et groupes), `search` (recherche par mots-clés robuste), `budget`, `errors`. |
+| `civix/` | Tout ce qui parle à CIVIX : `client`, `cache`, `directory` (annuaire des députés gardé 24 h, hors budget), `models/` (une réponse = un modèle ; `kinds` classe amendement / article / texte / autre), `lookup` (résolveur unique de députés, groupes), `search/` (recherche par mots-clés robuste, requête élargie), `budget`, `errors`. |
 | `analytics/` | Analyses sur plusieurs scrutins. `gather` lit les données avec des volumes bornés, `stats/` calcule (fonctions pures, testées sans réseau), `render/` met en forme, `exporting` produit CSV et JSON. |
 | `formatting/` | Mise en forme des réponses de consultation : scrutins, votes, déclarations, députés, groupes, recherche. Nettoie aussi les textes tiers (`text`). |
 | `tools/` | La couche MCP. Une classe par famille d'outils (`ToolSet`) : chaque outil est une méthode, le client CIVIX est un attribut. `tools/analyses/` regroupe les outils d'analyse. |

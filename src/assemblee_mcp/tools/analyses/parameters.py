@@ -5,18 +5,26 @@ from typing import Annotated, Literal
 from fastmcp.exceptions import ToolError
 from pydantic import Field
 
+from assemblee_mcp.civix.models.kinds import (
+    KIND_AMENDEMENT,
+    KIND_ARTICLE,
+    KIND_AUTRE,
+    KIND_ENSEMBLE,
+)
+from assemblee_mcp.limits import MAX_ANALYSED_SCRUTINS
+
 KindName = Literal["tous", "texte", "article", "amendement", "autre"]
 # Traduction des noms proposés au modèle vers les types publiés par CIVIX (`None` = tous).
 KIND_VALUES: dict[str, str | None] = {
     "tous": None,
-    "texte": "texte",
-    "article": "article",
-    "amendement": "amendement",
-    "autre": "scrutin",
+    "texte": KIND_ENSEMBLE,
+    "article": KIND_ARTICLE,
+    "amendement": KIND_AMENDEMENT,
+    "autre": KIND_AUTRE,
 }
 KIND_DESCRIPTION = (
     "Type de scrutin : `texte` (vote sur l'ensemble d'un texte), `article`, `amendement`, "
-    "`autre` (motions…) ou `tous`."
+    "`autre` (motions, résolutions, suspensions de séance…) ou `tous`."
 )
 
 PeriodDays = Annotated[
@@ -38,7 +46,7 @@ MaxScrutins = Annotated[
     Field(
         description="Nombre maximal de scrutins analysés (échantillon borné).",
         ge=3,
-        le=30,
+        le=MAX_ANALYSED_SCRUTINS,
     ),
 ]
 OptionalSubject = Annotated[

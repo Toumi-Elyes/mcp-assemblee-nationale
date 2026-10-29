@@ -25,8 +25,7 @@ TYPE_LABELS = {
     "amendement": "amendements",
     "article": "articles",
     "texte": "votes sur l'ensemble d'un texte",
-    "scrutin": "autres scrutins (motions…)",
-    "motion_censure": "motions de censure",
+    "autre": "autres scrutins (motions, résolutions, suspensions de séance…)",
 }
 
 
@@ -78,7 +77,19 @@ def method_block(method: Method) -> str:
     return "\n".join(lines)
 
 
+def warning_block(method: Method) -> str:
+    """Avertissements (échantillon trop mince…) en tête de réponse, ou texte vide."""
+    if not method.warnings:
+        return ""
+    return "\n".join(f"> **Attention** : {warning}" for warning in method.warnings) + "\n\n"
+
+
 def finish_analysis(body: str, method: Method) -> str:
-    """Corps, méthode, ligne « Source : » et pied de page CIVIX."""
+    """Avertissements, corps, méthode, ligne « Source : » et pied de page CIVIX."""
     source = source_line(SOURCE_CIVIX, SOURCE_ASSEMBLEE)
-    return finish(f"{body}\n\n{method_block(method)}", source)
+    return finish(f"{warning_block(method)}{body}\n\n{method_block(method)}", source)
+
+
+def explained_percent(rate: float | None, reason: str) -> str:
+    """Pourcentage, ou la raison pour laquelle il ne peut pas être calculé."""
+    return f"non calculable : {reason}" if rate is None else percent(rate)

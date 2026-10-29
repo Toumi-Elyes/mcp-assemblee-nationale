@@ -54,7 +54,7 @@ def test_format_scrutin_with_group_table() -> None:
     text = formatting.format_scrutin(response, {"PO845485": "LIOT"})
     assert "82 pour, 1 contre, 5 abstention(s), 2 non-votant(s) (total 90)" in text
     assert "| LIOT | 1 | 0 | 0 | 0 | 1 |" in text
-    assert "https://www.assemblee-nationale.fr/dyn/17/scrutins/jo7324" in text
+    assert "https://www.assemblee-nationale.fr/dyn/17/scrutins/7324" in text
     assert "https://www.civix.fr/votes/VTANR5L17V7324" in text
 
 

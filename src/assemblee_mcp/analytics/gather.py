@@ -6,6 +6,7 @@ on lit donc les pages utiles, en repérant par dichotomie la page de départ d'u
 
 import asyncio
 import math
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 
@@ -21,6 +22,7 @@ from assemblee_mcp.limits import (
     DOSSIER_MAX_PAGES,
     MAX_LIST_PAGES,
     SAMPLE_MAX_PAGES,
+    VOTES_BATCH,
 )
 
 
@@ -47,6 +49,17 @@ class Sample:
 def current_day() -> date:
     """Jour courant (UTC)."""
     return datetime.now(UTC).date()
+
+
+def period_start(end: date, days: int) -> date:
+    """Premier jour d'une période de `days` jours calendaires se terminant à `end` inclus."""
+    return end - timedelta(days=days - 1)
+
+
+def last_days(days: int) -> tuple[date, date]:
+    """Bornes (début, fin) des `days` derniers jours, aujourd'hui inclus."""
+    end = current_day()
+    return period_start(end, days), end
 
 
 def page_days(page: ScrutinListResponse) -> list[date]:
@@ -136,7 +149,7 @@ async def fetch_period(
 
 def select_kind(items: list[ScrutinSummary], kind: str | None) -> list[ScrutinSummary]:
     """Garde un seul type de scrutin (`texte`, `amendement`, `article`, `scrutin`)."""
-    return items if kind is None else [item for item in items if item.type == kind]
+    return items if kind is None else [item for item in items if item.kind == kind]
 
 
 async def sample_from_period(
@@ -148,7 +161,7 @@ async def sample_from_period(
     kind: str | None = None,
 ) -> tuple[Sample, Listing]:
     """Échantillon régulier de `count` scrutins parmi ceux des `days` derniers jours."""
-    start = today - timedelta(days=days)
+    start = period_start(today, days)
     listing = await fetch_period(client, start, today, max_pages=SAMPLE_MAX_PAGES)
     pool = select_kind(listing.items, kind)
     return Sample(evenly_spaced(pool, count), len(pool), listing.truncated), listing
@@ -239,3 +252,39 @@ async def fetch_votes(client: CivixClient, scrutins: list[ScrutinSummary]) -> li
 
     results = await asyncio.gather(*(one(item.uid) for item in scrutins))
     return [result for result in results if result is not None]
+
+
+@dataclass(frozen=True)
+class VotesScan:
+    """Votes lus pour une analyse, et ce qui a arrêté la lecture."""
+
+    votes: list[ScrutinVotes]
+    usable: int
+    stopped_by_budget: bool
+
+
+async def scan_votes(
+    client: CivixClient,
+    scrutins: list[ScrutinSummary],
+    is_usable: Callable[[ScrutinVotes], bool],
+    target: int,
+) -> VotesScan:
+    """Lit les votes par lots jusqu'à `target` scrutins exploitables, ou jusqu'à épuisement.
+
+    Un scrutin est exploitable si `is_usable` le dit (le député y a voté, les deux y ont voté…).
+    Si le budget d'appels s'épuise en route, on garde ce qui a été lu.
+    """
+    votes: list[ScrutinVotes] = []
+    usable = 0
+    for first in range(0, len(scrutins), VOTES_BATCH):
+        try:
+            batch = await fetch_votes(client, scrutins[first : first + VOTES_BATCH])
+        except CivixBudgetError:
+            if not votes:
+                raise
+            return VotesScan(votes, usable, stopped_by_budget=True)
+        votes.extend(batch)
+        usable += sum(1 for item in batch if is_usable(item))
+        if usable >= target:
+            break
+    return VotesScan(votes, usable, stopped_by_budget=False)

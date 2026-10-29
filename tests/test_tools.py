@@ -212,7 +212,7 @@ async def test_comment_a_vote_on_subject(mcp_client: McpClient, civix_mock: Civi
     assert "## Votes de Frédéric Valletoux (HOR)" in text
     assert text.count("A voté : **Abstention**") == 3
     assert "https://www.civix.fr/votes/VTANR5L17V7324" in text
-    assert "https://www.assemblee-nationale.fr/dyn/17/scrutins/jo7324" in text
+    assert "https://www.assemblee-nationale.fr/dyn/17/scrutins/7324" in text
     assert civix_mock.paths()[:2] == ["/search", "/scrutins"]
     votes_calls = [path for path in civix_mock.paths() if path.endswith("/votes")]
     assert len(votes_calls) == 3

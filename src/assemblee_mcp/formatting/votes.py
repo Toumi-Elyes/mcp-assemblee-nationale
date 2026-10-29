@@ -10,7 +10,7 @@ from assemblee_mcp.civix.models import (
     Vote,
 )
 from assemblee_mcp.formatting.scrutins import counts_sentence, scrutin_heading
-from assemblee_mcp.formatting.sources import finish, response_source_line
+from assemblee_mcp.formatting.sources import finish, scrutin_source_line
 from assemblee_mcp.formatting.text import field_text
 from assemblee_mcp.textutils import fold
 
@@ -109,4 +109,4 @@ def format_votes(
         lines += ["", "Aucun vote ne correspond à ces critères."]
     elif len(selected) > limit:
         lines += ["", "Affinez avec `groupe`, `position` ou `nom` pour voir les autres noms."]
-    return finish("\n".join(lines), response_source_line(response))
+    return finish("\n".join(lines), scrutin_source_line(scrutin))

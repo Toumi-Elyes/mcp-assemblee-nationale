@@ -11,7 +11,12 @@ from assemblee_mcp.civix.models import (
     VoteCounts,
 )
 from assemblee_mcp.civix.search import ScrutinSearch
-from assemblee_mcp.formatting.sources import finish, pagination_hint, response_source_line
+from assemblee_mcp.formatting.sources import (
+    finish,
+    pagination_hint,
+    response_source_line,
+    scrutin_source_line,
+)
 from assemblee_mcp.formatting.text import field_text, format_date, truncate
 
 
@@ -125,4 +130,4 @@ def format_scrutin(
         lines += ["", "### Décompte par groupe", ""]
         lines.append(group_counts_table(attributes.results_by_group, abbreviations or {}))
     lines += ["", "Pour savoir qui a voté quoi, utilisez `votes_scrutin` avec cet identifiant."]
-    return finish("\n".join(lines), response_source_line(response))
+    return finish("\n".join(lines), scrutin_source_line(scrutin))

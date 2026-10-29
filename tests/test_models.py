@@ -41,9 +41,7 @@ def test_scrutin_detail_fixture() -> None:
     assert attributes.results_global.pour == 82
     assert attributes.results_global.total == 90
     assert len(attributes.results_by_group) == 11
-    assert (
-        response.source.assemblee_url == "https://www.assemblee-nationale.fr/dyn/17/scrutins/jo7324"
-    )
+    assert response.source.assemblee_url is None
     assert response.pagination is None
 
 

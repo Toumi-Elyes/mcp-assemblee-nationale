@@ -8,17 +8,28 @@ from pydantic import Field
 
 from assemblee_mcp.analytics import gather, render, stats
 from assemblee_mcp.analytics.models import Method
+from assemblee_mcp.analytics.stats import spread_order
+from assemblee_mcp.analytics.stats.deputes import both_expressed, deputy_present
 from assemblee_mcp.civix import lookup
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.civix.models import Depute
-from assemblee_mcp.limits import ANALYTICS_DEADLINE_SECONDS, ANALYTICS_MAX_CALLS
+from assemblee_mcp.limits import (
+    ANALYTICS_DEADLINE_SECONDS,
+    ANALYTICS_MAX_CALLS,
+    MAX_ANALYSED_SCRUTINS,
+    TARGET_USABLE_SCRUTINS,
+)
 from assemblee_mcp.tools.analyses.parameters import (
     MaxScrutins,
     OptionalSamplePeriodDays,
     OptionalSubject,
     require_subject_or_period,
 )
-from assemblee_mcp.tools.analyses.sampling import SelectedSample, select_sample
+from assemblee_mcp.tools.analyses.sampling import (
+    SelectedSample,
+    select_sample,
+    small_sample_warnings,
+)
 from assemblee_mcp.tools.common import ToolFunction, ToolSet, limited
 from assemblee_mcp.tools.resolution import resolve_depute
 
@@ -39,34 +50,51 @@ def group_uid_of(abbreviations: dict[str, str], abbr: str | None) -> str | None:
     return next((uid for uid, name in abbreviations.items() if name == abbr), None)
 
 
+def usable_notes(scan: gather.VotesScan, noun: str) -> tuple[list[str], list[str]]:
+    """Notes et avertissements sur les scrutins exploitables d'une lecture de votes."""
+    notes = [f"{scan.usable} scrutin(s) {noun} sur {len(scan.votes)} examiné(s)."]
+    if scan.stopped_by_budget:
+        notes.append("Lecture arrêtée par le plafond d'appels : scrutins restants non lus.")
+    return notes, small_sample_warnings(scan.usable, f"scrutin(s) {noun}")
+
+
 def depute_method(
-    selection: SelectedSample, analysed: int, *, counted: str, limits: list[str]
+    selection: SelectedSample,
+    scan: gather.VotesScan,
+    *,
+    noun: str,
+    counted: str,
+    limits: list[str],
 ) -> Method:
     """Méthode d'une analyse de député(s) sur un échantillon de scrutins."""
     sample = selection.sample
+    notes, warnings = usable_notes(scan, noun)
     return Method(
         period=selection.period,
-        analysed=analysed,
+        analysed=len(scan.votes),
         matching=sample.matching,
-        truncated=sample.truncated,
+        truncated=sample.truncated or scan.stopped_by_budget,
         counted=counted,
         limits=limits,
-        notes=selection.notes,
+        notes=[*selection.notes, *notes],
+        warnings=warnings,
     )
 
 
-def bilan_method(selection: SelectedSample, analysed: int) -> Method:
+def bilan_method(selection: SelectedSample, scan: gather.VotesScan) -> Method:
     """Méthode de `bilan_depute`."""
     return depute_method(
         selection,
-        analysed,
+        scan,
+        noun="où le député figure dans la liste des votes",
         counted=(
             "position du député dans la liste des votes de chaque scrutin ; « absent de la "
             "liste » = aucun vote enregistré pour lui ; alignement = vote exprimé identique à "
             "la position majoritaire de son groupe (scrutins sans position nette exclus)."
         ),
         limits=[
-            "l'absence d'un vote enregistré ne dit rien de l'intérêt du député pour le sujet ;",
+            "l'absence d'un vote enregistré ne dit rien de l'intérêt du député pour le sujet "
+            "(liste CIVIX tirée des données ouvertes de l'Assemblée) ;",
             "un vote par délégation est enregistré au nom du député ;",
             "le groupe retenu est le groupe actuel du député ;",
             "échantillon borné : ne pas généraliser à l'ensemble de l'activité du député.",
@@ -74,11 +102,12 @@ def bilan_method(selection: SelectedSample, analysed: int) -> Method:
     )
 
 
-def comparison_method(selection: SelectedSample, analysed: int) -> Method:
+def comparison_method(selection: SelectedSample, scan: gather.VotesScan) -> Method:
     """Méthode de `comparer_deputes`."""
     return depute_method(
         selection,
-        analysed,
+        scan,
+        noun="comparables (les deux ont voté)",
         counted=(
             "scrutins où les deux députés ont exprimé un vote (pour, contre, abstention) ; "
             "accord = même position."
@@ -111,7 +140,7 @@ class DeputeAnalyses(ToolSet):
         ],
         sujet: OptionalSubject = None,
         periode_jours: OptionalSamplePeriodDays = None,
-        max_scrutins: MaxScrutins = 30,
+        max_scrutins: MaxScrutins = MAX_ANALYSED_SCRUTINS,
     ) -> str:
         """Répartition des votes d'UN député sur un échantillon et alignement sur son groupe.
 
@@ -124,15 +153,20 @@ class DeputeAnalyses(ToolSet):
         if isinstance(found, str):
             return found
         selection = await select_sample(self.client, sujet, periode_jours, max_scrutins, "tous")
-        votes, abbreviations = await asyncio.gather(
-            gather.fetch_votes(self.client, selection.sample.chosen),
+        scan, abbreviations = await asyncio.gather(
+            gather.scan_votes(
+                self.client,
+                spread_order(selection.sample.chosen),
+                lambda votes: deputy_present(votes, found.uid),
+                TARGET_USABLE_SCRUTINS,
+            ),
             lookup.groupe_abbreviations(self.client),
         )
         group_uid = group_uid_of(abbreviations, found.groupe_abrev)
         result = stats.depute_bilan(
-            found.full_name, found.uid, group_uid, found.groupe_abrev, votes
+            found.full_name, found.uid, group_uid, found.groupe_abrev, scan.votes
         )
-        method = bilan_method(selection, len(votes))
+        method = bilan_method(selection, scan)
         return render.render_bilan(result, method)
 
     @analytics_tool
@@ -142,7 +176,7 @@ class DeputeAnalyses(ToolSet):
         depute_b: DeputeNameB,
         sujet: OptionalSubject = None,
         periode_jours: OptionalSamplePeriodDays = None,
-        max_scrutins: MaxScrutins = 30,
+        max_scrutins: MaxScrutins = MAX_ANALYSED_SCRUTINS,
     ) -> str:
         """Compare les votes de DEUX députés nommés : part de scrutins votés de la même façon.
 
@@ -159,11 +193,16 @@ class DeputeAnalyses(ToolSet):
         if not isinstance(second, Depute):
             return second
         selection = await select_sample(self.client, sujet, periode_jours, max_scrutins, "tous")
-        votes = await gather.fetch_votes(self.client, selection.sample.chosen)
-        result = stats.compare_deputes(
-            first.full_name, first.uid, second.full_name, second.uid, votes
+        scan = await gather.scan_votes(
+            self.client,
+            spread_order(selection.sample.chosen),
+            lambda votes: both_expressed(votes, first.uid, second.uid),
+            TARGET_USABLE_SCRUTINS,
         )
-        method = comparison_method(selection, len(votes))
+        result = stats.compare_deputes(
+            first.full_name, first.uid, second.full_name, second.uid, scan.votes
+        )
+        method = comparison_method(selection, scan)
         return render.render_comparison(result, method)
 
 
