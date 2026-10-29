@@ -1,0 +1,47 @@
+{
+ "publisher": "CIVIX.fr",
+ "api_version": "v1",
+ "retrieved_at": "2026-10-29T20:26:34.907Z",
+ "license": {
+  "name": "Open Data – Assemblée nationale",
+  "notice": "Données publiques de l'Assemblée nationale, présentées par CIVIX.fr (initiative indépendante)."
+ },
+ "schema_version": "2026-04-29",
+ "answer": "Cette page renvoie 0 résultat(s).",
+ "canonical_url": "https://www.civix.fr/votes/VTANR5L17V7324",
+ "confidence": "high",
+ "meta": {
+  "schema_version": "2026-04-29",
+  "api_version": "v1",
+  "retrieved_at": "2026-10-29T20:26:34.907Z",
+  "last_updated": "2026-10-29T20:26:34.907Z",
+  "query": {
+   "uid": "VTANR5L17V7324"
+  },
+  "pagination": null
+ },
+ "summary": "Déclarations publiques approuvées pour le scrutin VTANR5L17V7324.",
+ "source": {
+  "type": "dataset",
+  "provider": "Assemblée nationale",
+  "via": "CIVIX.fr",
+  "source_urls": [
+   "https://www.assemblee-nationale.fr"
+  ],
+  "civix_urls": {
+   "page": "https://www.civix.fr/votes/VTANR5L17V7324",
+   "api": "https://www.civix.fr/api/v1/scrutins/VTANR5L17V7324/statements"
+  }
+ },
+ "citation": {
+  "text": "Selon CIVIX.fr (données publiques de l'Assemblée nationale, consultées le 29 octobre 2026), les déclarations publiques approuvées sont disponibles pour le scrutin VTANR5L17V7324.",
+  "url": "https://www.civix.fr/api/v1/scrutins/VTANR5L17V7324/statements"
+ },
+ "data": {
+  "type": "statements",
+  "attributes": {
+   "statements": []
+  },
+  "statements": []
+ }
+}

@@ -1,0 +1,268 @@
+{
+ "publisher": "CIVIX.fr",
+ "api_version": "v1",
+ "retrieved_at": "2026-10-29T20:25:43.155Z",
+ "license": {
+  "name": "Open Data – Assemblée nationale",
+  "notice": "Données publiques de l'Assemblée nationale, présentées par CIVIX.fr (initiative indépendante)."
+ },
+ "schema_version": "2026-04-29",
+ "answer": "Cette page renvoie 16 résultat(s).",
+ "canonical_url": "https://www.civix.fr/api/v1/search?search=retraites&page=1&page_size=3",
+ "confidence": "high",
+ "meta": {
+  "schema_version": "2026-04-29",
+  "api_version": "v1",
+  "retrieved_at": "2026-10-29T20:25:43.155Z",
+  "last_updated": "2026-10-29T20:25:43.155Z",
+  "query": {
+   "search": "retraites",
+   "page": 1,
+   "page_size": 3
+  },
+  "pagination": {
+   "page": 1,
+   "page_size": 3
+  }
+ },
+ "summary": "Recherche pour \"retraites\" : 16 résultat(s) sur la page 1.",
+ "source": {
+  "type": "dataset",
+  "provider": "Assemblée nationale",
+  "via": "CIVIX.fr",
+  "source_urls": [
+   "https://www.assemblee-nationale.fr"
+  ],
+  "civix_urls": {
+   "page": "https://www.civix.fr/api",
+   "api": "https://www.civix.fr/api/v1/search?search=retraites&page=1&page_size=3"
+  }
+ },
+ "citation": {
+  "text": "Selon CIVIX.fr (données publiques de l'Assemblée nationale, consultées le 29 octobre 2026), la recherche pour \"retraites\" renvoie 16 résultat(s).",
+  "url": "https://www.civix.fr/api/v1/search?search=retraites&page=1&page_size=3"
+ },
+ "query": {
+  "search": "retraites",
+  "page": 1,
+  "page_size": 3
+ },
+ "results": {
+  "deputes": [],
+  "scrutins": [
+   {
+    "uid": "VTANR5L17V7322",
+    "titre": "l'amendement n° 9 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "date_scrutin": "2026-06-04T00:00:00+00:00",
+    "numero": 7322,
+    "type_vote": "scrutin public ordinaire"
+   },
+   {
+    "uid": "VTANR5L17V7314",
+    "titre": "l'amendement n° 19 du Gouvernement à l'article premier de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "date_scrutin": "2026-06-04T00:00:00+00:00",
+    "numero": 7314,
+    "type_vote": "scrutin public ordinaire"
+   },
+   {
+    "uid": "VTANR5L17V7323",
+    "titre": "l'amendement n° 10 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "date_scrutin": "2026-06-04T00:00:00+00:00",
+    "numero": 7323,
+    "type_vote": "scrutin public ordinaire"
+   },
+   {
+    "uid": "VTANR5L17V7320",
+    "titre": "l'amendement n° 5 de M. Bazin de suppression de l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "date_scrutin": "2026-06-04T00:00:00+00:00",
+    "numero": 7320,
+    "type_vote": "scrutin public ordinaire"
+   },
+   {
+    "uid": "VTANR5L17V7318",
+    "titre": "l'amendement n° 11 de M. Alexandre à l'article 5 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "date_scrutin": "2026-06-04T00:00:00+00:00",
+    "numero": 7318,
+    "type_vote": "scrutin public ordinaire"
+   },
+   {
+    "uid": "VTANR5L17V7316",
+    "titre": "l'amendement n° 3 de M. Peytavie après l'article 3 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "date_scrutin": "2026-06-04T00:00:00+00:00",
+    "numero": 7316,
+    "type_vote": "scrutin public ordinaire"
+   },
+   {
+    "uid": "VTANR5L17V7315",
+    "titre": "l'amendement n° 20 (rect.) du Gouvernement à l'article 3 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "date_scrutin": "2026-06-04T00:00:00+00:00",
+    "numero": 7315,
+    "type_vote": "scrutin public ordinaire"
+   },
+   {
+    "uid": "VTANR5L17V7319",
+    "titre": "l'article 5 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "date_scrutin": "2026-06-04T00:00:00+00:00",
+    "numero": 7319,
+    "type_vote": "scrutin public ordinaire"
+   }
+  ],
+  "groupes": [],
+  "dossiers": [
+   {
+    "uid": "DLR5L16N49097",
+    "titre": "Uniformiser les retraites des veuves ou conjoint survivant de harkis et des harkis",
+    "procedure_label": "Résolution Article 34-1"
+   },
+   {
+    "uid": "DLR5L16N47405",
+    "titre": "Rendre obligatoire l’exercice d’une mission d’intérêt public pour les bénéficiaires du revenu de solidarité active tout en les affiliant au régime général des retraites",
+    "procedure_label": "Proposition de loi ordinaire"
+   },
+   {
+    "uid": "DLR5L15N44185",
+    "titre": "Réforme du calcul des aides sociales et des retraites pour prendre en compte la hausse des prix de l’énergie",
+    "procedure_label": "Proposition de loi ordinaire"
+   },
+   {
+    "uid": "DLR5L15N37145",
+    "titre": "Réévaluation digne les pensions de retraites agricoles",
+    "procedure_label": "Résolution Article 34-1"
+   },
+   {
+    "uid": "DLR5L14N31235",
+    "titre": "Questions sociales et santé : avenir et justice du système de retraites",
+    "procedure_label": "Projet de loi ordinaire"
+   },
+   {
+    "uid": "DLR5L16N47619",
+    "titre": "Proposition de résolution visant à l'abrogation de la loi de financement rectificative de la sécurité sociale pour 2023 portant réforme des retraites",
+    "procedure_label": "Proposition de loi ordinaire"
+   },
+   {
+    "uid": "DLR5L16N49473",
+    "titre": "Proposition de loi d'abrogation de la réforme des retraites portant l'âge légal de départ à 64 ans",
+    "procedure_label": "Proposition de loi ordinaire"
+   },
+   {
+    "uid": "DLR5L15N37078",
+    "titre": "Procédure à mettre en œuvre pour une réforme globale des retraites",
+    "procedure_label": "Proposition de loi ordinaire"
+   }
+  ]
+ },
+ "total": 16,
+ "data": {
+  "type": "search",
+  "attributes": {
+   "query": "retraites",
+   "page": 1,
+   "page_size": 3,
+   "results": {
+    "deputes": [],
+    "scrutins": [
+     {
+      "uid": "VTANR5L17V7322",
+      "titre": "l'amendement n° 9 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+      "date_scrutin": "2026-06-04T00:00:00+00:00",
+      "numero": 7322,
+      "type_vote": "scrutin public ordinaire"
+     },
+     {
+      "uid": "VTANR5L17V7314",
+      "titre": "l'amendement n° 19 du Gouvernement à l'article premier de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+      "date_scrutin": "2026-06-04T00:00:00+00:00",
+      "numero": 7314,
+      "type_vote": "scrutin public ordinaire"
+     },
+     {
+      "uid": "VTANR5L17V7323",
+      "titre": "l'amendement n° 10 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+      "date_scrutin": "2026-06-04T00:00:00+00:00",
+      "numero": 7323,
+      "type_vote": "scrutin public ordinaire"
+     },
+     {
+      "uid": "VTANR5L17V7320",
+      "titre": "l'amendement n° 5 de M. Bazin de suppression de l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+      "date_scrutin": "2026-06-04T00:00:00+00:00",
+      "numero": 7320,
+      "type_vote": "scrutin public ordinaire"
+     },
+     {
+      "uid": "VTANR5L17V7318",
+      "titre": "l'amendement n° 11 de M. Alexandre à l'article 5 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+      "date_scrutin": "2026-06-04T00:00:00+00:00",
+      "numero": 7318,
+      "type_vote": "scrutin public ordinaire"
+     },
+     {
+      "uid": "VTANR5L17V7316",
+      "titre": "l'amendement n° 3 de M. Peytavie après l'article 3 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+      "date_scrutin": "2026-06-04T00:00:00+00:00",
+      "numero": 7316,
+      "type_vote": "scrutin public ordinaire"
+     },
+     {
+      "uid": "VTANR5L17V7315",
+      "titre": "l'amendement n° 20 (rect.) du Gouvernement à l'article 3 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+      "date_scrutin": "2026-06-04T00:00:00+00:00",
+      "numero": 7315,
+      "type_vote": "scrutin public ordinaire"
+     },
+     {
+      "uid": "VTANR5L17V7319",
+      "titre": "l'article 5 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+      "date_scrutin": "2026-06-04T00:00:00+00:00",
+      "numero": 7319,
+      "type_vote": "scrutin public ordinaire"
+     }
+    ],
+    "groupes": [],
+    "dossiers": [
+     {
+      "uid": "DLR5L16N49097",
+      "titre": "Uniformiser les retraites des veuves ou conjoint survivant de harkis et des harkis",
+      "procedure_label": "Résolution Article 34-1"
+     },
+     {
+      "uid": "DLR5L16N47405",
+      "titre": "Rendre obligatoire l’exercice d’une mission d’intérêt public pour les bénéficiaires du revenu de solidarité active tout en les affiliant au régime général des retraites",
+      "procedure_label": "Proposition de loi ordinaire"
+     },
+     {
+      "uid": "DLR5L15N44185",
+      "titre": "Réforme du calcul des aides sociales et des retraites pour prendre en compte la hausse des prix de l’énergie",
+      "procedure_label": "Proposition de loi ordinaire"
+     },
+     {
+      "uid": "DLR5L15N37145",
+      "titre": "Réévaluation digne les pensions de retraites agricoles",
+      "procedure_label": "Résolution Article 34-1"
+     },
+     {
+      "uid": "DLR5L14N31235",
+      "titre": "Questions sociales et santé : avenir et justice du système de retraites",
+      "procedure_label": "Projet de loi ordinaire"
+     },
+     {
+      "uid": "DLR5L16N47619",
+      "titre": "Proposition de résolution visant à l'abrogation de la loi de financement rectificative de la sécurité sociale pour 2023 portant réforme des retraites",
+      "procedure_label": "Proposition de loi ordinaire"
+     },
+     {
+      "uid": "DLR5L16N49473",
+      "titre": "Proposition de loi d'abrogation de la réforme des retraites portant l'âge légal de départ à 64 ans",
+      "procedure_label": "Proposition de loi ordinaire"
+     },
+     {
+      "uid": "DLR5L15N37078",
+      "titre": "Procédure à mettre en œuvre pour une réforme globale des retraites",
+      "procedure_label": "Proposition de loi ordinaire"
+     }
+    ]
+   },
+   "total": 16
+  }
+ }
+}

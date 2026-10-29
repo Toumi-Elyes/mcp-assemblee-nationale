@@ -1,0 +1,137 @@
+{
+ "publisher": "CIVIX.fr",
+ "api_version": "v1",
+ "retrieved_at": "2026-10-29T20:29:17.556Z",
+ "license": {
+  "name": "Open Data – Assemblée nationale",
+  "notice": "Données publiques de l'Assemblée nationale, présentées par CIVIX.fr (initiative indépendante)."
+ },
+ "schema_version": "2026-04-29",
+ "answer": "Cette page renvoie 38 résultat(s).",
+ "canonical_url": "https://www.civix.fr/deputes",
+ "confidence": "high",
+ "meta": {
+  "schema_version": "2026-04-29",
+  "api_version": "v1",
+  "retrieved_at": "2026-10-29T20:29:17.556Z",
+  "last_updated": "2026-10-29T20:29:17.556Z",
+  "query": {
+   "page": 1,
+   "page_size": 50,
+   "legislature": null,
+   "groupe": "HOR"
+  },
+  "pagination": {
+   "page": 1,
+   "page_size": 50,
+   "next_page": null,
+   "count_estimated": 4
+  }
+ },
+ "summary": "Liste des députés – groupe HOR : 38 résultat(s) sur la page 1.",
+ "source": {
+  "type": "dataset",
+  "provider": "Assemblée nationale",
+  "via": "CIVIX.fr",
+  "source_urls": [
+   "https://www.assemblee-nationale.fr"
+  ],
+  "civix_urls": {
+   "page": "https://www.civix.fr/api",
+   "api": "https://www.civix.fr/api/v1/deputes?page=1&page_size=50&groupe=HOR"
+  }
+ },
+ "citation": {
+  "text": "Selon CIVIX.fr (données publiques de l'Assemblée nationale, consultées le 29 octobre 2026), la liste des députés du groupe HOR renvoie 38 résultat(s) sur la page 1.",
+  "url": "https://www.civix.fr/api/v1/deputes?page=1&page_size=50&groupe=HOR"
+ },
+ "data": {
+  "type": "deputies",
+  "attributes": {
+   "query": {
+    "page": 1,
+    "page_size": 50,
+    "legislature": null,
+    "groupe": "HOR"
+   },
+   "results": [
+    {
+     "uid": "PA794470",
+     "prenom": "Félicie",
+     "nom": "Gérard",
+     "legislature": 17,
+     "circ_num": 7,
+     "circ_departement": "Nord",
+     "groupe_uid": "PO845470",
+     "groupe_abrev": "HOR",
+     "groupe_libelle": "Horizons & Indépendants",
+     "urls": {
+      "civix_page": "https://www.civix.fr/deputes/PA794470",
+      "civix_api": "https://www.civix.fr/api/v1/deputes?uid=PA794470",
+      "assemblee": "https://www.assemblee-nationale.fr/dyn/deputes/PA794470"
+     }
+    },
+    {
+     "uid": "PA793398",
+     "prenom": "Jérémie",
+     "nom": "Patrier-Leitus",
+     "legislature": 17,
+     "circ_num": 3,
+     "circ_departement": "Calvados",
+     "groupe_uid": "PO845470",
+     "groupe_abrev": "HOR",
+     "groupe_libelle": "Horizons & Indépendants",
+     "urls": {
+      "civix_page": "https://www.civix.fr/deputes/PA793398",
+      "civix_api": "https://www.civix.fr/api/v1/deputes?uid=PA793398",
+      "assemblee": "https://www.assemblee-nationale.fr/dyn/deputes/PA793398"
+     }
+    },
+    {
+     "uid": "PA795350",
+     "prenom": "Frédéric",
+     "nom": "Valletoux",
+     "legislature": 17,
+     "circ_num": 2,
+     "circ_departement": "Seine-et-Marne",
+     "groupe_uid": "PO845470",
+     "groupe_abrev": "HOR",
+     "groupe_libelle": "Horizons & Indépendants",
+     "urls": {
+      "civix_page": "https://www.civix.fr/deputes/PA795350",
+      "civix_api": "https://www.civix.fr/api/v1/deputes?uid=PA795350",
+      "assemblee": "https://www.assemblee-nationale.fr/dyn/deputes/PA795350"
+     }
+    },
+    {
+     "uid": "PA794278",
+     "prenom": "Xavier",
+     "nom": "Albertini",
+     "legislature": 17,
+     "circ_num": 1,
+     "circ_departement": "Marne",
+     "groupe_uid": "PO845470",
+     "groupe_abrev": "HOR",
+     "groupe_libelle": "Horizons & Indépendants",
+     "urls": {
+      "civix_page": "https://www.civix.fr/deputes/PA794278",
+      "civix_api": "https://www.civix.fr/api/v1/deputes?uid=PA794278",
+      "assemblee": "https://www.assemblee-nationale.fr/dyn/deputes/PA794278"
+     }
+    }
+   ],
+   "pagination": {
+    "page": 1,
+    "page_size": 50,
+    "next_page": null,
+    "count_estimated": 38
+   }
+  },
+  "pagination": {
+   "page": 1,
+   "page_size": 50,
+   "next_page": null,
+   "count_estimated": 38
+  }
+ }
+}

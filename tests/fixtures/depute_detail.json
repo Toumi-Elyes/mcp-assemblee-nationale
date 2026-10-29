@@ -1,0 +1,67 @@
+{
+ "publisher": "CIVIX.fr",
+ "api_version": "v1",
+ "retrieved_at": "2026-10-29T20:26:17.061Z",
+ "license": {
+  "name": "Open Data – Assemblée nationale",
+  "notice": "Données publiques de l'Assemblée nationale, présentées par CIVIX.fr (initiative indépendante)."
+ },
+ "schema_version": "2026-04-29",
+ "answer": "Audrey Abadie-Amiel est député de la 17e législature et membre du groupe LIOT.",
+ "canonical_url": "https://www.civix.fr/deputes/PA793214",
+ "confidence": "high",
+ "meta": {
+  "schema_version": "2026-04-29",
+  "api_version": "v1",
+  "retrieved_at": "2026-10-29T20:26:17.061Z",
+  "last_updated": "2026-10-29T20:26:17.061Z",
+  "query": {
+   "uid": "PA793214"
+  },
+  "pagination": null
+ },
+ "summary": "Audrey Abadie-Amiel est député(e) de la 17e législature et siège au sein du groupe LIOT. 2e circonscription — Ariège.",
+ "source": {
+  "type": "dataset",
+  "provider": "Assemblée nationale",
+  "via": "CIVIX.fr",
+  "source_urls": [
+   "https://www.assemblee-nationale.fr/dyn/deputes/PA793214"
+  ],
+  "civix_urls": {
+   "page": "https://www.civix.fr/deputes/PA793214",
+   "api": "https://www.civix.fr/api/v1/deputes?uid=PA793214"
+  }
+ },
+ "citation": {
+  "text": "Selon CIVIX.fr (données publiques de l'Assemblée nationale, consultées le 29 octobre 2026), Audrey Abadie-Amiel est député(e) de la 17e législature et membre du groupe LIOT.",
+  "url": "https://www.civix.fr/deputes/PA793214"
+ },
+ "data": {
+  "type": "deputy",
+  "attributes": {
+   "deputy": {
+    "uid": "PA793214",
+    "prenom": "Audrey",
+    "nom": "Abadie-Amiel",
+    "legislature": 17,
+    "circ_num": 2,
+    "circ_departement": "Ariège",
+    "groupe_uid": "PO845485",
+    "groupe_abrev": "LIOT",
+    "groupe_libelle": "Libertés, Indépendants, Outre-mer et Territoires"
+   }
+  },
+  "deputy": {
+   "uid": "PA793214",
+   "prenom": "Audrey",
+   "nom": "Abadie-Amiel",
+   "legislature": 17,
+   "circ_num": 2,
+   "circ_departement": "Ariège",
+   "groupe_uid": "PO845485",
+   "groupe_abrev": "LIOT",
+   "groupe_libelle": "Libertés, Indépendants, Outre-mer et Territoires"
+  }
+ }
+}

@@ -1,0 +1,530 @@
+{
+ "publisher": "CIVIX.fr",
+ "api_version": "v1",
+ "retrieved_at": "2026-10-29T20:26:33.931Z",
+ "license": {
+  "name": "Open Data – Assemblée nationale",
+  "notice": "Données publiques de l'Assemblée nationale, présentées par CIVIX.fr (initiative indépendante)."
+ },
+ "schema_version": "2026-04-29",
+ "answer": "Le scrutin n°7324 a abouti au résultat officiel suivant : adopté.",
+ "canonical_url": "https://www.civix.fr/votes/VTANR5L17V7324",
+ "confidence": "high",
+ "meta": {
+  "schema_version": "2026-04-29",
+  "api_version": "v1",
+  "retrieved_at": "2026-10-29T20:26:33.931Z",
+  "last_updated": "2026-06-04T00:00:00.000Z",
+  "query": {
+   "uid": "VTANR5L17V7324",
+   "include_votes": true
+  },
+  "pagination": null
+ },
+ "summary": "Scrutin n°7324 (législature 17) du 04 juin 2026 : l'ensemble de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).. Le résultat officiel du scrutin est : l'Assemblée nationale a adopté. Résultat: 82 pour, 1 contre, 5 abstentions, 2 non-votants (total 90).",
+ "source": {
+  "type": "dataset",
+  "provider": "Assemblée nationale",
+  "via": "CIVIX.fr",
+  "source_urls": [
+   "https://www.assemblee-nationale.fr/dyn/17/scrutins/jo7324"
+  ],
+  "civix_urls": {
+   "page": "https://www.civix.fr/votes/VTANR5L17V7324",
+   "api": "https://www.civix.fr/api/v1/scrutins?uid=VTANR5L17V7324"
+  }
+ },
+ "citation": {
+  "text": "Selon CIVIX.fr (données publiques de l'Assemblée nationale, consultées le 29 octobre 2026), le scrutin n°7324 du 04 juin 2026 portant sur \"l'ensemble de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).\" a abouti au résultat officiel suivant : l'Assemblée nationale a adopté. Résultat: 82 pour, 1 contre, 5 abstentions, 2 non-votants (total 90).",
+  "url": "https://www.civix.fr/votes/VTANR5L17V7324"
+ },
+ "data": {
+  "type": "scrutin",
+  "attributes": {
+   "scrutin": {
+    "uid": "VTANR5L17V7324",
+    "numero": 7324,
+    "legislature": 17,
+    "date_scrutin": "2026-06-04T00:00:00+00:00",
+    "titre": "l'ensemble de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "objet": {
+     "libelle": "l'ensemble de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+     "dossierLegislatif": {
+      "libelle": "Mesures de justice en faveur de la revalorisation des pensions de retraites agricoles",
+      "dossierRef": "DLR5L17N51955"
+     },
+     "referenceLegislative": null
+    },
+    "objet_libelle": "l'ensemble de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "objet_raw": {
+     "libelle": "l'ensemble de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+     "dossierLegislatif": {
+      "libelle": "Mesures de justice en faveur de la revalorisation des pensions de retraites agricoles",
+      "dossierRef": "DLR5L17N51955"
+     },
+     "referenceLegislative": null
+    },
+    "sort_code": "adopté",
+    "sort_libelle": "l'Assemblée nationale a adopté",
+    "sort_raw": {
+     "code": "adopté",
+     "libelle": "l'Assemblée nationale a adopté"
+    },
+    "is_adopted": true,
+    "official_result": "l'Assemblée nationale a adopté",
+    "majority_rule": "majorité simple des suffrages exprimés",
+    "majority_threshold": null,
+    "majority_explanation": "Aucune règle spéciale détectée : le scrutin relève de la majorité simple des suffrages exprimés.",
+    "type_primary": "loi_proposition",
+    "tags": [
+     "justice",
+     "travail"
+    ],
+    "type_vote": {
+     "codeTypeVote": "SPO",
+     "libelleTypeVote": "scrutin public ordinaire",
+     "typeMajorite": "Majorité absolue des suffrages exprimés"
+    },
+    "vote_mode": "vote nominal",
+    "demandeur": {
+     "texte": "Président du groupe \"Gauche Démocrate et Républicaine\"",
+     "referenceLegislative": null
+    },
+    "synthese": {
+     "annonce": "l'Assemblée nationale a adopté",
+     "decompte": {
+      "pour": "82",
+      "contre": "1",
+      "nonVotants": "2",
+      "abstentions": "5",
+      "nonVotantsVolontaires": "0"
+     },
+     "nombreVotants": "88",
+     "suffragesExprimes": "83",
+     "nbrSuffragesRequis": "42"
+    }
+   },
+   "results_global": {
+    "pour": 82,
+    "contre": 1,
+    "abstention": 5,
+    "non_votant": 2,
+    "unknown": 0,
+    "total": 90
+   },
+   "results_by_group": [
+    {
+     "groupe_uid": "PO845401",
+     "pour": 20,
+     "contre": 0,
+     "abstention": 0,
+     "non_votant": 1,
+     "unknown": 0,
+     "total": 21
+    },
+    {
+     "groupe_uid": "PO845413",
+     "pour": 18,
+     "contre": 0,
+     "abstention": 0,
+     "non_votant": 0,
+     "unknown": 0,
+     "total": 18
+    },
+    {
+     "groupe_uid": "PO845407",
+     "pour": 7,
+     "contre": 0,
+     "abstention": 2,
+     "non_votant": 1,
+     "unknown": 0,
+     "total": 10
+    },
+    {
+     "groupe_uid": "PO845439",
+     "pour": 9,
+     "contre": 0,
+     "abstention": 0,
+     "non_votant": 0,
+     "unknown": 0,
+     "total": 9
+    },
+    {
+     "groupe_uid": "PO845419",
+     "pour": 8,
+     "contre": 0,
+     "abstention": 0,
+     "non_votant": 0,
+     "unknown": 0,
+     "total": 8
+    },
+    {
+     "groupe_uid": "PO845514",
+     "pour": 8,
+     "contre": 0,
+     "abstention": 0,
+     "non_votant": 0,
+     "unknown": 0,
+     "total": 8
+    },
+    {
+     "groupe_uid": "PO845470",
+     "pour": 3,
+     "contre": 0,
+     "abstention": 3,
+     "non_votant": 0,
+     "unknown": 0,
+     "total": 6
+    },
+    {
+     "groupe_uid": "PO845454",
+     "pour": 4,
+     "contre": 1,
+     "abstention": 0,
+     "non_votant": 0,
+     "unknown": 0,
+     "total": 5
+    },
+    {
+     "groupe_uid": "PO872880",
+     "pour": 3,
+     "contre": 0,
+     "abstention": 0,
+     "non_votant": 0,
+     "unknown": 0,
+     "total": 3
+    },
+    {
+     "groupe_uid": "PO845485",
+     "pour": 1,
+     "contre": 0,
+     "abstention": 0,
+     "non_votant": 0,
+     "unknown": 0,
+     "total": 1
+    },
+    {
+     "groupe_uid": "PO845425",
+     "pour": 1,
+     "contre": 0,
+     "abstention": 0,
+     "non_votant": 0,
+     "unknown": 0,
+     "total": 1
+    }
+   ],
+   "include_votes": true,
+   "votes": [
+    {
+     "deputy_uid": "PA721908",
+     "prenom": "Yaël",
+     "nom": "Braun-Pivet",
+     "mandat_uid": "PM843467",
+     "position": "non_votant",
+     "par_delegation": false
+    },
+    {
+     "deputy_uid": "PA720468",
+     "prenom": "Sébastien",
+     "nom": "Chenu",
+     "mandat_uid": "PM840333",
+     "position": "non_votant",
+     "par_delegation": false
+    },
+    {
+     "deputy_uid": "PA720154",
+     "prenom": "Nicole",
+     "nom": "Dubré-Chirat",
+     "mandat_uid": "PM842852",
+     "position": "abstention",
+     "par_delegation": false
+    },
+    {
+     "deputy_uid": "PA794470",
+     "prenom": "Félicie",
+     "nom": "Gérard",
+     "mandat_uid": "PM843104",
+     "position": "abstention",
+     "par_delegation": false
+    },
+    {
+     "deputy_uid": "PA721612",
+     "prenom": "Carole",
+     "nom": "Guillerm",
+     "mandat_uid": "PM879690",
+     "position": "contre",
+     "par_delegation": false
+    },
+    {
+     "deputy_uid": "PA795050",
+     "prenom": "Astrid",
+     "nom": "Panosyan-Bouvet",
+     "mandat_uid": "PM874601",
+     "position": "abstention",
+     "par_delegation": true
+    },
+    {
+     "deputy_uid": "PA793398",
+     "prenom": "Jérémie",
+     "nom": "Patrier-Leitus",
+     "mandat_uid": "PM842489",
+     "position": "abstention",
+     "par_delegation": false
+    },
+    {
+     "deputy_uid": "PA795350",
+     "prenom": "Frédéric",
+     "nom": "Valletoux",
+     "mandat_uid": "PM843410",
+     "position": "abstention",
+     "par_delegation": false
+    },
+    {
+     "deputy_uid": "PA719138",
+     "prenom": "Michel",
+     "nom": "Castellani",
+     "mandat_uid": "PM842672",
+     "position": "pour",
+     "par_delegation": false
+    },
+    {
+     "deputy_uid": "PA795228",
+     "prenom": "Nadège",
+     "nom": "Abomangoli",
+     "mandat_uid": "PM840447",
+     "position": "pour",
+     "par_delegation": false
+    },
+    {
+     "deputy_uid": "PA793262",
+     "prenom": "Laurent",
+     "nom": "Alexandre",
+     "mandat_uid": "PM842438",
+     "position": "pour",
+     "par_delegation": false
+    },
+    {
+     "deputy_uid": "PA794906",
+     "prenom": "Gabriel",
+     "nom": "Amard",
+     "mandat_uid": "PM843284",
+     "position": "pour",
+     "par_delegation": false
+    },
+    {
+     "deputy_uid": "PA794138",
+     "prenom": "Ségolène",
+     "nom": "Amiot",
+     "mandat_uid": "PM842909",
+     "position": "pour",
+     "par_delegation": false
+    },
+    {
+     "deputy_uid": "PA795588",
+     "prenom": "Farida",
+     "nom": "Amrani",
+     "mandat_uid": "PM843557",
+     "position": "pour",
+     "par_delegation": false
+    },
+    {
+     "deputy_uid": "PA794562",
+     "prenom": "Philippe",
+     "nom": "Ballard",
+     "mandat_uid": "PM840339",
+     "position": "pour",
+     "par_delegation": false
+    },
+    {
+     "deputy_uid": "PA606793",
+     "prenom": "Laurent",
+     "nom": "Baumel",
+     "mandat_uid": "PM842759",
+     "position": "pour",
+     "par_delegation": false
+    },
+    {
+     "deputy_uid": "PA796106",
+     "prenom": "Édouard",
+     "nom": "Bénard",
+     "mandat_uid": "PM843383",
+     "position": "pour",
+     "par_delegation": false
+    }
+   ]
+  },
+  "scrutin": {
+   "uid": "VTANR5L17V7324",
+   "numero": 7324,
+   "legislature": 17,
+   "date_scrutin": "2026-06-04T00:00:00+00:00",
+   "titre": "l'ensemble de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+   "objet": {
+    "libelle": "l'ensemble de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "dossierLegislatif": {
+     "libelle": "Mesures de justice en faveur de la revalorisation des pensions de retraites agricoles",
+     "dossierRef": "DLR5L17N51955"
+    },
+    "referenceLegislative": null
+   },
+   "objet_libelle": "l'ensemble de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+   "objet_raw": {
+    "libelle": "l'ensemble de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "dossierLegislatif": {
+     "libelle": "Mesures de justice en faveur de la revalorisation des pensions de retraites agricoles",
+     "dossierRef": "DLR5L17N51955"
+    },
+    "referenceLegislative": null
+   },
+   "sort_code": "adopté",
+   "sort_libelle": "l'Assemblée nationale a adopté",
+   "sort_raw": {
+    "code": "adopté",
+    "libelle": "l'Assemblée nationale a adopté"
+   },
+   "is_adopted": true,
+   "official_result": "l'Assemblée nationale a adopté",
+   "majority_rule": "majorité simple des suffrages exprimés",
+   "majority_threshold": null,
+   "majority_explanation": "Aucune règle spéciale détectée : le scrutin relève de la majorité simple des suffrages exprimés.",
+   "type_primary": "loi_proposition",
+   "tags": [
+    "justice",
+    "travail"
+   ],
+   "type_vote": {
+    "codeTypeVote": "SPO",
+    "libelleTypeVote": "scrutin public ordinaire",
+    "typeMajorite": "Majorité absolue des suffrages exprimés"
+   },
+   "vote_mode": "vote nominal",
+   "demandeur": {
+    "texte": "Président du groupe \"Gauche Démocrate et Républicaine\"",
+    "referenceLegislative": null
+   },
+   "synthese": {
+    "annonce": "l'Assemblée nationale a adopté",
+    "decompte": {
+     "pour": "82",
+     "contre": "1",
+     "nonVotants": "2",
+     "abstentions": "5",
+     "nonVotantsVolontaires": "0"
+    },
+    "nombreVotants": "88",
+    "suffragesExprimes": "83",
+    "nbrSuffragesRequis": "42"
+   }
+  },
+  "results_global": {
+   "pour": 82,
+   "contre": 1,
+   "abstention": 5,
+   "non_votant": 2,
+   "unknown": 0,
+   "total": 90
+  },
+  "results_by_group": [
+   {
+    "groupe_uid": "PO845401",
+    "pour": 20,
+    "contre": 0,
+    "abstention": 0,
+    "non_votant": 1,
+    "unknown": 0,
+    "total": 21
+   },
+   {
+    "groupe_uid": "PO845413",
+    "pour": 18,
+    "contre": 0,
+    "abstention": 0,
+    "non_votant": 0,
+    "unknown": 0,
+    "total": 18
+   },
+   {
+    "groupe_uid": "PO845407",
+    "pour": 7,
+    "contre": 0,
+    "abstention": 2,
+    "non_votant": 1,
+    "unknown": 0,
+    "total": 10
+   },
+   {
+    "groupe_uid": "PO845439",
+    "pour": 9,
+    "contre": 0,
+    "abstention": 0,
+    "non_votant": 0,
+    "unknown": 0,
+    "total": 9
+   },
+   {
+    "groupe_uid": "PO845419",
+    "pour": 8,
+    "contre": 0,
+    "abstention": 0,
+    "non_votant": 0,
+    "unknown": 0,
+    "total": 8
+   },
+   {
+    "groupe_uid": "PO845514",
+    "pour": 8,
+    "contre": 0,
+    "abstention": 0,
+    "non_votant": 0,
+    "unknown": 0,
+    "total": 8
+   },
+   {
+    "groupe_uid": "PO845470",
+    "pour": 3,
+    "contre": 0,
+    "abstention": 3,
+    "non_votant": 0,
+    "unknown": 0,
+    "total": 6
+   },
+   {
+    "groupe_uid": "PO845454",
+    "pour": 4,
+    "contre": 1,
+    "abstention": 0,
+    "non_votant": 0,
+    "unknown": 0,
+    "total": 5
+   },
+   {
+    "groupe_uid": "PO872880",
+    "pour": 3,
+    "contre": 0,
+    "abstention": 0,
+    "non_votant": 0,
+    "unknown": 0,
+    "total": 3
+   },
+   {
+    "groupe_uid": "PO845485",
+    "pour": 1,
+    "contre": 0,
+    "abstention": 0,
+    "non_votant": 0,
+    "unknown": 0,
+    "total": 1
+   },
+   {
+    "groupe_uid": "PO845425",
+    "pour": 1,
+    "contre": 0,
+    "abstention": 0,
+    "non_votant": 0,
+    "unknown": 0,
+    "total": 1
+   }
+  ],
+  "include_votes": true
+ }
+}

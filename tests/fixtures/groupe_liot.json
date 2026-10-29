@@ -1,0 +1,67 @@
+{
+ "publisher": "CIVIX.fr",
+ "api_version": "v1",
+ "retrieved_at": "2026-10-29T20:26:43.956Z",
+ "license": {
+  "name": "Open Data – Assemblée nationale",
+  "notice": "Données publiques de l'Assemblée nationale, présentées par CIVIX.fr (initiative indépendante)."
+ },
+ "schema_version": "2026-04-29",
+ "answer": "Le groupe parlementaire Libertés, Indépendants, Outre-mer et Territoires (LIOT) compte 23 député(s) à l'Assemblée nationale.",
+ "canonical_url": "https://www.civix.fr/groupes/LIOT",
+ "confidence": "high",
+ "meta": {
+  "schema_version": "2026-04-29",
+  "api_version": "v1",
+  "retrieved_at": "2026-10-29T20:26:43.956Z",
+  "last_updated": "2026-10-29T20:26:43.956Z",
+  "query": {
+   "abbr": "LIOT"
+  },
+  "pagination": null
+ },
+ "summary": "Libertés, Indépendants, Outre-mer et Territoires (LIOT)",
+ "source": {
+  "type": "dataset",
+  "provider": "Assemblée nationale",
+  "via": "CIVIX.fr",
+  "source_urls": [
+   "https://www.assemblee-nationale.fr"
+  ],
+  "civix_urls": {
+   "page": "https://www.civix.fr/groupes/LIOT",
+   "api": "https://www.civix.fr/api/v1/groupes/LIOT"
+  }
+ },
+ "citation": {
+  "text": "Selon CIVIX.fr (données publiques de l'Assemblée nationale, consultées le 29 octobre 2026), le groupe politique \"Libertés, Indépendants, Outre-mer et Territoires\" (LIOT) appartient à la 17e législature et compte 23 députés.",
+  "url": "https://www.civix.fr/groupes/LIOT"
+ },
+ "data": {
+  "type": "groupe",
+  "attributes": {
+   "groupe": {
+    "uid": "PO845485",
+    "abbr": "LIOT",
+    "libelle": "Libertés, Indépendants, Outre-mer et Territoires",
+    "legislature": 17,
+    "effectif": 23,
+    "urls": {
+     "page": "https://www.civix.fr/groupes/LIOT",
+     "api": "https://www.civix.fr/api/v1/groupes/LIOT"
+    }
+   }
+  },
+  "groupe": {
+   "uid": "PO845485",
+   "abbr": "LIOT",
+   "libelle": "Libertés, Indépendants, Outre-mer et Territoires",
+   "legislature": 17,
+   "effectif": 23,
+   "urls": {
+    "page": "https://www.civix.fr/groupes/LIOT",
+    "api": "https://www.civix.fr/api/v1/groupes/LIOT"
+   }
+  }
+ }
+}
