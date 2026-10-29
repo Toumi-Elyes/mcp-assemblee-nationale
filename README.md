@@ -4,9 +4,12 @@
 
 # MCP Assemblée nationale
 
-**Demandez à Claude, ChatGPT ou Gemini comment ont voté les députés. En français, avec les sources.**
+**Demandez à Claude, ChatGPT ou Gemini comment ont voté les députés.**
+Gratuit, en français, avec les sources.
 
-[**Voir la démo en direct**](https://landing-page-mcp-assemblee-national.vercel.app) · [Ajouter à mon assistant](#ajouter-en-2-minutes) · [Exemples de questions](#exemples-de-questions) · [English](#english)
+### [Voir la démo en direct](https://landing-page-mcp-assemblee-national.vercel.app)
+
+[Ajouter à mon assistant](#ajouter-en-2-minutes) · [Exemples de questions](#exemples-de-questions) · [English](#english)
 
 [![CI](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/actions/workflows/ci.yml/badge.svg)](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/actions/workflows/ci.yml)
 ![Python 3.14+](https://img.shields.io/badge/python-3.14%2B-blue)
@@ -19,35 +22,37 @@
 
 ## C'est quoi ?
 
-Un connecteur qui branche votre assistant IA sur les **données publiques de l'Assemblée nationale**. L'IA va chercher les vrais chiffres au lieu de répondre de mémoire, et elle cite le lien de chaque scrutin.
+Un **connecteur** à ajouter à votre assistant IA. Il lui donne accès aux **données publiques de l'Assemblée nationale** : scrutins, députés, groupes. L'IA va chercher les vrais chiffres au lieu de répondre de mémoire, et elle cite le lien de chaque scrutin.
 
 - **Gratuit** : pas de compte, pas de clé, pas d'abonnement à ce service.
-- **Lecture seule** : l'IA consulte, elle ne modifie rien.
+- **En lecture seule** : l'IA consulte, elle ne modifie rien.
 - **Neutre** : les chiffres sont transmis tels quels, sans analyse politique.
 - **Sourcé** : chaque réponse renvoie vers la page du scrutin.
 
-Données : [API publique CIVIX](https://www.data.gouv.fr/dataservices/api-publique-civix) (data.gouv.fr), qui republie les données ouvertes de l'Assemblée nationale.
+> Un connecteur, c'est un petit service que l'IA peut appeler pour trouver une information. Celui-ci repose sur MCP, un standard ouvert que Claude, ChatGPT et Gemini savent utiliser.
+
+Les données viennent de l'[API publique CIVIX](https://www.data.gouv.fr/dataservices/api-publique-civix) (data.gouv.fr), qui republie les données ouvertes de l'Assemblée nationale.
 
 ## Ajouter en 2 minutes
 
-Copiez cette adresse, puis collez-la dans votre assistant :
+**1. Copiez cette adresse** (le bouton de copie apparaît en survolant le cadre) :
 
 ```
 https://mcp-assemblee-nationale.vercel.app/mcp
 ```
 
-Choisissez votre assistant :
+**2. Collez-la dans votre assistant.** Ouvrez le bloc qui correspond au vôtre :
 
 <details>
 <summary><b>Claude</b> (claude.ai et application) : plan gratuit inclus</summary>
 
-1. Ouvrez [claude.ai](https://claude.ai) et allez dans **Paramètres → Connecteurs**.
+1. Ouvrez [claude.ai](https://claude.ai), puis **Paramètres → Connecteurs**.
 2. Cliquez sur **Ajouter un connecteur personnalisé**.
-3. Nom : `Assemblée nationale`. URL : collez l'adresse ci-dessus.
+3. Nom : `Assemblée nationale`. URL : collez l'adresse copiée.
 4. Cliquez sur **Ajouter**. Aucune connexion n'est demandée.
-5. Dans une nouvelle conversation, cliquez sur le bouton **+** (ou l'icône des outils) et vérifiez que **Assemblée nationale** est activé.
+5. Dans une nouvelle conversation, cliquez sur **+** (ou sur l'icône des réglages de la conversation) et vérifiez que **Assemblée nationale** est activé.
 
-Le connecteur est ensuite disponible dans l'application Claude sur ordinateur et sur téléphone.
+Le connecteur est ensuite disponible sur ordinateur et sur téléphone.
 
 > Le plan gratuit autorise un connecteur personnalisé, les plans payants en autorisent plusieurs. Sur un compte Team ou Enterprise, c'est l'administrateur qui l'ajoute pour l'organisation.
 
@@ -56,22 +61,22 @@ Le connecteur est ensuite disponible dans l'application Claude sur ordinateur et
 <details>
 <summary><b>ChatGPT</b> : plans payants, depuis le navigateur</summary>
 
-Il faut un abonnement payant (Plus, Pro, Business, Enterprise ou Edu), et la configuration se fait sur **chatgpt.com**.
+Il faut un abonnement payant (Plus, Pro, Business, Enterprise ou Edu). Tout se fait sur **chatgpt.com**.
 
 1. Ouvrez **Paramètres → Applications et connecteurs → Paramètres avancés** et activez le **Mode développeur**. *Selon la version, ce réglage peut aussi se trouver dans **Paramètres → Sécurité**.*
 2. Revenez dans **Applications et connecteurs** et cliquez sur **Créer**.
-3. Nom : `Assemblée nationale`. URL du serveur MCP : collez l'adresse ci-dessus. Authentification : **Aucune**.
-4. Cochez la case de confiance puis validez.
+3. Nom : `Assemblée nationale`. URL du serveur MCP : collez l'adresse copiée. Authentification : **Aucune**.
+4. Cochez la case de confiance, puis validez.
 5. Dans une conversation, cliquez sur **+ → Mode développeur** et activez **Assemblée nationale**.
 
-> ChatGPT affiche « non vérifié par OpenAI » pour toute application ajoutée soi-même : c'est normal. Ce serveur ne fait que lire des données publiques.
+> ChatGPT affiche « non vérifié par OpenAI » pour toute application ajoutée soi-même : c'est normal. Ce connecteur ne fait que lire des données publiques.
 
 </details>
 
 <details>
 <summary><b>Gemini</b> : via Gemini CLI</summary>
 
-L'application Gemini (gemini.google.com) ne permet pas, à notre connaissance, d'ajouter son propre serveur MCP. Dès que ce sera possible, la même adresse fonctionnera. En attendant, avec **Gemini CLI** (dans un terminal) :
+L'application Gemini (gemini.google.com) ne permet pas, à notre connaissance, d'ajouter son propre connecteur. Dès que ce sera possible, la même adresse fonctionnera. En attendant, vous pouvez utiliser **Gemini CLI**, qui s'utilise dans un terminal :
 
 1. Ouvrez (ou créez) le fichier `~/.gemini/settings.json`.
 2. Ajoutez ce bloc :
@@ -86,14 +91,14 @@ L'application Gemini (gemini.google.com) ne permet pas, à notre connaissance, d
    }
    ```
 
-3. Relancez Gemini CLI, puis tapez `/mcp` pour vérifier que `assemblee-nationale` est listé.
+3. Relancez Gemini CLI, puis tapez `/mcp` : `assemblee-nationale` doit apparaître dans la liste.
 
 </details>
 
 <details>
-<summary><b>Claude Desktop, Cursor et autres</b> : en local sur votre ordinateur</summary>
+<summary><b>Claude Desktop, Cursor et autres</b> : sur votre ordinateur</summary>
 
-La méthode recommandée reste l'adresse ci-dessus : Claude Desktop reprend vos connecteurs claude.ai. Pour faire tourner le serveur chez vous :
+Le plus simple reste l'adresse ci-dessus : Claude Desktop reprend vos connecteurs claude.ai. Pour faire tourner le service chez vous :
 
 1. Installez [uv](https://docs.astral.sh/uv/getting-started/installation/).
 2. Collez cette configuration :
@@ -118,18 +123,18 @@ La méthode recommandée reste l'adresse ci-dessus : Claude Desktop reprend vos 
 
 **Partout**
 
-- Le connecteur doit être **activé dans la conversation en cours** (bouton **+**) : l'ajouter dans les réglages ne suffit pas.
-- Demandez explicitement : « Utilise l'outil Assemblée nationale pour… ». Sans cela, l'IA répond parfois de mémoire.
+- Le connecteur doit être **activé dans la conversation en cours** (bouton **+**). L'ajouter dans les réglages ne suffit pas.
+- Demandez-le explicitement : « Utilise le connecteur Assemblée nationale pour… ». Sans cela, l'IA répond parfois de mémoire.
 - Les noms des menus changent d'une version à l'autre. Si vous ne trouvez pas **Connecteurs** ou **Applications et connecteurs**, cherchez « connecteur », « MCP » ou « développeur » dans les paramètres.
 - Vérifiez l'adresse : elle doit se terminer par `/mcp`, sans espace ni guillemet.
 
-**Claude** : le plan gratuit n'autorise qu'**un seul** connecteur personnalisé, retirez-en un autre pour ajouter celui-ci. Sur un compte d'organisation, seul l'administrateur peut en ajouter.
+**Claude** : le plan gratuit n'autorise qu'**un seul** connecteur personnalisé. Retirez-en un autre pour ajouter celui-ci. Sur un compte d'organisation, seul l'administrateur peut en ajouter.
 
 **ChatGPT** : il faut un plan payant et le **Mode développeur**, depuis le navigateur (pas l'application mobile). Le connecteur n'est actif que dans les conversations où vous l'avez choisi via **+ → Mode développeur**.
 
-**Gemini** : l'application grand public ne prend pas en charge les serveurs MCP personnalisés, à notre connaissance. Utilisez Gemini CLI. Si `/mcp` ne liste rien, vérifiez que le JSON est valide et relancez Gemini CLI.
+**Gemini** : l'application grand public ne prend pas en charge les connecteurs personnalisés, à notre connaissance. Utilisez Gemini CLI. Si `/mcp` ne liste rien, vérifiez que le texte collé est valide et relancez Gemini CLI.
 
-**En local (uvx)** : installez [uv](https://docs.astral.sh/uv/getting-started/installation/), puis redémarrez l'application pour qu'elle retrouve la commande `uvx`.
+**Sur votre ordinateur (uvx)** : installez [uv](https://docs.astral.sh/uv/getting-started/installation/), puis redémarrez l'application pour qu'elle retrouve la commande `uvx`.
 
 </details>
 
@@ -137,24 +142,21 @@ La méthode recommandée reste l'adresse ci-dessus : Claude Desktop reprend vos 
 
 Posez vos questions normalement, en français.
 
-| Vous voulez… | Demandez par exemple |
+| Votre besoin | Demandez par exemple |
 |---|---|
-| Retrouver un vote | « Quels sont les derniers scrutins sur l'immigration ? » |
-| Voir le résultat | « Résume-moi le scrutin sur l'aide à mourir, avec le détail par groupe. » |
-| Savoir comment un député a voté | « Comment a voté [nom du député] sur la loi de finances ? » |
-| Comparer les groupes | « Quels groupes ont voté contre le dernier budget ? » |
-| Filtrer un vote | « Quels députés du groupe Écologiste se sont abstenus sur ce scrutin ? » |
-| Lire les explications de vote | « Qu'ont déclaré les groupes avant le vote sur [sujet] ? » |
-| Connaître les groupes | « Liste les groupes parlementaires et leur nombre de députés. » |
-| Identifier un élu | « Qui est le député de la 2e circonscription de l'Ariège ? » |
-| Suivre un texte de bout en bout | « Retrace tous les votes sur le budget 2027. » |
-| Repérer les votes serrés | « Quels votes se sont joués à quelques voix ce mois-ci ? » |
-| Comprendre une tendance | « Quelles ont été les tendances des votes ce mois-ci ? » |
-| Savoir ce qui occupe l'Assemblée | « Quels textes ont été le plus votés cette semaine ? » |
-| Voir qui vote ensemble | « Sur les 30 derniers jours, quels groupes votent le plus souvent ensemble ? » |
-| Résumer les votes d'un député | « Donne-moi le bilan des votes de [député] ce mois-ci. » |
-| Comparer deux députés | « [Député A] et [député B] votent-ils souvent pareil ? » |
-| Récupérer les données | « Exporte en CSV les scrutins du 1er au 15 octobre. » |
+| **Retrouver un vote** | « Quels sont les derniers scrutins sur l'immigration ? » |
+| | « Retrace tous les votes sur le budget 2027. » |
+| | « Quels votes se sont joués à quelques voix ce mois-ci ? » |
+| **Comprendre un résultat** | « Résume-moi le scrutin sur l'aide à mourir, avec le détail par groupe. » |
+| | « Qu'ont déclaré les groupes avant le vote sur [sujet] ? » |
+| **Suivre un député** | « Comment a voté [nom du député] sur la loi de finances ? » |
+| | « Donne-moi le bilan des votes de [député] ce mois-ci. » |
+| | « [Député A] et [député B] votent-ils souvent pareil ? » |
+| **Comparer les groupes** | « Quels groupes ont voté contre le dernier budget ? » |
+| | « Sur les 30 derniers jours, quels groupes votent le plus souvent ensemble ? » |
+| **Voir les tendances** | « Quels textes ont été le plus votés cette semaine ? » |
+| | « Quelles ont été les tendances des votes ce mois-ci ? » |
+| **Récupérer les données** | « Exporte en CSV les scrutins du 1er au 15 octobre. » |
 
 Astuce : si l'IA ne trouve rien, reformulez avec un mot-clé du titre officiel (« retraites » plutôt que « la réforme de Borne »).
 
@@ -182,76 +184,76 @@ Source : *[lien vers la page du scrutin]*
 
 ```mermaid
 flowchart LR
-    A[Vous] --> B[Claude / ChatGPT]
-    B --> C[Ce serveur MCP]
+    A[Vous] --> B[Claude / ChatGPT / Gemini]
+    B --> C[Ce connecteur]
     C --> D[API CIVIX]
     D --> E[(Données de l'Assemblée nationale)]
 ```
 
 1. Vous posez une question en français à votre assistant.
-2. L'assistant appelle ce serveur pour obtenir les scrutins, députés ou groupes concernés.
-3. Le serveur interroge CIVIX et renvoie les chiffres tels quels. L'assistant rédige la réponse et cite la source.
+2. L'assistant appelle ce connecteur pour obtenir les scrutins, députés ou groupes concernés.
+3. Le connecteur interroge CIVIX et renvoie les chiffres tels quels. L'assistant rédige la réponse et cite la source.
 
 ## Ce que l'IA peut faire
 
-25 outils, rangés par intention. Tous sont en lecture seule et sourcés. Les analyses portent sur un échantillon borné, annoncé dans leur bloc **Méthode**.
+25 fonctions, rangées par besoin. Toutes sont en lecture seule et sourcées. Les analyses portent sur un échantillon limité, annoncé dans leur bloc **Méthode**. Le nom entre accents graves est celui de la fonction, utile surtout si vous voulez la demander explicitement.
 
 ### Suivre un vote
 
-| Outil | À quoi il sert |
+| Vous voulez… | Fonction |
 |---|---|
-| `rechercher` | Chercher sans savoir si c'est un vote, un député ou un groupe |
-| `rechercher_scrutins` | Trouver les votes sur un thème : date, résultat, titre, identifiant |
-| `obtenir_scrutin` | Résultat d'un vote : adopté ou rejeté, pour, contre, abstentions, détail par groupe |
-| `votes_scrutin` | Vote de chaque député, filtrable par groupe, position ou nom |
-| `declarations_groupes` | Explications de vote publiées par les groupes (souvent aucune) |
-| `comment_a_vote` | Comment UN député a voté sur un sujet, en une question, avec les sources |
-| `dossier_legislatif` | Chronologie de tous les scrutins d'un texte de loi |
-| `scrutins_par_periode` | Scrutins entre deux dates (90 jours au plus), filtrables par type et par résultat |
-| `votes_serres` | Votes récents au résultat serré (par défaut, les votes sur l'ensemble d'un texte) |
+| Chercher sans savoir si c'est un vote, un député ou un groupe | `rechercher` |
+| Trouver les votes sur un thème : date, résultat, titre | `rechercher_scrutins` |
+| Voir le résultat d'un vote : adopté ou rejeté, pour, contre, abstentions, détail par groupe | `obtenir_scrutin` |
+| Savoir qui a voté quoi, filtré par groupe, position ou nom | `votes_scrutin` |
+| Lire les explications de vote des groupes (souvent aucune) | `declarations_groupes` |
+| Savoir comment UN député a voté sur un sujet, avec les sources | `comment_a_vote` |
+| Suivre un texte de loi de bout en bout | `dossier_legislatif` |
+| Lister les scrutins entre deux dates (90 jours au plus), par type ou résultat | `scrutins_par_periode` |
+| Repérer les votes récents joués à quelques voix | `votes_serres` |
 
 ### Comprendre une tendance
 
-| Outil | À quoi il sert |
+| Vous voulez… | Fonction |
 |---|---|
-| `tendances_scrutins` | Volume de scrutins par semaine, taux d'adoption par type et par contexte, jours les plus chargés (7 à 90 jours) |
-| `textes_les_plus_votes` | Les textes qui ont donné lieu au plus de scrutins sur une période |
-| `statistiques_assemblee` | Totaux de la législature, sièges par groupe, taux d'adoption estimé sur un échantillon de 500 scrutins |
-| `positions_groupes` | Position majoritaire de chaque groupe sur les scrutins d'un sujet |
-| `accords_entre_groupes` | Part des scrutins où deux groupes ont la même position, pour chaque paire |
-| `cohesion_groupes` | Part des votes de chaque groupe qui suivent sa position majoritaire |
+| Voir le nombre de scrutins par semaine, la part de textes adoptés, les jours les plus chargés (7 à 90 jours) | `tendances_scrutins` |
+| Savoir quels textes ont donné lieu au plus de scrutins | `textes_les_plus_votes` |
+| Avoir les chiffres de la législature : totaux, sièges par groupe, taux d'adoption estimé | `statistiques_assemblee` |
+| Voir la position majoritaire de chaque groupe sur un sujet | `positions_groupes` |
+| Savoir à quelle fréquence deux groupes votent pareil | `accords_entre_groupes` |
+| Mesurer la part des votes d'un groupe qui suivent sa position majoritaire | `cohesion_groupes` |
 
 ### Un député, un groupe
 
-| Outil | À quoi il sert |
+| Vous voulez… | Fonction |
 |---|---|
-| `rechercher_deputes` | Trouver un député par nom, groupe ou législature |
-| `obtenir_depute` | Fiche d'un député : groupe, circonscription, liens officiels |
-| `lister_groupes` | Les groupes parlementaires : sigles, effectifs |
-| `obtenir_groupe` | Fiche d'un groupe |
-| `bilan_depute` | Répartition des positions d'UN député et alignement avec son groupe, avec les limites de l'échantillon |
-| `comparer_deputes` | Part de scrutins votés de la même façon par deux députés |
+| Trouver un député par nom, groupe ou législature | `rechercher_deputes` |
+| Voir la fiche d'un député : groupe, circonscription, liens officiels | `obtenir_depute` |
+| Connaître les groupes parlementaires : sigles, effectifs | `lister_groupes` |
+| Voir la fiche d'un groupe | `obtenir_groupe` |
+| Résumer les votes d'UN député et son alignement avec son groupe, avec les limites | `bilan_depute` |
+| Comparer deux députés : part de votes identiques | `comparer_deputes` |
 
-### Exporter des données
+### Récupérer les données
 
-| Outil | À quoi il sert |
+| Vous voulez… | Fonction |
 |---|---|
-| `exporter_scrutins` | Liste de scrutins en CSV ou JSON, avec protection contre les formules de tableur |
-| `exporter_votes` | Votes nominatifs d'un scrutin en CSV ou JSON |
+| Une liste de scrutins en CSV ou JSON, prête pour un tableur | `exporter_scrutins` |
+| Les votes de chaque député sur un scrutin, en CSV ou JSON | `exporter_votes` |
 
 ### Pour la recherche approfondie de ChatGPT
 
-| Outil | À quoi il sert |
+| Vous voulez… | Fonction |
 |---|---|
-| `search`, `fetch` | Les mêmes données, au format attendu par ChatGPT (deep research) |
+| Les mêmes données, dans le format attendu par la recherche approfondie de ChatGPT | `search`, `fetch` |
 
-**Neutralité** : aucun outil ne classe les députés ni les groupes. Les chiffres décrivent un échantillon, jamais une qualité.
+**Neutralité** : rien ne classe les députés ni les groupes. Les chiffres décrivent un échantillon, jamais une qualité.
 
 ## D'où viennent les données
 
 - **Source** : les données ouvertes de l'[Assemblée nationale](https://data.assemblee-nationale.fr), mises à disposition par [CIVIX](https://www.civix.fr), une initiative indépendante, non officielle et neutre ([API sur data.gouv.fr](https://www.data.gouv.fr/dataservices/api-publique-civix)).
 - **Licence des données** : Licence Ouverte Etalab 2.0.
-- **Neutralité** : ce serveur transmet les chiffres tels quels. Il n'ajoute aucune analyse politique et chaque réponse renvoie vers la source.
+- **Neutralité** : les chiffres sont transmis tels quels, sans analyse politique, et chaque réponse renvoie vers la source.
 - **Fraîcheur** : les réponses sont gardées en mémoire 10 minutes pour ménager l'API CIVIX. Un vote du jour peut mettre un peu de temps à apparaître, selon la mise à jour des données de l'Assemblée.
 
 Ce projet n'est affilié ni à l'Assemblée nationale, ni à CIVIX.
@@ -260,7 +262,7 @@ Ce projet n'est affilié ni à l'Assemblée nationale, ni à CIVIX.
 
 **Vie privée**
 
-- Le serveur ne reçoit que la requête envoyée par l'IA (par exemple « retraites » ou un nom de député), jamais votre conversation.
+- Le connecteur ne reçoit que la recherche envoyée par l'IA (par exemple « retraites » ou un nom de député), jamais votre conversation.
 - Ces mots-clés sont transmis à l'API CIVIX pour faire la recherche.
 - Il n'enregistre pas les conversations, n'utilise aucun cookie et ne demande aucun compte.
 - Les réponses de CIVIX sont gardées 10 minutes en mémoire, puis oubliées.
@@ -270,18 +272,18 @@ Ce projet n'est affilié ni à l'Assemblée nationale, ni à CIVIX.
 
 - **Assemblée nationale uniquement** : pas de Sénat, pas de Parlement européen.
 - **Fraîcheur** : elle dépend de la publication des données par l'Assemblée et de leur reprise par CIVIX.
-- **Disponibilité** : si CIVIX est indisponible, le serveur le dit et il faut réessayer plus tard.
+- **Disponibilité** : si CIVIX est indisponible, le connecteur le dit et il faut réessayer plus tard.
 - **Couverture** : seule la législature en cours (la 17e) est bien couverte pour les députés.
 - **Plusieurs scrutins par texte** : un texte donne souvent plusieurs votes (amendements, articles, ensemble). Vérifiez toujours lequel est cité.
 
 ## Sécurité
 
-Le serveur est en lecture seule et sans compte. Il est protégé ainsi :
+Le connecteur est en lecture seule et sans compte. Il est protégé ainsi :
 
-- **Budget d'appels et délai** : chaque appel d'outil est plafonné en nombre d'appels vers CIVIX (de 10 pour une recherche simple à 45 pour une analyse, les réponses en cache ne comptent pas) et en durée. Au-delà, il répond par exemple « Demande trop large : précisez le nom, le groupe ou le sujet ».
-- **Limitation de débit** : des règles de limitation de débit sont appliquées sur le pare-feu de Vercel.
-- **Texte tiers cité et signalé** : les déclarations des groupes sont citées telles quelles et marquées comme contenu tiers, pas comme instructions.
-- **Liens autorisés** : seuls les liens https vers `civix.fr`, `assemblee-nationale.fr` et `data.assemblee-nationale.fr` sont repris.
+- **Plafond de requêtes et délai maximal** : chaque question est limitée en nombre de requêtes vers CIVIX (de 10 pour une recherche simple à 45 pour une analyse, les réponses déjà en mémoire ne comptent pas) et en durée. Au-delà, il répond par exemple « Demande trop large : précisez le nom, le groupe ou le sujet ».
+- **Protection contre les abus** : des règles de limitation de débit sont appliquées sur le pare-feu de Vercel.
+- **Citations signalées** : les déclarations des groupes sont citées telles quelles et marquées comme texte de tiers, pas comme consignes.
+- **Liens contrôlés** : seuls les liens https vers `civix.fr`, `assemblee-nationale.fr` et `data.assemblee-nationale.fr` sont repris.
 
 Vous avez trouvé une faille ? Ne l'ouvrez pas en issue publique : suivez [SECURITY.md](SECURITY.md).
 
@@ -290,7 +292,7 @@ Vous avez trouvé une faille ? Ne l'ouvrez pas en issue publique : suivez [SECUR
 <details>
 <summary>Est-ce gratuit ?</summary>
 
-Oui. Le serveur, l'API CIVIX et l'hébergement sont gratuits. Seul l'abonnement à votre assistant (ChatGPT par exemple) peut être payant.
+Oui. Le connecteur, l'API CIVIX et l'hébergement sont gratuits. Seul l'abonnement à votre assistant (ChatGPT par exemple) peut être payant.
 
 </details>
 
@@ -304,28 +306,30 @@ Non. C'est un projet personnel, indépendant de l'Assemblée nationale. Les donn
 <details>
 <summary>Mes conversations sont-elles enregistrées ?</summary>
 
-Le serveur ne reçoit que la recherche envoyée par l'IA, jamais votre conversation. Il ne garde aucun historique et n'utilise aucun cookie. Voir [Vie privée et limites](#vie-privée-et-limites).
+Le connecteur ne reçoit que la recherche envoyée par l'IA, jamais votre conversation. Il ne garde aucun historique et n'utilise aucun cookie. Voir [Vie privée et limites](#vie-privée-et-limites).
 
 </details>
 
 <details>
-<summary>L'IA dit qu'elle n'a pas accès à l'outil</summary>
+<summary>L'IA dit qu'elle n'a pas accès au connecteur</summary>
 
-Vérifiez que le connecteur est activé dans la conversation (bouton **+**), puis demandez explicitement : « Utilise l'outil Assemblée nationale pour… ».
+Vérifiez que le connecteur est activé dans la conversation (bouton **+**), puis demandez explicitement : « Utilise le connecteur Assemblée nationale pour… ».
 
 </details>
 
 <details>
 <summary>J'ai un message d'erreur</summary>
 
-« Le service CIVIX est momentanément indisponible » : réessayez dans quelques minutes. « Aucune donnée trouvée » : l'identifiant ou le nom est inconnu, reformulez. « Demande trop large » : précisez le nom, le groupe ou le sujet.
+- « Le service CIVIX est momentanément indisponible » : réessayez dans quelques minutes.
+- « Aucune donnée trouvée » : l'identifiant ou le nom est inconnu. Reformulez.
+- « Demande trop large » : précisez le nom, le groupe ou le sujet.
 
 </details>
 
 <details>
 <summary>L'IA s'est trompée</summary>
 
-Ouvrez le lien « Source » de la réponse : il mène à la page du scrutin. Les chiffres viennent du serveur, mais c'est l'IA qui rédige la phrase : elle peut mal les résumer.
+Ouvrez le lien « Source » de la réponse : il mène à la page du scrutin. Les chiffres viennent du connecteur, mais c'est l'IA qui rédige la phrase : elle peut mal les résumer.
 
 </details>
 
@@ -333,7 +337,7 @@ Ouvrez le lien « Source » de la réponse : il mène à la page du scrutin. Les
 <summary>Comment signaler une erreur ?</summary>
 
 - *Les données elles-mêmes semblent fausses* (vote ou député mal enregistré) : signalez-le à [CIVIX](https://www.civix.fr), ou à l'Assemblée nationale pour la donnée d'origine.
-- *Le serveur se comporte mal* (outil en erreur, réponse mal formée) : [ouvrez une issue](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/issues) en indiquant votre question et la réponse obtenue.
+- *Le connecteur se comporte mal* (erreur, réponse mal formée) : [ouvrez une issue](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/issues) en indiquant votre question et la réponse obtenue.
 - *Une faille de sécurité* : voir [SECURITY.md](SECURITY.md).
 
 </details>
@@ -413,7 +417,7 @@ Une réponse qui ne respecte pas le modèle devient un message d'erreur lisible,
 
 Tous les outils sont annotés `readOnlyHint`, `idempotentHint` et `openWorldHint` à vrai, `destructiveHint` à faux. Ils renvoient du markdown français, sauf `search` et `fetch` qui renvoient du JSON. Une erreur CIVIX devient une `ToolError` au message clair. Taille de page par défaut : 10 (20 pour `scrutins_par_periode`).
 
-Budgets par appel d'outil (`tools/common.py`) : nombre maximal d'appels réseau vers CIVIX (les réponses en cache ne comptent pas) et délai maximal. Dépassement : message d'erreur en français, jamais de trace d'appel.
+Budgets par appel d'outil (`limits.py`) : nombre maximal d'appels réseau vers CIVIX (les réponses en cache ne comptent pas) et délai maximal. Dépassement : message d'erreur en français, jamais de trace d'appel.
 
 | Famille | Appels CIVIX max | Délai max | Outils |
 |---|---|---|---|
@@ -509,7 +513,7 @@ mcp-assemblee-nationale --http --host 0.0.0.0 --port $PORT
 
 ## Contribuer
 
-Les issues et pull requests sont les bienvenues : nouvel outil, meilleure formulation des réponses, correction. La branche `main` est protégée : toute contribution passe par une pull request dont la CI est verte. Voir [CONTRIBUTING.md](CONTRIBUTING.md).
+Les issues et pull requests sont les bienvenues : nouvelle fonction, meilleure formulation des réponses, correction. La branche `main` est protégée : toute contribution passe par une pull request dont la CI est verte. Voir [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Une règle : **des faits sourcés, aucune interprétation politique**.
 
@@ -522,15 +526,15 @@ Une règle : **des faits sourcés, aucune interprétation politique**.
 
 ## English
 
-An [MCP](https://modelcontextprotocol.io) server that lets Claude, ChatGPT or Gemini answer questions about **French National Assembly votes** (scrutins, individual votes by deputy, parliamentary groups), using the open [CIVIX API](https://www.data.gouv.fr/dataservices/api-publique-civix). Free, no account, no API key, read-only, every answer links to its source.
+A connector (an [MCP](https://modelcontextprotocol.io) server) that lets Claude, ChatGPT or Gemini answer questions about **French National Assembly votes**, using the open [CIVIX API](https://www.data.gouv.fr/dataservices/api-publique-civix). Free, no account, read-only, every answer links its source.
 
 - **Live demo**: [landing page](https://landing-page-mcp-assemblee-national.vercel.app)
 - **Remote URL** (Claude custom connectors, ChatGPT developer mode, Gemini CLI `httpUrl`): `https://mcp-assemblee-nationale.vercel.app/mcp`
 - **Local**: `uvx --from git+https://github.com/Toumi-Elyes/mcp-assemblee-nationale mcp-assemblee-nationale` (stdio), or `--http` for streamable HTTP.
-- **Stack**: Python 3.14+, FastMCP 4, Pydantic v2 models, httpx, Poetry, hosted on Vercel (Paris).
-- **Tools**: 25 read-only tools (vote tracking, trends, group agreement and cohesion, per-deputy summary, CSV/JSON exports) and 6 prompts; every analysis ends with a « Méthode » block (period, sample, limits) and nothing ranks deputies.
-- **Scope**: National Assembly only (no Senate). Tool outputs are in French, since the underlying data is French.
-- **Privacy**: the server only receives the tool query, keeps no conversation history, sets no cookies; CIVIX responses are cached for 10 minutes.
-- **Security**: per-tool CIVIX call budget, rate limiting at the hosting firewall, third-party text quoted and marked, links allow-listed. Report vulnerabilities via [SECURITY.md](SECURITY.md).
+- **Tools**: 25 read-only tools and 6 prompts (vote tracking, trends, group agreement and cohesion, per-deputy summary, CSV/JSON exports). Every analysis ends with a « Méthode » block (period, sample, limits) and nothing ranks deputies. Outputs are in French.
+- **Scope**: National Assembly only (no Senate).
+- **Privacy**: only the tool query is received; no conversation history, no cookies; CIVIX responses are cached for 10 minutes.
+- **Security**: per-call CIVIX request cap, rate limiting at the hosting firewall, third-party text quoted and marked, links allow-listed. Report vulnerabilities via [SECURITY.md](SECURITY.md).
+- **Stack**: Python 3.14+, FastMCP 4, Pydantic v2, httpx, Poetry, hosted on Vercel (Paris).
 - **Not official**: independent project, not affiliated with the Assemblée nationale or CIVIX.
-- **Licence**: code under [MIT](LICENSE); data under Licence Ouverte Etalab 2.0 (Assemblée nationale, via CIVIX).
+- **Licence**: code under [MIT](LICENSE); data under Licence Ouverte Etalab 2.0.
