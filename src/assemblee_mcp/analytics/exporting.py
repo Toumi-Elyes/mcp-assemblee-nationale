@@ -88,6 +88,6 @@ def to_json(columns: Sequence[str], rows: Sequence[Row]) -> str:
     return json.dumps(cleaned, ensure_ascii=False)
 
 
-def serialise(fmt: str, columns: Sequence[str], rows: Sequence[Row]) -> str:
+def serialise(format_name: str, columns: Sequence[str], rows: Sequence[Row]) -> str:
     """Sérialise en `csv` ou `json`."""
-    return to_json(columns, rows) if fmt == "json" else to_csv(columns, rows)
+    return to_json(columns, rows) if format_name == "json" else to_csv(columns, rows)

@@ -105,7 +105,7 @@ async def resolve_groupe(client: CivixClient, groupe: str) -> str:
     found = await find_groupe(client, groupe)
     if found is not None:
         return found.abbr
-    known = ", ".join(g.abbr for g in await list_groupes(client))
+    known = ", ".join(groupe.abbr for groupe in await list_groupes(client))
     raise CivixNotFoundError(f"Groupe « {groupe} » inconnu. Groupes disponibles : {known}.")
 
 
@@ -156,4 +156,8 @@ async def find_deputes(
 
 def _only_groupe(deputes: list[Depute], groupe: str) -> list[Depute]:
     wanted = fold(groupe)
-    return [d for d in deputes if d.groupe_abrev is not None and fold(d.groupe_abrev) == wanted]
+    return [
+        depute
+        for depute in deputes
+        if depute.groupe_abrev is not None and fold(depute.groupe_abrev) == wanted
+    ]

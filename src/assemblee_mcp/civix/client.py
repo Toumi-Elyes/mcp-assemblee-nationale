@@ -2,7 +2,6 @@
 
 import asyncio
 import time
-from collections import OrderedDict
 from collections.abc import Callable, Mapping
 from datetime import datetime, timedelta
 from http import HTTPStatus
@@ -13,6 +12,7 @@ import httpx
 from pydantic import ValidationError
 
 from assemblee_mcp.civix.budget import CivixBudgetError, charge_call
+from assemblee_mcp.civix.cache import CacheKey, TtlCache
 from assemblee_mcp.civix.errors import (
     UNEXPECTED_MESSAGE,
     CivixError,
@@ -44,7 +44,6 @@ from assemblee_mcp.config import (
 )
 
 QueryParams = Mapping[str, str | int | bool | None]
-CacheKey = tuple[str, tuple[tuple[str, str], ...]]
 MAX_ATTEMPTS = 2
 FORBIDDEN_SEGMENTS = frozenset({"", ".", ".."})
 RETRYABLE_STATUSES = frozenset({HTTPStatus.BAD_GATEWAY, HTTPStatus.GATEWAY_TIMEOUT})
@@ -59,33 +58,22 @@ def segment(value: str) -> str:
     return quote(value, safe="")
 
 
-class TtlCache:
-    """Cache LRU à durée de vie limitée et taille plafonnée."""
+def parse_response(response: httpx.Response) -> Any:
+    """Corps JSON d'une réponse CIVIX, ou l'erreur française correspondant au statut HTTP.
 
-    def __init__(self, max_entries: int, ttl: float, clock: Callable[[], float]) -> None:
-        self._max_entries = max_entries
-        self._ttl = ttl
-        self._clock = clock
-        self._entries: OrderedDict[CacheKey, tuple[float, CivixResponse[Any]]] = OrderedDict()
-
-    def get(self, key: CacheKey) -> CivixResponse[Any] | None:
-        """Valeur en cache non expirée, sinon `None`."""
-        entry = self._entries.get(key)
-        if entry is None:
-            return None
-        expires_at, value = entry
-        if expires_at <= self._clock():
-            del self._entries[key]
-            return None
-        self._entries.move_to_end(key)
-        return value
-
-    def set(self, key: CacheKey, value: CivixResponse[Any], ttl: float | None = None) -> None:
-        """Mémorise une valeur en évinçant les plus anciennes au-delà du plafond."""
-        self._entries[key] = (self._clock() + (self._ttl if ttl is None else ttl), value)
-        self._entries.move_to_end(key)
-        while len(self._entries) > self._max_entries:
-            self._entries.popitem(last=False)
+    429 et 503 ne sont pas rejoués : insister aggraverait la charge d'un service déjà saturé.
+    """
+    status = response.status_code
+    if status == HTTPStatus.NOT_FOUND:
+        raise CivixNotFoundError
+    if status >= HTTPStatus.INTERNAL_SERVER_ERROR or status == HTTPStatus.TOO_MANY_REQUESTS:
+        raise CivixUnavailableError
+    if status >= HTTPStatus.BAD_REQUEST:
+        raise CivixError(UNEXPECTED_MESSAGE)
+    try:
+        return response.json()
+    except ValueError as error:
+        raise CivixError(UNEXPECTED_MESSAGE) from error
 
 
 class CivixClient:
@@ -98,6 +86,7 @@ class CivixClient:
         transport: httpx.AsyncBaseTransport | None = None,
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
+        """Prépare le client ; `transport` et `clock` sont injectables pour les tests."""
         settings_ = settings or Settings.from_env()
         self.settings = settings_
         self._transport = transport
@@ -204,6 +193,7 @@ class CivixClient:
         params: QueryParams,
         response_model: type[CivixResponse[AttributesT]],
     ) -> CivixResponse[AttributesT]:
+        """Réponse du cache, d'une requête identique déjà en vol, ou d'un nouvel appel."""
         clean = {
             key: str(value).lower() if isinstance(value, bool) else str(value)
             for key, value in params.items()
@@ -219,24 +209,35 @@ class CivixClient:
             shared = await pending
             if isinstance(shared, response_model):
                 return shared
+        parsed = await self._load_and_share(key, path, clean, response_model)
+        cache.set(key, parsed, self._ttl_for(parsed))
+        return parsed
+
+    async def _load_and_share[AttributesT: CivixModel](
+        self,
+        key: CacheKey,
+        path: str,
+        params: dict[str, str],
+        response_model: type[CivixResponse[AttributesT]],
+    ) -> CivixResponse[AttributesT]:
+        """Appelle CIVIX en laissant les requêtes identiques simultanées attendre ce résultat."""
         future: asyncio.Future[CivixResponse[Any]] = asyncio.get_running_loop().create_future()
         future.add_done_callback(lambda done: done.cancelled() or done.exception())
         self._inflight[key] = future
         try:
-            parsed = await self._load(path, clean, response_model)
+            parsed = await self._load(path, params, response_model)
         except BaseException as error:
-            future.set_exception(
-                error if isinstance(error, CivixError) else CivixUnavailableError()
-            )
+            failure = error if isinstance(error, CivixError) else CivixUnavailableError()
+            future.set_exception(failure)
             raise
         else:
-            cache.set(key, parsed, self._ttl_for(parsed))
             future.set_result(parsed)
             return parsed
         finally:
             del self._inflight[key]
 
     def _cache_for(self, path: str) -> TtlCache:
+        """Cache adapté au chemin : votes et détails de scrutin ont chacun le leur."""
         if path.endswith(VOTES_SUFFIX):
             return self._votes_cache
         if path.startswith("/scrutins/") and path.count("/") == DETAIL_PATH_SLASHES:
@@ -260,6 +261,7 @@ class CivixClient:
         params: dict[str, str],
         response_model: type[CivixResponse[AttributesT]],
     ) -> CivixResponse[AttributesT]:
+        """Appelle CIVIX et valide la réponse avec le modèle du point d'accès."""
         payload = await self._fetch_json(path, params)
         try:
             return response_model.model_validate(payload)
@@ -267,15 +269,11 @@ class CivixClient:
             raise CivixError(UNEXPECTED_MESSAGE) from error
 
     async def _fetch_json(self, path: str, params: dict[str, str]) -> Any:
+        """GET JSON avec une seule nouvelle tentative, réservée aux pannes passagères."""
         for attempt in range(MAX_ATTEMPTS):
             if attempt > 0:
                 await asyncio.sleep(self.settings.retry_delay)
-            try:
-                charge_call()
-            except CivixBudgetError:
-                if attempt == 0:
-                    raise
-                raise CivixUnavailableError from None
+            self._charge_attempt(attempt)
             try:
                 async with self._slots:
                     response = await self._client().get(path, params=params)
@@ -283,18 +281,16 @@ class CivixClient:
                 continue
             except httpx.HTTPError as error:
                 raise CivixUnavailableError from error
-            if response.status_code == HTTPStatus.NOT_FOUND:
-                raise CivixNotFoundError
             if response.status_code in RETRYABLE_STATUSES:
                 continue
-            if response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
-                raise CivixUnavailableError
-            if response.status_code == HTTPStatus.TOO_MANY_REQUESTS:
-                raise CivixUnavailableError
-            if response.status_code >= HTTPStatus.BAD_REQUEST:
-                raise CivixError(UNEXPECTED_MESSAGE)
-            try:
-                return response.json()
-            except ValueError as error:
-                raise CivixError(UNEXPECTED_MESSAGE) from error
+            return parse_response(response)
         raise CivixUnavailableError
+
+    def _charge_attempt(self, attempt: int) -> None:
+        """Compte l'appel ; une nouvelle tentative sans budget devient « indisponible »."""
+        try:
+            charge_call()
+        except CivixBudgetError:
+            if attempt == 0:
+                raise
+            raise CivixUnavailableError from None

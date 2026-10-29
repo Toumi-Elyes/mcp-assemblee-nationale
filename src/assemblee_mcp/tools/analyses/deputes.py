@@ -1,0 +1,172 @@
+"""Outils d'analyse de députés nommés : répartition des votes et comparaison."""
+
+import asyncio
+from typing import Annotated
+
+from fastmcp import FastMCP
+from pydantic import Field
+
+from assemblee_mcp.analytics import gather, render, stats
+from assemblee_mcp.analytics.models import Method
+from assemblee_mcp.civix import lookup
+from assemblee_mcp.civix.client import CivixClient
+from assemblee_mcp.civix.models import Depute
+from assemblee_mcp.limits import ANALYTICS_DEADLINE_SECONDS, ANALYTICS_MAX_CALLS
+from assemblee_mcp.tools.analyses.parameters import (
+    MaxScrutins,
+    OptionalSamplePeriodDays,
+    OptionalSubject,
+    require_subject_or_period,
+)
+from assemblee_mcp.tools.analyses.sampling import SelectedSample, select_sample
+from assemblee_mcp.tools.common import ToolFunction, ToolSet, limited
+from assemblee_mcp.tools.resolution import resolve_depute
+
+analytics_tool = limited(ANALYTICS_MAX_CALLS, ANALYTICS_DEADLINE_SECONDS)
+
+DeputeNameA = Annotated[
+    str, Field(description="Nom du premier député ou son `uid`.", min_length=2, max_length=100)
+]
+DeputeNameB = Annotated[
+    str, Field(description="Nom du second député ou son `uid`.", min_length=2, max_length=100)
+]
+
+
+def group_uid_of(abbreviations: dict[str, str], abbr: str | None) -> str | None:
+    """Identifiant d'un groupe à partir de son sigle."""
+    if abbr is None:
+        return None
+    return next((uid for uid, name in abbreviations.items() if name == abbr), None)
+
+
+def depute_method(
+    selection: SelectedSample, analysed: int, *, counted: str, limits: list[str]
+) -> Method:
+    """Méthode d'une analyse de député(s) sur un échantillon de scrutins."""
+    sample = selection.sample
+    return Method(
+        period=selection.period,
+        analysed=analysed,
+        matching=sample.matching,
+        truncated=sample.truncated,
+        counted=counted,
+        limits=limits,
+        notes=selection.notes,
+    )
+
+
+def bilan_method(selection: SelectedSample, analysed: int) -> Method:
+    """Méthode de `bilan_depute`."""
+    return depute_method(
+        selection,
+        analysed,
+        counted=(
+            "position du député dans la liste des votes de chaque scrutin ; « absent de la "
+            "liste » = aucun vote enregistré pour lui ; alignement = vote exprimé identique à "
+            "la position majoritaire de son groupe (scrutins sans position nette exclus)."
+        ),
+        limits=[
+            "l'absence d'un vote enregistré ne dit rien de l'intérêt du député pour le sujet ;",
+            "un vote par délégation est enregistré au nom du député ;",
+            "le groupe retenu est le groupe actuel du député ;",
+            "échantillon borné : ne pas généraliser à l'ensemble de l'activité du député.",
+        ],
+    )
+
+
+def comparison_method(selection: SelectedSample, analysed: int) -> Method:
+    """Méthode de `comparer_deputes`."""
+    return depute_method(
+        selection,
+        analysed,
+        counted=(
+            "scrutins où les deux députés ont exprimé un vote (pour, contre, abstention) ; "
+            "accord = même position."
+        ),
+        limits=[
+            "les scrutins où l'un des deux est absent ou non-votant sont exclus ;",
+            "un accord sur un amendement ou un article n'est pas un accord sur un texte ;",
+            "échantillon borné, sans valeur de classement.",
+        ],
+    )
+
+
+class DeputeAnalyses(ToolSet):
+    """Analyses de votes de députés nommés, jamais de classement."""
+
+    def tools(self) -> tuple[ToolFunction, ...]:
+        """Outils exposés."""
+        return (self.bilan_depute, self.comparer_deputes)
+
+    @analytics_tool
+    async def bilan_depute(
+        self,
+        depute: Annotated[
+            str,
+            Field(
+                description="Nom d'UN député (« Jérôme Guedj ») ou son `uid`.",
+                min_length=2,
+                max_length=100,
+            ),
+        ],
+        sujet: OptionalSubject = None,
+        periode_jours: OptionalSamplePeriodDays = None,
+        max_scrutins: MaxScrutins = 30,
+    ) -> str:
+        """Répartition des votes d'UN député sur un échantillon et alignement sur son groupe.
+
+        Donne le nombre de pour, contre, abstentions, non-votants et scrutins absents de la liste
+        des votes, ainsi que la part de votes conformes à la position majoritaire de son groupe.
+        Indiquer `sujet` ou `periode_jours`. Sert à décrire, jamais à classer ou juger un député.
+        """
+        require_subject_or_period(sujet, periode_jours)
+        found = await resolve_depute(self.client, depute)
+        if isinstance(found, str):
+            return found
+        selection = await select_sample(self.client, sujet, periode_jours, max_scrutins, "tous")
+        votes, abbreviations = await asyncio.gather(
+            gather.fetch_votes(self.client, selection.sample.chosen),
+            lookup.groupe_abbreviations(self.client),
+        )
+        group_uid = group_uid_of(abbreviations, found.groupe_abrev)
+        result = stats.depute_bilan(
+            found.full_name, found.uid, group_uid, found.groupe_abrev, votes
+        )
+        method = bilan_method(selection, len(votes))
+        return render.render_bilan(result, method)
+
+    @analytics_tool
+    async def comparer_deputes(
+        self,
+        depute_a: DeputeNameA,
+        depute_b: DeputeNameB,
+        sujet: OptionalSubject = None,
+        periode_jours: OptionalSamplePeriodDays = None,
+        max_scrutins: MaxScrutins = 30,
+    ) -> str:
+        """Compare les votes de DEUX députés nommés : part de scrutins votés de la même façon.
+
+        À utiliser pour « X et Y votent-ils pareil ? ». Calcule, sur les scrutins où les deux ont
+        exprimé un vote, la part de positions identiques. Indiquer `sujet` ou `periode_jours`.
+        Description factuelle d'un échantillon borné, sans jugement.
+        """
+        require_subject_or_period(sujet, periode_jours)
+        first, second = await asyncio.gather(
+            resolve_depute(self.client, depute_a), resolve_depute(self.client, depute_b)
+        )
+        if not isinstance(first, Depute):
+            return first
+        if not isinstance(second, Depute):
+            return second
+        selection = await select_sample(self.client, sujet, periode_jours, max_scrutins, "tous")
+        votes = await gather.fetch_votes(self.client, selection.sample.chosen)
+        result = stats.compare_deputes(
+            first.full_name, first.uid, second.full_name, second.uid, votes
+        )
+        method = comparison_method(selection, len(votes))
+        return render.render_comparison(result, method)
+
+
+def register(mcp: FastMCP, client: CivixClient) -> None:
+    """Enregistre les outils d'analyse de députés."""
+    DeputeAnalyses(client).register(mcp)

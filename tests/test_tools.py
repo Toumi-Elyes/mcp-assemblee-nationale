@@ -1,12 +1,19 @@
 import json
-from typing import Any
 
 import pytest
-from fastmcp import Client
 from fastmcp.exceptions import ToolError
-from mcp.types import TextContent
 
-from tests.conftest import SCRUTIN_UID, CivixStub, Payload, load_fixture
+from tests.conftest import (
+    PANOSYAN,
+    SCRUTIN_UID,
+    VALLETOUX,
+    CivixStub,
+    DeputeStub,
+    McpClient,
+    call,
+    load_fixture,
+    search_with_deputes,
+)
 
 EXPECTED_TOOLS = {
     "rechercher",
@@ -35,33 +42,6 @@ EXPECTED_TOOLS = {
     "exporter_scrutins",
     "exporter_votes",
 }
-VALLETOUX = ("PA795350", "Frédéric", "Valletoux", "HOR")
-PANOSYAN = ("PA795050", "Astrid", "Panosyan-Bouvet", "EPR")
-
-McpClient = Client[Any]
-
-
-async def call(client: McpClient, name: str, **arguments: Any) -> str:
-    result = await client.call_tool(name, arguments)
-    content = result.content[0]
-    assert isinstance(content, TextContent)
-    return content.text
-
-
-def search_with_deputes(*deputes: tuple[str, str, str, str]) -> Payload:
-    payload = load_fixture("search_depute")
-    payload["data"]["attributes"]["results"]["deputes"] = [
-        {
-            "acteur_uid": uid,
-            "prenom": prenom,
-            "nom": nom,
-            "groupe_libelle_abrev": groupe,
-            "circ_departement": "Paris",
-            "slug": f"{prenom}-{nom}".lower(),
-        }
-        for uid, prenom, nom, groupe in deputes
-    ]
-    return payload
 
 
 async def test_all_tools_are_registered_read_only(mcp_client: McpClient) -> None:
@@ -258,7 +238,8 @@ async def test_comment_a_vote_ambiguous_deputy_lists_candidates(
     civix_mock.add(
         "/search",
         search_with_deputes(
-            ("PA1", "Élisa", "Martin", "LFI-NFP"), ("PA2", "Patrice", "Martin", "RN")
+            DeputeStub("PA1", "Élisa", "Martin", "LFI-NFP"),
+            DeputeStub("PA2", "Patrice", "Martin", "RN"),
         ),
         search="Martin",
     )
@@ -275,7 +256,8 @@ async def test_comment_a_vote_exact_name_resolves_ambiguity(
     civix_mock.add(
         "/search",
         search_with_deputes(
-            ("PA1", "Élisa", "Martin", "LFI-NFP"), ("PA2", "Élisabeth", "Martineau", "RN")
+            DeputeStub("PA1", "Élisa", "Martin", "LFI-NFP"),
+            DeputeStub("PA2", "Élisabeth", "Martineau", "RN"),
         ),
         search="élisa martin",
     )

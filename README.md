@@ -377,36 +377,17 @@ Les réponses enregistrées sont dans `tests/fixtures/`, avec la spécification 
 
 ```
 src/assemblee_mcp/
-├── civix/
-│   ├── client.py     client HTTP async (caches TTL, une nouvelle tentative, erreurs en français)
-│   ├── budget.py     budget d'appels CIVIX par appel d'outil
-│   ├── models.py     modèles Pydantic des réponses CIVIX
-│   ├── lookup.py     recherches composées (députés, groupes, sigles)
-│   ├── search.py     recherche d'un ensemble de scrutins par sujet ou période
-│   └── errors.py     erreurs lisibles pour l'utilisateur
-├── analytics/
-│   ├── gather.py     constitution des échantillons de scrutins et de votes
-│   ├── stats.py      calculs (taux d'adoption, accords, cohésion, bilans)
-│   ├── models.py     modèles des résultats d'analyse
-│   ├── render.py     mise en forme, dont le bloc « Méthode »
-│   └── exporting.py  export CSV / JSON (neutralisation des formules de tableur)
-├── tools/
-│   ├── recherche.py  rechercher
-│   ├── scrutins.py   rechercher_scrutins, obtenir_scrutin, votes_scrutin, declarations_groupes
-│   ├── deputes.py    rechercher_deputes, obtenir_depute, comment_a_vote
-│   ├── groupes.py    lister_groupes, obtenir_groupe
-│   ├── analyses.py   tendances, dossiers, positions, accords, cohésion, bilans, comparaisons
-│   ├── export.py     exporter_scrutins, exporter_votes
-│   ├── chatgpt.py    search, fetch (format ChatGPT)
-│   └── common.py     types de paramètres, annotations lecture seule, budget, conversion d'erreurs
-├── formatting.py     mise en forme des réponses en français
-├── links.py          liens vers CIVIX et l'Assemblée nationale
-├── urls.py           liste des sites autorisés pour les liens repris
-├── textutils.py      comparaison de textes sans accents ni casse
+├── civix/            client HTTP async de l'API CIVIX : caches, budget d'appels, erreurs en français
+│   └── models/       modèles Pydantic des réponses CIVIX (enveloppe, scrutins, députés, groupes)
+├── analytics/        analyses pures : échantillons (gather), calculs (stats/), rendu avec bloc « Méthode » (render/), exports CSV/JSON
+├── tools/            outils MCP, une classe par famille d'outils (ToolSet) ; analyses/ regroupe les outils de tendance
+├── formatting/       mise en forme des réponses en français (scrutins, votes, députés, déclarations, sources)
+├── limits.py         budgets, délais, tailles de page et plafonds de période, chacun commenté
 ├── prompts.py        questions prêtes à l'emploi
-├── config.py         réglages (variables d'environnement)
+├── config.py         réglages lus dans les variables d'environnement
 ├── server.py         assemble le serveur (`mcp`) et la route /health
-└── __main__.py       lancement en stdio ou en HTTP
+├── __main__.py       lancement en stdio ou en HTTP
+└── README.md         plan détaillé du code et parcours d'une requête
 api/index.py          point d'entrée Vercel (ASGI)
 web/                  page de démo (Next.js)
 ```

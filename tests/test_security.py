@@ -1,5 +1,4 @@
 import asyncio
-from typing import Any
 
 import httpx
 import pytest
@@ -23,15 +22,9 @@ from assemblee_mcp.links import depute_assemblee_url, depute_civix_url
 from assemblee_mcp.server import create_server
 from assemblee_mcp.tools import common
 from assemblee_mcp.urls import safe_url
-from tests.conftest import API, SCRUTIN_UID, CivixStub, load_fixture
+from tests.conftest import API, SCRUTIN_UID, CivixStub, McpClient, call, load_fixture
 
-McpClient = Client[Any]
 HIDDEN = "".join(chr(code) for code in (0x00, 0x07, 0x200B, 0x202E, 0x2066, 0xFEFF))
-
-
-async def call(client: McpClient, name: str, **arguments: Any) -> str:
-    result = await client.call_tool(name, arguments)
-    return str(result.content[0].text)  # type: ignore[union-attr]
 
 
 async def test_503_is_not_retried(settings: Settings) -> None:
