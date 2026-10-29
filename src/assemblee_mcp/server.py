@@ -1,5 +1,7 @@
 """Serveur MCP : point d'entrée `mcp` pour FastMCP Cloud et fabrique `create_server`."""
 
+from importlib.metadata import PackageNotFoundError, version
+
 from fastmcp import FastMCP
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
@@ -9,6 +11,7 @@ from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.tools import chatgpt, deputes, groupes, recherche, scrutins
 
 SERVER_NAME = "Assemblée nationale (CIVIX)"
+PACKAGE_NAME = "mcp-assemblee-nationale"
 INSTRUCTIONS = """\
 Ce serveur donne accès aux votes de l'Assemblée nationale française (scrutins publics, \
 députés, groupes parlementaires) via l'API ouverte CIVIX.
@@ -31,10 +34,18 @@ lequel tu cites. Utilise les accents français dans les mots-clés.
 """
 
 
+def package_version() -> str:
+    """Version du paquet installé."""
+    try:
+        return version(PACKAGE_NAME)
+    except PackageNotFoundError:
+        return "0.0.0"
+
+
 def create_server(client: CivixClient | None = None) -> FastMCP:
     """Construit le serveur ; un client peut être injecté (tests)."""
     civix = client or CivixClient()
-    server = FastMCP(name=SERVER_NAME, instructions=INSTRUCTIONS)
+    server = FastMCP(name=SERVER_NAME, instructions=INSTRUCTIONS, version=package_version())
     for module in (recherche, scrutins, deputes, groupes, chatgpt):
         module.register(server, civix)
     prompts.register(server)

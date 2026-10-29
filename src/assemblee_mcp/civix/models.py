@@ -6,7 +6,7 @@ directement sous `data`, ce que `extra="ignore"` écarte.
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Generic, TypeVar
+from typing import TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -27,7 +27,7 @@ class Position(StrEnum):
     UNKNOWN = "unknown"
 
     @classmethod
-    def _missing_(cls, value: object) -> "Position":
+    def _missing_(cls, value: object) -> Position:
         return cls.UNKNOWN
 
     @property
@@ -99,14 +99,14 @@ class Citation(CivixModel):
 AttributesT = TypeVar("AttributesT", bound=CivixModel)
 
 
-class Data(CivixModel, Generic[AttributesT]):
+class Data[AttributesT: CivixModel](CivixModel):
     """Bloc `data` : type de ressource et attributs."""
 
     type: str | None = None
     attributes: AttributesT
 
 
-class CivixResponse(CivixModel, Generic[AttributesT]):
+class CivixResponse[AttributesT: CivixModel](CivixModel):
     """Enveloppe commune à toutes les réponses CIVIX."""
 
     answer: str | None = None

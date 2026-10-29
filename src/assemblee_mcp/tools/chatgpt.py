@@ -60,7 +60,8 @@ def split_id(identifier: str) -> tuple[str, str]:
     prefix, separator, value = identifier.partition(ID_SEPARATOR)
     if not separator or not value:
         raise ToolError(
-            "Identifiant invalide : attendu « scrutin:<uid> », « depute:<uid> » ou « groupe:<sigle> »."
+            "Identifiant invalide : attendu « scrutin:<uid> », « depute:<uid> » "
+            "ou « groupe:<sigle> »."
         )
     if prefix not in {SCRUTIN_PREFIX, DEPUTE_PREFIX, GROUPE_PREFIX}:
         raise ToolError(f"Type d'identifiant inconnu : « {prefix} ».")
@@ -119,7 +120,10 @@ def register(mcp: FastMCP, client: CivixClient) -> None:
         id: Annotated[
             str,
             Field(
-                description="Identifiant renvoyé par `search` : scrutin:<uid>, depute:<uid>, groupe:<sigle>.",
+                description=(
+                    "Identifiant renvoyé par `search` : "
+                    "scrutin:<uid>, depute:<uid> ou groupe:<sigle>."
+                ),
                 min_length=3,
                 max_length=100,
             ),

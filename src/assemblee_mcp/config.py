@@ -25,7 +25,7 @@ class Settings:
     user_agent: str = DEFAULT_USER_AGENT
 
     @classmethod
-    def from_env(cls) -> "Settings":
+    def from_env(cls) -> Settings:
         """Construit les paramètres à partir des variables `CIVIX_*`."""
         return cls(
             base_url=os.environ.get("CIVIX_BASE_URL", DEFAULT_BASE_URL).rstrip("/"),

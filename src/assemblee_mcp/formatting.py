@@ -202,7 +202,8 @@ def scrutin_facts(scrutin: ScrutinDetail) -> list[str]:
 def scrutin_heading(scrutin: ScrutinDetail) -> str:
     """Titre markdown d'un scrutin."""
     number = f" n°{scrutin.numero}" if scrutin.numero is not None else ""
-    return f"## Scrutin{number} — {format_date(scrutin.date_scrutin)}\n\n{truncate(scrutin.titre, 600)}"
+    title = truncate(scrutin.titre, 600)
+    return f"## Scrutin{number} — {format_date(scrutin.date_scrutin)}\n\n{title}"
 
 
 def format_scrutin(
@@ -296,7 +297,9 @@ def format_votes(
         names = vote_names(group)
         shown = names[:budget]
         budget -= len(shown)
-        lines += ["", f"### {position.label} ({len(group)})", ", ".join(shown) or "—"]
+        lines += ["", f"### {position.label} ({len(group)})"]
+        if shown:
+            lines.append(", ".join(shown))
         if len(shown) < len(names):
             lines.append(f"… et {len(names) - len(shown)} autres.")
     if not selected:
@@ -498,7 +501,7 @@ def position_sentence(entry: ScrutinPosition) -> str:
     if entry.unavailable:
         return "Votes de ce scrutin momentanément indisponibles."
     if entry.vote is None:
-        return "Aucun vote enregistré pour ce député sur ce scrutin (absent ou non listé)."
+        return "Aucun vote enregistré pour ce député sur ce scrutin."
     delegation = " (par délégation)" if entry.vote.par_delegation else ""
     return f"A voté : **{entry.vote.position.label}**{delegation}."
 

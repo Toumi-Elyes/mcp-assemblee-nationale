@@ -47,7 +47,7 @@ PositionName = Literal["pour", "contre", "abstention", "non_votant"]
 P = ParamSpec("P")
 
 
-def civix_tool(function: Callable[P, Awaitable[str]]) -> Callable[P, Awaitable[str]]:
+def civix_tool[**P](function: Callable[P, Awaitable[str]]) -> Callable[P, Awaitable[str]]:
     """Convertit une `CivixError` en `ToolError` au message clair, sans trace d'appel."""
 
     @functools.wraps(function)
