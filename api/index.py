@@ -12,11 +12,21 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
 from starlette.types import Receive, Scope, Send
 
 from assemblee_mcp.server import mcp
 
-mcp_app = mcp.http_app(path="/mcp", stateless_http=True, json_response=True)
+CORS = Middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+    expose_headers=["Mcp-Session-Id"],
+)
+
+mcp_app = mcp.http_app(path="/mcp", stateless_http=True, json_response=True, middleware=[CORS])
 
 
 class LazyLifespanApp:

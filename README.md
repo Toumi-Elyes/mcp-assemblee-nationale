@@ -21,7 +21,6 @@ L'adresse à coller dans votre assistant :
 https://mcp-assemblee-nationale.vercel.app/mcp
 ```
 
-<!-- URL à confirmer après déploiement -->
 
 ---
 
