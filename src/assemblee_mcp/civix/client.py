@@ -11,6 +11,7 @@ from urllib.parse import quote
 import httpx
 from pydantic import ValidationError
 
+from assemblee_mcp.civix.budget import CivixBudgetError, charge_call
 from assemblee_mcp.civix.errors import (
     UNEXPECTED_MESSAGE,
     CivixError,
@@ -30,16 +31,57 @@ from assemblee_mcp.civix.models import (
     SearchResponse,
     StatementsResponse,
 )
-from assemblee_mcp.config import Settings
+from assemblee_mcp.config import (
+    CONNECT_TIMEOUT_SECONDS,
+    MAX_CONCURRENT_REQUESTS,
+    MAX_CONNECTIONS,
+    MAX_KEEPALIVE_CONNECTIONS,
+    POOL_TIMEOUT_SECONDS,
+    Settings,
+)
 
 QueryParams = Mapping[str, str | int | bool | None]
 CacheKey = tuple[str, tuple[tuple[str, str], ...]]
 MAX_ATTEMPTS = 2
+FORBIDDEN_SEGMENTS = frozenset({"", ".", ".."})
+RETRYABLE_STATUSES = frozenset({HTTPStatus.BAD_GATEWAY, HTTPStatus.GATEWAY_TIMEOUT})
+VOTES_SUFFIX = "/votes"
 
 
 def segment(value: str) -> str:
-    """Encode une valeur insérée dans un chemin d'URL (`/`, `?`, `..` compris)."""
+    """Encode une valeur insérée dans un chemin d'URL ; refuse `""`, `.` et `..`."""
+    if value in FORBIDDEN_SEGMENTS:
+        raise CivixNotFoundError
     return quote(value, safe="")
+
+
+class TtlCache:
+    """Cache LRU à durée de vie limitée et taille plafonnée."""
+
+    def __init__(self, max_entries: int, ttl: float, clock: Callable[[], float]) -> None:
+        self._max_entries = max_entries
+        self._ttl = ttl
+        self._clock = clock
+        self._entries: OrderedDict[CacheKey, tuple[float, CivixResponse[Any]]] = OrderedDict()
+
+    def get(self, key: CacheKey) -> CivixResponse[Any] | None:
+        """Valeur en cache non expirée, sinon `None`."""
+        entry = self._entries.get(key)
+        if entry is None:
+            return None
+        expires_at, value = entry
+        if expires_at <= self._clock():
+            del self._entries[key]
+            return None
+        self._entries.move_to_end(key)
+        return value
+
+    def set(self, key: CacheKey, value: CivixResponse[Any]) -> None:
+        """Mémorise une valeur en évinçant les plus anciennes au-delà du plafond."""
+        self._entries[key] = (self._clock() + self._ttl, value)
+        self._entries.move_to_end(key)
+        while len(self._entries) > self._max_entries:
+            self._entries.popitem(last=False)
 
 
 class CivixClient:
@@ -52,11 +94,15 @@ class CivixClient:
         transport: httpx.AsyncBaseTransport | None = None,
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
-        self.settings = settings or Settings.from_env()
+        settings_ = settings or Settings.from_env()
+        self.settings = settings_
         self._transport = transport
         self._clock = clock
         self._http: httpx.AsyncClient | None = None
-        self._cache: OrderedDict[CacheKey, tuple[float, CivixResponse[Any]]] = OrderedDict()
+        self._cache = TtlCache(settings_.cache_max_entries, settings_.cache_ttl, clock)
+        self._votes_cache = TtlCache(settings_.votes_cache_max_entries, settings_.cache_ttl, clock)
+        self._inflight: dict[CacheKey, asyncio.Future[CivixResponse[Any]]] = {}
+        self._slots = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
 
     async def aclose(self) -> None:
         """Ferme la connexion HTTP sous-jacente."""
@@ -68,7 +114,15 @@ class CivixClient:
         if self._http is None:
             self._http = httpx.AsyncClient(
                 base_url=self.settings.base_url,
-                timeout=self.settings.timeout,
+                timeout=httpx.Timeout(
+                    self.settings.timeout,
+                    connect=CONNECT_TIMEOUT_SECONDS,
+                    pool=POOL_TIMEOUT_SECONDS,
+                ),
+                limits=httpx.Limits(
+                    max_connections=MAX_CONNECTIONS,
+                    max_keepalive_connections=MAX_KEEPALIVE_CONNECTIONS,
+                ),
                 headers={"User-Agent": self.settings.user_agent, "Accept": "application/json"},
                 transport=self._transport,
             )
@@ -149,29 +203,69 @@ class CivixClient:
             if value is not None
         }
         key: CacheKey = (path, tuple(sorted(clean.items())))
-        cached = self._cache_get(key)
+        cache = self._votes_cache if path.endswith(VOTES_SUFFIX) else self._cache
+        cached = cache.get(key)
         if cached is not None and isinstance(cached, response_model):
             return cached
-        payload = await self._fetch_json(path, clean)
+        pending = self._inflight.get(key)
+        if pending is not None:
+            shared = await pending
+            if isinstance(shared, response_model):
+                return shared
+        future: asyncio.Future[CivixResponse[Any]] = asyncio.get_running_loop().create_future()
+        future.add_done_callback(lambda done: done.cancelled() or done.exception())
+        self._inflight[key] = future
         try:
-            parsed = response_model.model_validate(payload)
+            parsed = await self._load(path, clean, response_model)
+        except BaseException as error:
+            future.set_exception(
+                error if isinstance(error, CivixError) else CivixUnavailableError()
+            )
+            raise
+        else:
+            cache.set(key, parsed)
+            future.set_result(parsed)
+            return parsed
+        finally:
+            del self._inflight[key]
+
+    async def _load[AttributesT: CivixModel](
+        self,
+        path: str,
+        params: dict[str, str],
+        response_model: type[CivixResponse[AttributesT]],
+    ) -> CivixResponse[AttributesT]:
+        payload = await self._fetch_json(path, params)
+        try:
+            return response_model.model_validate(payload)
         except ValidationError as error:
             raise CivixError(UNEXPECTED_MESSAGE) from error
-        self._cache_set(key, parsed)
-        return parsed
 
     async def _fetch_json(self, path: str, params: dict[str, str]) -> Any:
         for attempt in range(MAX_ATTEMPTS):
             if attempt > 0:
                 await asyncio.sleep(self.settings.retry_delay)
             try:
-                response = await self._client().get(path, params=params)
-            except httpx.HTTPError:
+                charge_call()
+            except CivixBudgetError:
+                if attempt == 0:
+                    raise
+                raise CivixUnavailableError from None
+            try:
+                async with self._slots:
+                    response = await self._client().get(path, params=params)
+            except httpx.TransportError:
                 continue
+            except httpx.HTTPError as error:
+                raise CivixUnavailableError from error
             if response.status_code == HTTPStatus.NOT_FOUND:
                 raise CivixNotFoundError
-            if response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
+            if response.status_code in RETRYABLE_STATUSES:
                 continue
+            if response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
+                raise CivixUnavailableError
+            if response.status_code == HTTPStatus.TOO_MANY_REQUESTS:
+                raise CivixUnavailableError
             if response.status_code >= HTTPStatus.BAD_REQUEST:
                 raise CivixError(UNEXPECTED_MESSAGE)
             try:
@@ -179,20 +273,3 @@ class CivixClient:
             except ValueError as error:
                 raise CivixError(UNEXPECTED_MESSAGE) from error
         raise CivixUnavailableError
-
-    def _cache_get(self, key: CacheKey) -> CivixResponse[Any] | None:
-        entry = self._cache.get(key)
-        if entry is None:
-            return None
-        expires_at, value = entry
-        if expires_at <= self._clock():
-            del self._cache[key]
-            return None
-        self._cache.move_to_end(key)
-        return value
-
-    def _cache_set(self, key: CacheKey, value: CivixResponse[Any]) -> None:
-        self._cache[key] = (self._clock() + self.settings.cache_ttl, value)
-        self._cache.move_to_end(key)
-        while len(self._cache) > self.settings.cache_max_entries:
-            self._cache.popitem(last=False)

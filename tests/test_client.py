@@ -42,10 +42,10 @@ async def test_cache_is_bounded(civix_mock: CivixStub) -> None:
     assert len(civix_mock.requests) == 4
 
 
-async def test_retry_on_503_then_success(settings: Settings) -> None:
+async def test_retry_on_502_then_success(settings: Settings) -> None:
     with respx.mock(base_url=API) as router:
         route = router.get("/groupes").mock(
-            side_effect=[httpx.Response(503), httpx.Response(200, json=load_fixture("groupes"))]
+            side_effect=[httpx.Response(502), httpx.Response(200, json=load_fixture("groupes"))]
         )
         response = await CivixClient(settings).list_groupes()
     assert route.call_count == 2
@@ -54,7 +54,7 @@ async def test_retry_on_503_then_success(settings: Settings) -> None:
 
 async def test_two_failures_raise_unavailable(settings: Settings) -> None:
     with respx.mock(base_url=API) as router:
-        route = router.get("/groupes").mock(return_value=httpx.Response(503))
+        route = router.get("/groupes").mock(return_value=httpx.Response(502))
         with pytest.raises(CivixUnavailableError, match="indisponible"):
             await CivixClient(settings).list_groupes()
     assert route.call_count == 2
@@ -81,8 +81,8 @@ async def test_errors_are_not_cached(settings: Settings) -> None:
     with respx.mock(base_url=API) as router:
         route = router.get("/groupes").mock(
             side_effect=[
-                httpx.Response(503),
-                httpx.Response(503),
+                httpx.Response(502),
+                httpx.Response(502),
                 httpx.Response(200, json=load_fixture("groupes")),
             ]
         )

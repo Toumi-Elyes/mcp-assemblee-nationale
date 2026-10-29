@@ -4,9 +4,15 @@ import os
 from dataclasses import dataclass
 
 DEFAULT_BASE_URL = "https://www.civix.fr/api/v1"
-DEFAULT_TIMEOUT_SECONDS = 15.0
+DEFAULT_TIMEOUT_SECONDS = 10.0
+CONNECT_TIMEOUT_SECONDS = 5.0
+POOL_TIMEOUT_SECONDS = 5.0
 DEFAULT_CACHE_TTL_SECONDS = 600.0
 DEFAULT_CACHE_MAX_ENTRIES = 500
+DEFAULT_VOTES_CACHE_MAX_ENTRIES = 100
+MAX_CONCURRENT_REQUESTS = 4
+MAX_CONNECTIONS = 8
+MAX_KEEPALIVE_CONNECTIONS = 4
 DEFAULT_RETRY_DELAY_SECONDS = 0.3
 DEFAULT_USER_AGENT = (
     "mcp-assemblee-nationale (+https://github.com/Toumi-Elyes/mcp-assemblee-nationale)"
@@ -21,6 +27,7 @@ class Settings:
     timeout: float = DEFAULT_TIMEOUT_SECONDS
     cache_ttl: float = DEFAULT_CACHE_TTL_SECONDS
     cache_max_entries: int = DEFAULT_CACHE_MAX_ENTRIES
+    votes_cache_max_entries: int = DEFAULT_VOTES_CACHE_MAX_ENTRIES
     retry_delay: float = DEFAULT_RETRY_DELAY_SECONDS
     user_agent: str = DEFAULT_USER_AGENT
 

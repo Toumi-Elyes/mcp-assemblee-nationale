@@ -25,12 +25,14 @@ from assemblee_mcp.formatting import (
 )
 from assemblee_mcp.tools.common import (
     DEFAULT_PAGE_SIZE,
+    DIRECTORY_MAX_CALLS,
     READ_ONLY_ANNOTATIONS,
     GroupeAbbreviation,
     LegislatureNumber,
     Page,
     ScrutinUid,
     civix_tool,
+    limited,
 )
 
 DeputeUid = Annotated[
@@ -80,7 +82,7 @@ async def position_for_summary(
 def register(mcp: FastMCP, client: CivixClient) -> None:
     """Enregistre les outils sur les députés."""
 
-    @civix_tool
+    @limited(DIRECTORY_MAX_CALLS)
     async def rechercher_deputes(
         nom: Annotated[
             str | None,
@@ -101,8 +103,9 @@ def register(mcp: FastMCP, client: CivixClient) -> None:
         obtenir_depute. Sans `nom`, liste les députés (filtrables par groupe).
         """
         if nom is None:
+            abbr = await lookup.resolve_groupe(client, groupe) if groupe is not None else None
             response = await client.list_deputes(
-                groupe=groupe, legislature=legislature, page=page, page_size=DEFAULT_PAGE_SIZE
+                groupe=abbr, legislature=legislature, page=page, page_size=DEFAULT_PAGE_SIZE
             )
             deputes = list(response.attributes.results)
             hint = pagination_hint(response.pagination, len(deputes), "député(s)")

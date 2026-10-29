@@ -33,6 +33,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             port=args.port,
             path=MCP_PATH,
             stateless_http=True,
+            host_origin_protection="auto",
         )
         return
     mcp.run()

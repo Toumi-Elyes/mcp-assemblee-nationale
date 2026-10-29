@@ -1,6 +1,7 @@
 """Construction des liens publics vers CIVIX et l'Assemblée nationale."""
 
 from assemblee_mcp.civix.models import Depute, Groupe
+from assemblee_mcp.urls import safe_url
 
 CIVIX_SITE = "https://www.civix.fr"
 ASSEMBLEE_DEPUTES = "https://www.assemblee-nationale.fr/dyn/deputes"
@@ -28,14 +29,17 @@ def assemblee_depute_url(uid: str) -> str:
 
 def depute_civix_url(depute: Depute) -> str:
     """Lien CIVIX d'un député."""
-    return (depute.urls.civix_page if depute.urls else None) or civix_depute_url(depute.uid)
+    given = depute.urls.civix_page if depute.urls else None
+    return safe_url(given, civix_depute_url(depute.uid)) or civix_depute_url(depute.uid)
 
 
 def depute_assemblee_url(depute: Depute) -> str:
     """Lien Assemblée nationale d'un député."""
-    return (depute.urls.assemblee if depute.urls else None) or assemblee_depute_url(depute.uid)
+    given = depute.urls.assemblee if depute.urls else None
+    return safe_url(given, assemblee_depute_url(depute.uid)) or assemblee_depute_url(depute.uid)
 
 
 def groupe_civix_url(groupe: Groupe) -> str:
     """Lien CIVIX d'un groupe."""
-    return (groupe.urls.page if groupe.urls else None) or civix_groupe_url(groupe.abbr)
+    given = groupe.urls.page if groupe.urls else None
+    return safe_url(given, civix_groupe_url(groupe.abbr)) or civix_groupe_url(groupe.abbr)
