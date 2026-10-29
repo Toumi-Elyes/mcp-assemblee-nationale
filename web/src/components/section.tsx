@@ -16,7 +16,7 @@ export const Section: React.FC<SectionProps> = ({ id, title, intro, meta, tone =
     <section
       id={id}
       aria-labelledby={headingId}
-      className={cn("py-16 sm:py-20", tone === "surface" ? "bg-surface" : undefined, className)}
+      className={cn("py-20 sm:py-28", tone === "surface" ? "bg-surface" : undefined, className)}
     >
       <div className="mx-auto w-full max-w-page px-4 sm:px-6">
         <header className="flex flex-col gap-4 border-b-2 border-rule pb-5 lg:flex-row lg:items-end lg:justify-between lg:gap-12">

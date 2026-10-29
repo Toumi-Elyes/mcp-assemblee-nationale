@@ -12,7 +12,7 @@ export const FinalCta: React.FC = () => {
             Une adresse à coller dans votre assistant, et chaque vote devient vérifiable.
           </p>
         </div>
-        <InstallLine fieldId="adresse-connecteur-fin" headingId="ajouter-fin-titre" showDefinition />
+        <InstallLine fieldId="adresse-connecteur-fin" headingId="ajouter-fin-titre" />
       </div>
     </section>
   );

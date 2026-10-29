@@ -12,7 +12,7 @@ export const LiveSection: React.FC<{ view: HomeView }> = ({ view }) => {
     <Section
       id="tendances"
       title="Ce que le connecteur lit aujourd'hui"
-      intro="Ces chiffres sont lus dans les données de l'Assemblée nationale, sans mise en forme à la main."
+      intro="Tirés des données ouvertes de l'Assemblée nationale et mis à jour automatiquement."
       tone="surface"
     >
       {nothing ? (

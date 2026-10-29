@@ -19,29 +19,18 @@ const STOPS = [
   },
 ] as const;
 
-type InstallLineProps = {
-  fieldId: string;
-  headingId: string;
-  compact?: boolean;
-  showDefinition?: boolean;
-  className?: string;
-};
+type InstallLineProps = { fieldId: string; headingId: string; className?: string };
 
-export const InstallLine: React.FC<InstallLineProps> = ({ fieldId, headingId, compact = false, showDefinition = false, className }) => {
+export const InstallLine: React.FC<InstallLineProps> = ({ fieldId, headingId, className }) => {
   return (
     <div className={cn("flex flex-col gap-4", className)}>
-      <div
-        className={cn(
-          "flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6",
-          compact ? "lg:sr-only" : undefined,
-        )}
-      >
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
         <h2 id={headingId} className="font-display text-2xl font-semibold tracking-tight">
           {CTA_LABEL} : trois étapes, aucune ligne de code
         </h2>
         <p className="text-sm text-ink-soft">Gratuit, sans compte, sans clé. Pour Claude et ChatGPT.</p>
       </div>
-      <ol className={cn("grid gap-0", compact ? "lg:grid-cols-[minmax(0,10fr)_minmax(0,6fr)_minmax(0,3fr)]" : "lg:grid-cols-[minmax(0,8fr)_minmax(0,5fr)_minmax(0,5fr)]")}>
+      <ol className="grid gap-0 lg:grid-cols-[minmax(0,8fr)_minmax(0,5fr)_minmax(0,5fr)]">
         {STOPS.map((stop, index) => {
           const isFirst = index === 0;
           const isLast = index === STOPS.length - 1;
@@ -63,7 +52,7 @@ export const InstallLine: React.FC<InstallLineProps> = ({ fieldId, headingId, co
                   <span className="sr-only">Étape {index + 1} : </span>
                   {stop.title}
                 </h3>
-                {compact ? null : <p className="max-w-measure text-base text-ink-soft">{stop.text}</p>}
+                <p className="max-w-measure text-base text-ink-soft">{stop.text}</p>
                 {isFirst ? <CopyField id={fieldId} className="mt-1" /> : null}
                 {index === 1 ? (
                   <a href={INSTALL_HREF} className={`${LINK_TEXT} self-start text-base font-medium`}>
@@ -73,22 +62,15 @@ export const InstallLine: React.FC<InstallLineProps> = ({ fieldId, headingId, co
                     </span>
                   </a>
                 ) : null}
-                {index === 1 && compact ? (
-                  <p aria-hidden="true" className="hidden text-sm text-ink-soft lg:block">
-                    Gratuit, sans compte, sans clé. Pour Claude et ChatGPT.
-                  </p>
-                ) : null}
               </div>
             </li>
           );
         })}
       </ol>
-      {showDefinition ? (
-        <p className="max-w-measure text-sm text-muted">
-          Un connecteur est une adresse que votre assistant sait interroger pour obtenir des données fiables. Son nom
-          technique est MCP.
-        </p>
-      ) : null}
+      <p className="max-w-measure text-sm text-muted">
+        Un connecteur est une adresse que votre assistant sait interroger pour obtenir des données fiables. Son nom
+        technique est MCP.
+      </p>
     </div>
   );
 };

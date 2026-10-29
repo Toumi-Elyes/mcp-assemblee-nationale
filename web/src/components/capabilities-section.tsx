@@ -62,7 +62,7 @@ export const CapabilitiesSection: React.FC = () => {
           <span className="text-right">Outil</span>
         </div>
         {CAPABILITY_GROUPS.map((group, index) => (
-          <details key={group.id} open={index < 2} className="group">
+          <details key={group.id} open={index === 0} className="group">
             <summary className="flex cursor-pointer list-none items-baseline justify-between gap-4 border-b border-rule py-4 transition-colors hover:text-accent">
               <span className="flex flex-col gap-1">
                 <span className="font-display text-2xl font-semibold tracking-tight">{group.title}</span>

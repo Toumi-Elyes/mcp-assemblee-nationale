@@ -2,7 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { getScrutinVotes } from "@/lib/civix/api";
 import { toPosition, toResult } from "@/lib/civix/mappers";
-import { firstAssembleeUrl, safeUrl } from "@/lib/civix/urls";
+import { assembleeScrutinUrl, safeUrl } from "@/lib/civix/urls";
 import { CIVIX_SITE } from "@/lib/config";
 import { cleanTitle } from "@/lib/text";
 import { getFinalVotes, getSuggestions } from "./home";
@@ -25,7 +25,7 @@ export const getHeroChat = cache(async (): Promise<HeroChat | null> => {
     return null;
   }
   const topic = latest.dossier?.label ?? latest.title;
-  const assembleeUrl = firstAssembleeUrl(response.source?.source_urls ?? []);
+  const assembleeUrl = assembleeScrutinUrl(attributes.scrutin);
   const cleanTopic = cleanTitle(topic);
   const subject = cleanTopic.length <= QUESTION_TOPIC_LIMIT && !cleanTopic.endsWith("…") ? cleanTopic : GENERIC_SUBJECT;
   return {

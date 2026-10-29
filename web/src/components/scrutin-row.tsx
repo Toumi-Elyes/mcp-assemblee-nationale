@@ -20,7 +20,9 @@ export const BoardHead: React.FC = () => {
   );
 };
 
-export const ScrutinRow: React.FC<{ scrutin: ScrutinRowData; counts: Counts | undefined }> = ({ scrutin, counts }) => {
+type ScrutinRowProps = { scrutin: ScrutinRowData; counts: Counts | undefined; dossier?: string | null };
+
+export const ScrutinRow: React.FC<ScrutinRowProps> = ({ scrutin, counts, dossier = null }) => {
   return (
     <li className={`flex flex-col gap-2 border-b border-line py-3.5 ${BOARD_COLUMNS} sm:items-start`}>
       <span className="flex items-center justify-between gap-3 sm:contents">
@@ -35,17 +37,19 @@ export const ScrutinRow: React.FC<{ scrutin: ScrutinRowData; counts: Counts | un
           <ResultBadge result={scrutin.result} />
         </span>
       </span>
-      <span className="flex min-w-0 flex-col gap-2 sm:order-2">
+      <span className="flex min-w-0 flex-col gap-1.5 sm:order-2">
+        {dossier !== null ? <span className="line-clamp-1 text-sm text-muted">{dossier}</span> : null}
         <a
           href={`/scrutins/${scrutin.uid}`}
-          className="text-base font-medium leading-6 text-ink underline decoration-line hover:text-accent hover:decoration-accent"
+          title={scrutin.title}
+          className="line-clamp-2 text-base font-medium leading-6 text-ink underline decoration-line hover:text-accent hover:decoration-accent"
         >
           {scrutin.title}
         </a>
         {counts !== undefined ? (
           <span className="flex flex-col gap-1.5">
             <PositionBar counts={counts} label="Répartition des votes" />
-            <span className="tabular text-sm text-ink-soft">
+            <span className="tabular text-xs text-muted">
               {formatNumber(counts.pour)} pour · {formatNumber(counts.contre)} contre ·{" "}
               {pluralize(counts.abstention, "abstention")}
             </span>

@@ -58,7 +58,7 @@ const HomePage = async () => {
       <LiveProvider initial={buildLiveSnapshot(view)}>
       <Hero chat={view.heroChat} generatedAt={view.generatedAt} />
       <Problem />
-      <Benefits counters={view.counters} />
+      <Benefits />
       <Tagline />
       <LiveSection view={view} />
       </LiveProvider>

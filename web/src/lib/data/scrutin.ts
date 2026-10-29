@@ -10,7 +10,7 @@ import { toPosition, toResult, toDay } from "@/lib/civix/mappers";
 import type { Counts, Dossier, Position, VoteResult } from "@/lib/civix/types";
 import { cleanTitle } from "@/lib/text";
 import { settle } from "./result";
-import { firstAssembleeUrl, safeUrl } from "@/lib/civix/urls";
+import { assembleeScrutinUrl, safeUrl } from "@/lib/civix/urls";
 import { CIVIX_SITE } from "@/lib/config";
 
 export type VoteRow = {
@@ -139,7 +139,7 @@ export const getScrutinPage = cache(async (uid: string): Promise<ScrutinPageData
     votes,
     groupOptions,
     civixUrl: safeUrl(response.source?.civix_urls["page"], `${CIVIX_SITE}/votes/${scrutin.uid}`),
-    assembleeUrl: firstAssembleeUrl(response.source?.source_urls ?? []),
+    assembleeUrl: assembleeScrutinUrl(scrutin),
   };
 });
 

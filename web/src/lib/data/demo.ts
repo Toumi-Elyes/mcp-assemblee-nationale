@@ -1,6 +1,6 @@
 import "server-only";
 import { getDepute, getScrutinVotes, listScrutins, searchDeputes } from "@/lib/civix/api";
-import { firstAssembleeUrl, safeUrl } from "@/lib/civix/urls";
+import { assembleeScrutinUrl, safeUrl } from "@/lib/civix/urls";
 import { toPosition, toResult } from "@/lib/civix/mappers";
 import type { Depute, Position, VoteResult } from "@/lib/civix/types";
 import { CIVIX_SITE } from "@/lib/config";
@@ -47,7 +47,7 @@ async function entryFor(deputeUid: string, uid: string): Promise<DemoEntry> {
     result: toResult(scrutin.sort_code, scrutin.is_adopted),
     position: vote ? toPosition(vote.position) : "unknown",
     civixUrl: safeUrl(response.source?.civix_urls["page"], `${CIVIX_SITE}/votes/${uid}`),
-    assembleeUrl: firstAssembleeUrl(response.source?.source_urls ?? []),
+    assembleeUrl: assembleeScrutinUrl(scrutin),
   };
 }
 
