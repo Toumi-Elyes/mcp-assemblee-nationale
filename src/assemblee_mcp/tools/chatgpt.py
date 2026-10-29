@@ -1,6 +1,7 @@
 """Outils `search` et `fetch` attendus par ChatGPT (deep research et connecteurs)."""
 
 import asyncio
+import re
 from typing import Annotated
 
 from fastmcp import FastMCP
@@ -24,6 +25,11 @@ SCRUTIN_PREFIX = "scrutin"
 DEPUTE_PREFIX = "depute"
 GROUPE_PREFIX = "groupe"
 ID_SEPARATOR = ":"
+ID_PATTERNS = {
+    SCRUTIN_PREFIX: re.compile(r"[A-Za-z0-9_-]{3,64}"),
+    DEPUTE_PREFIX: re.compile(r"[A-Za-z0-9]{3,32}"),
+    GROUPE_PREFIX: re.compile(r"[A-Za-z0-9_-]{1,32}"),
+}
 Metadata = dict[str, str | int | bool | None]
 
 
@@ -57,15 +63,18 @@ def make_id(prefix: str, value: str) -> str:
 
 
 def split_id(identifier: str) -> tuple[str, str]:
-    """Sépare `<type>:<valeur>` ; lève `ToolError` si le format est invalide."""
+    """Sépare `<type>:<valeur>` et valide la valeur ; lève `ToolError` si invalide."""
     prefix, separator, value = identifier.partition(ID_SEPARATOR)
     if not separator or not value:
         raise ToolError(
             "Identifiant invalide : attendu « scrutin:<uid> », « depute:<uid> » "
             "ou « groupe:<sigle> »."
         )
-    if prefix not in {SCRUTIN_PREFIX, DEPUTE_PREFIX, GROUPE_PREFIX}:
+    pattern = ID_PATTERNS.get(prefix)
+    if pattern is None:
         raise ToolError(f"Type d'identifiant inconnu : « {prefix} ».")
+    if pattern.fullmatch(value) is None:
+        raise ToolError(f"Identifiant invalide pour le type « {prefix} » : « {value[:40]} ».")
     return prefix, value
 
 

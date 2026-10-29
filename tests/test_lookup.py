@@ -41,15 +41,24 @@ async def test_find_deputes_uses_search_first(client: CivixClient, civix_mock: C
     assert civix_mock.paths() == ["/search"]
 
 
-async def test_find_deputes_falls_back_to_directory_without_accents(
+async def test_find_deputes_searches_each_word_when_full_name_fails(
+    client: CivixClient, civix_mock: CivixStub
+) -> None:
+    civix_mock.add("/search", load_fixture("search_depute"), search="abadie")
+    found = await lookup.find_deputes(client, "abadie amiel")
+    assert [d.nom for d in found] == ["Abadie-Amiel"]
+    assert civix_mock.paths() == ["/search", "/search"]
+
+
+async def test_find_deputes_falls_back_to_directory(
     client: CivixClient, civix_mock: CivixStub
 ) -> None:
     payload = load_fixture("deputes")
     payload["meta"]["pagination"]["next_page"] = None
     civix_mock.add("/deputes", payload, page="1")
-    found = await lookup.find_deputes(client, "abadie amiel")
+    found = await lookup.find_deputes(client, "audrey abadie amiel")
     assert [d.nom for d in found] == ["Abadie-Amiel"]
-    assert civix_mock.paths() == ["/search", "/deputes"]
+    assert civix_mock.paths() == ["/search", "/search", "/search", "/deputes"]
 
 
 async def test_find_deputes_by_uid(client: CivixClient) -> None:

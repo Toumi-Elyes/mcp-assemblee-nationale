@@ -236,6 +236,7 @@ Ce projet n'est affilié ni à l'Assemblée nationale, ni à CIVIX.
 **Vie privée**
 
 - Le serveur ne reçoit que la requête envoyée par l'IA (par exemple « retraites » ou un nom de député), jamais votre conversation.
+- Ces mots-clés sont transmis à l'API CIVIX pour faire la recherche.
 - Il n'enregistre pas les conversations, n'utilise aucun cookie et ne demande aucun compte.
 - Les réponses de CIVIX sont gardées 10 minutes en mémoire, puis oubliées.
 - Votre assistant (Claude, ChatGPT, Gemini) applique de son côté sa propre politique de confidentialité. L'hébergeur du serveur peut aussi tenir des journaux techniques d'accès : ce code n'y écrit pas vos questions.

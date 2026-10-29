@@ -9,6 +9,8 @@ from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from assemblee_mcp.urls import safe_url
+
 
 class CivixModel(BaseModel):
     """Base commune : champs inconnus ignorés, modèles immuables."""
@@ -78,14 +80,14 @@ class Source(CivixModel):
     def assemblee_url(self) -> str | None:
         """Lien précis vers l'Assemblée nationale, hors simple page d'accueil."""
         for url in self.source_urls:
-            if url.rstrip("/") != ASSEMBLEE_HOMEPAGE:
-                return url
+            if url.rstrip("/") != ASSEMBLEE_HOMEPAGE and (checked := safe_url(url)) is not None:
+                return checked
         return None
 
     @property
     def civix_page(self) -> str | None:
         """Page CIVIX lisible par un humain."""
-        return self.civix_urls.get("page")
+        return safe_url(self.civix_urls.get("page"))
 
 
 class Citation(CivixModel):

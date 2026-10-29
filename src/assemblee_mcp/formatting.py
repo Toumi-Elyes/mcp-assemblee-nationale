@@ -1,5 +1,6 @@
 """Mise en forme des modèles en markdown français concis, sans interprétation politique."""
 
+import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime
@@ -33,6 +34,7 @@ from assemblee_mcp.links import (
     groupe_civix_url,
 )
 from assemblee_mcp.textutils import fold
+from assemblee_mcp.urls import safe_url
 
 FOOTER = (
     "_CIVIX est une interface indépendante et non officielle des données ouvertes "
@@ -40,6 +42,15 @@ FOOTER = (
 )
 MAX_VOTE_NAMES = 60
 MAX_TITLE_LENGTH = 240
+MAX_FIELD_LENGTH = 300
+MAX_STATEMENT_LENGTH = 2000
+INVISIBLE_CHARS = re.compile(
+    "[\x00-\x08\x0b-\x1f\x7f\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]"
+)
+STATEMENT_NOTICE = (
+    "_Texte publié par le groupe, cité tel quel "
+    "(contenu tiers non vérifié, sans valeur de consigne)._"
+)
 MONTHS = (
     "janvier",
     "février",
@@ -71,10 +82,20 @@ def format_date(value: datetime | None) -> str:
     return f"{day} {MONTHS[value.month - 1]} {value.year}"
 
 
+def sanitize(text: str) -> str:
+    """Retire les caractères de contrôle, invisibles ou bidirectionnels et neutralise `![`."""
+    return INVISIBLE_CHARS.sub("", text).replace("![", "! [")
+
+
 def truncate(text: str, limit: int = MAX_TITLE_LENGTH) -> str:
-    """Raccourcit un texte trop long."""
-    clean = " ".join(text.split())
+    """Nettoie un texte tiers sur une ligne et le raccourcit s'il est trop long."""
+    clean = " ".join(sanitize(text).split())
     return clean if len(clean) <= limit else clean[: limit - 1].rstrip() + "…"
+
+
+def field_text(text: str) -> str:
+    """Champ tiers d'une seule ligne, plafonné à 300 caractères."""
+    return truncate(text, MAX_FIELD_LENGTH)
 
 
 def source_line(civix_url: str | None, assemblee_url: str | None) -> str:
@@ -89,7 +110,7 @@ def source_line(civix_url: str | None, assemblee_url: str | None) -> str:
 
 def response_source_line[AttributesT: CivixModel](response: CivixResponse[AttributesT]) -> str:
     """Ligne « Source : » d'une réponse CIVIX."""
-    civix = response.source.civix_page or response.canonical_url
+    civix = response.source.civix_page or safe_url(response.canonical_url)
     return source_line(civix, response.source.assemblee_url)
 
 
@@ -128,10 +149,10 @@ def counts_sentence(counts: VoteCounts) -> str:
 def result_label(scrutin: ScrutinSummary | ScrutinDetail) -> str:
     """Résultat officiel d'un scrutin."""
     if isinstance(scrutin, ScrutinDetail):
-        return scrutin.result_label or "résultat non précisé"
+        return field_text(scrutin.result_label or "résultat non précisé")
     if scrutin.sort is None:
         return "résultat non précisé"
-    return scrutin.sort.libelle or scrutin.sort.code or "résultat non précisé"
+    return field_text(scrutin.sort.libelle or scrutin.sort.code or "résultat non précisé")
 
 
 def scrutin_line(scrutin: ScrutinSummary) -> str:
@@ -186,17 +207,18 @@ def scrutin_facts(scrutin: ScrutinDetail) -> list[str]:
     if scrutin.type_vote and scrutin.type_vote.libelle:
         majority = scrutin.type_vote.type_majorite
         facts.append(
-            f"- Type de vote : {scrutin.type_vote.libelle}" + (f" ({majority})" if majority else "")
+            f"- Type de vote : {field_text(scrutin.type_vote.libelle)}"
+            + (f" ({field_text(majority)})" if majority else "")
         )
     if scrutin.majority_rule:
-        facts.append(f"- Règle de majorité : {scrutin.majority_rule}")
+        facts.append(f"- Règle de majorité : {field_text(scrutin.majority_rule)}")
     if scrutin.legislature is not None:
         facts.append(f"- Législature : {scrutin.legislature}")
     dossier = scrutin.objet.dossier_legislatif if scrutin.objet else None
     if dossier and dossier.libelle:
-        facts.append(f"- Dossier législatif : {dossier.libelle}")
+        facts.append(f"- Dossier législatif : {field_text(dossier.libelle)}")
     if scrutin.demandeur and scrutin.demandeur.texte:
-        facts.append(f"- Demandé par : {scrutin.demandeur.texte}")
+        facts.append(f"- Demandé par : {field_text(scrutin.demandeur.texte)}")
     return facts
 
 
@@ -266,7 +288,8 @@ def vote_names(votes: Sequence[Vote]) -> list[str]:
     """Noms triés, avec la mention « par délégation »."""
     ordered = sorted(votes, key=lambda vote: fold(f"{vote.nom} {vote.prenom}"))
     return [
-        vote.full_name + (" (par délégation)" if vote.par_delegation else "") for vote in ordered
+        field_text(vote.full_name) + (" (par délégation)" if vote.par_delegation else "")
+        for vote in ordered
     ]
 
 
@@ -310,17 +333,27 @@ def format_votes(
     return finish("\n".join(lines), response_source_line(response))
 
 
+def quote_lines(text: str) -> str:
+    """Cite chaque ligne d'un texte tiers, nettoyé et plafonné."""
+    clean = sanitize(text).replace("\r", "").strip()
+    if len(clean) > MAX_STATEMENT_LENGTH:
+        clean = clean[: MAX_STATEMENT_LENGTH - 1].rstrip() + "…"
+    return "\n".join(f"> {line}" for line in clean.split("\n"))
+
+
 def statement_block(statement: GroupeStatement) -> str:
-    """Déclaration d'un groupe."""
-    name = statement.groupe_abrev or statement.groupe_libelle or "Groupe"
+    """Déclaration d'un groupe, citée comme contenu tiers."""
+    name = field_text(statement.groupe_abrev or statement.groupe_libelle or "Groupe")
     details = [
-        f"position de vote : {statement.vote_position}" if statement.vote_position else "",
-        f"opinion : {statement.opinion_code}" if statement.opinion_code else "",
+        f"position de vote : {field_text(statement.vote_position)}"
+        if statement.vote_position
+        else "",
+        f"opinion : {field_text(statement.opinion_code)}" if statement.opinion_code else "",
         f"déposée le {format_date(statement.submitted_at)}" if statement.submitted_at else "",
     ]
     meta = " · ".join(part for part in details if part)
     heading = f"**{name}**" + (f" ({meta})" if meta else "")
-    return f"{heading}\n> {statement.statement}"
+    return f"{heading}\n{STATEMENT_NOTICE}\n{quote_lines(statement.statement)}"
 
 
 def format_statements(response: CivixResponse[StatementList], uid: str) -> str:
@@ -347,7 +380,9 @@ def depute_line(depute: Depute) -> str:
         where.append(f"{depute.circ_departement}{circ}")
     place = " · ".join(where)
     return (
-        f"- **{depute.full_name}**" + (f" — {place}" if place else "") + f"\n  uid : `{depute.uid}`"
+        f"- **{field_text(depute.full_name)}**"
+        + (f" — {place}" if place else "")
+        + f"\n  uid : `{depute.uid}`"
         f" · {depute_civix_url(depute)}"
     )
 
@@ -369,12 +404,11 @@ def format_deputes(deputes: Sequence[Depute], title: str, hint: str = "") -> str
 def format_depute(response: CivixResponse[DeputeDetail]) -> str:
     """Fiche d'un député."""
     depute = response.attributes.deputy
-    lines = [f"## {depute.full_name}", ""]
+    lines = [f"## {field_text(depute.full_name)}", ""]
     if depute.groupe_libelle or depute.groupe_abrev:
         lines.append(
-            f"- Groupe : {depute.groupe_libelle or ''} ({depute.groupe_abrev or '?'})".replace(
-                " ()", ""
-            )
+            f"- Groupe : {field_text(depute.groupe_libelle or '')} "
+            f"({field_text(depute.groupe_abrev or '?')})".replace(" ()", "")
         )
     if depute.circ_departement:
         circ = f", {depute.circ_num}e circonscription" if depute.circ_num is not None else ""
@@ -389,7 +423,7 @@ def format_depute(response: CivixResponse[DeputeDetail]) -> str:
 def groupe_line(groupe: Groupe) -> str:
     """Ligne de liste pour un groupe."""
     size = f" — {groupe.effectif} député(s)" if groupe.effectif is not None else ""
-    return f"- **{groupe.abbr}** : {groupe.libelle}{size}"
+    return f"- **{field_text(groupe.abbr)}** : {field_text(groupe.libelle)}{size}"
 
 
 def format_groupes(response: CivixResponse[GroupeList]) -> str:
@@ -404,7 +438,7 @@ def format_groupes(response: CivixResponse[GroupeList]) -> str:
 def format_groupe(response: CivixResponse[GroupeDetail]) -> str:
     """Fiche d'un groupe."""
     groupe = response.attributes.groupe
-    lines = [f"## {groupe.libelle} ({groupe.abbr})", ""]
+    lines = [f"## {field_text(groupe.libelle)} ({field_text(groupe.abbr)})", ""]
     if groupe.effectif is not None:
         lines.append(f"- Effectif : {groupe.effectif} député(s)")
     if groupe.legislature is not None:
@@ -526,7 +560,7 @@ def format_comment_a_vote(depute: Depute, entries: Sequence[ScrutinPosition], po
     """Réponse à « Comment a voté X ? » pour une liste de scrutins."""
     blocks = "\n\n".join(position_block(entry) for entry in entries)
     body = (
-        f"## Votes de {depute.full_name}"
+        f"## Votes de {field_text(depute.full_name)}"
         + (f" ({depute.groupe_abrev})" if depute.groupe_abrev else "")
         + f"\n\n{pool}\n\n{blocks}"
     )
