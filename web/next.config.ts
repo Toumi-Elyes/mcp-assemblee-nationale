@@ -34,7 +34,10 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: { unoptimized: true },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      { source: "/video/:path*", headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }] },
+    ];
   },
 };
 
