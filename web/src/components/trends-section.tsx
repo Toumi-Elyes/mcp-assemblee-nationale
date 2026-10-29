@@ -1,7 +1,8 @@
-import { formatPercent, formatShortDay } from "@/lib/format";
+import { endSentence, formatPercent, formatShortDay, pluralize } from "@/lib/format";
 import type { VoteKind } from "@/lib/stats";
 import type { TrendsData } from "@/lib/data/view-types";
-import { ScrutinRow } from "./scrutin-row";
+import { Plate } from "./plate";
+import { BoardHead, ScrutinRow } from "./scrutin-row";
 import { TopDossiers } from "./top-dossiers";
 import { VotesPerDayChart } from "./votes-per-day-chart";
 
@@ -13,83 +14,81 @@ const KIND_LABELS: Record<VoteKind, string> = {
   autre: "Autre",
 };
 
-const Card: React.FC<{ title: string; note?: string; children: React.ReactNode }> = ({ title, note, children }) => {
-  return (
-    <div className="h-full">
-      <article className="flex h-full flex-col gap-4 rounded-lg border border-line bg-raised p-6">
-        <header className="flex flex-col gap-1">
-          <h4 className="text-lg font-bold">{title}</h4>
-          {note !== undefined ? <p className="text-sm text-muted">{note}</p> : null}
-        </header>
-        {children}
-      </article>
-    </div>
-  );
-};
-
 export const TrendsSection: React.FC<{ trends: TrendsData }> = ({ trends }) => {
   const { perDay, kinds, kindsCoverage, finalVotes, finalCounts } = trends;
   const partial = !perDay.coverage.complete;
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <h3 className="text-2xl font-bold">Tendances</h3>
-        <p className="max-w-hero text-base text-muted">
-          Calculées sur les scrutins lus en direct.
-          {partial ? ` Fenêtre partielle, à partir du ${formatShortDay(perDay.coverage.from)}.` : ""}
-        </p>
-      </div>
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card title="Scrutins par jour" note={`${perDay.total} scrutins sur la période.`}>
+      <p className="max-w-measure text-base text-ink-soft">
+        Tendances calculées sur les scrutins lus en direct.
+        {partial ? ` Fenêtre partielle, à partir du ${formatShortDay(perDay.coverage.from)}.` : ""}
+      </p>
+      <div className="grid gap-x-12 gap-y-14 lg:grid-cols-12">
+        <Plate number={1} title="Scrutins par jour" note={`${perDay.total} scrutins sur la période.`} className="lg:col-span-7">
           <VotesPerDayChart data={perDay} />
-        </Card>
-        <Card title="Dossiers les plus votés" note="Nombre de scrutins par dossier législatif.">
+        </Plate>
+        <Plate
+          number={2}
+          title="Dossiers les plus votés"
+          note="Nombre de scrutins par dossier législatif."
+          className="lg:col-span-5"
+        >
           <TopDossiers periods={trends.periods} />
-        </Card>
-        <Card
+        </Plate>
+        <Plate
+          number={3}
           title="Taux d'adoption par type de vote"
-          note={`Du ${formatShortDay(kindsCoverage.from)} au ${formatShortDay(kindsCoverage.to)}.`}
+          note={endSentence(`Du ${formatShortDay(kindsCoverage.from)} au ${formatShortDay(kindsCoverage.to)}`)}
+          className="lg:col-span-4"
         >
           {kinds.length === 0 ? (
             <p className="text-sm text-muted">Pas assez de scrutins sur la période.</p>
           ) : (
-            <ul className="flex flex-col gap-3">
+            <ul className="flex flex-col gap-4">
               {kinds.map((kind) => (
-                <li key={kind.kind} className="flex flex-col gap-1">
+                <li key={kind.kind} className="flex flex-col gap-1.5">
                   <div className="flex items-baseline justify-between gap-3">
                     <span className="text-sm font-medium">{KIND_LABELS[kind.kind]}</span>
-                    <span className="tabular text-sm">
+                    <span className="tabular font-display text-lg font-semibold">
                       {kind.adoptionRate !== null ? formatPercent(kind.adoptionRate) : "n/d"}
                     </span>
                   </div>
                   <svg
                     role="img"
                     aria-label={`${kind.adopted} adoptés sur ${kind.total}`}
-                    className="h-2 w-full overflow-hidden rounded"
+                    className="h-2.5 w-full"
                     preserveAspectRatio="none"
                   >
                     <rect width="100%" height="100%" className="fill-absent" />
-                    <rect width={`${(kind.adoptionRate ?? 0) * 100}%`} height="100%" className="fill-accent" />
+                    <rect width={`${(kind.adoptionRate ?? 0) * 100}%`} height="100%" className="fill-ink" />
                   </svg>
                   <span className="text-xs text-muted">
-                    {kind.total} votes : {kind.adopted} adoptés, {kind.rejected} rejetés
+                    {pluralize(kind.total, "vote")} : {pluralize(kind.adopted, "adopté")}, {pluralize(kind.rejected, "rejeté")}
                   </span>
                 </li>
               ))}
             </ul>
           )}
-        </Card>
-        <Card title="Derniers votes sur l'ensemble d'un texte" note="Les votes finals, du plus récent au plus ancien.">
+        </Plate>
+        <Plate
+          number={4}
+          title="Derniers votes sur l'ensemble d'un texte"
+          note="Les votes finals, du plus récent au plus ancien."
+          className="lg:col-span-8"
+        >
           {finalVotes === null || finalVotes.length === 0 ? (
             <p className="text-sm text-muted">Aucun vote sur l'ensemble d'un texte à afficher pour le moment.</p>
           ) : (
-            <ul className="flex flex-col gap-2">
-              {finalVotes.map((scrutin) => (
-                <ScrutinRow key={scrutin.uid} scrutin={scrutin} counts={finalCounts.get(scrutin.uid)} />
-              ))}
-            </ul>
+            <div className="flex flex-col">
+              <BoardHead />
+              <ul className="flex flex-col">
+                {finalVotes.map((scrutin) => (
+                  <ScrutinRow key={scrutin.uid} scrutin={scrutin} counts={finalCounts.get(scrutin.uid)} />
+                ))}
+              </ul>
+            </div>
           )}
-        </Card>
+        </Plate>
       </div>
     </div>
   );

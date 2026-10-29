@@ -2,16 +2,18 @@
 @import "@fontsource/public-sans/400.css";
 @import "@fontsource/public-sans/500.css";
 @import "@fontsource/public-sans/700.css";
-@import "@fontsource/spectral/500.css";
-@import "@fontsource/spectral/700.css";
+@import "@fontsource/barlow-semi-condensed/500.css";
+@import "@fontsource/barlow-semi-condensed/600.css";
+@import "@fontsource/barlow-semi-condensed/700.css";
 
 :root {
   color-scheme: light;
   --bg: #ffffff;
   --surface: #f6f6f6;
   --raised: #ffffff;
-  --hover: #ececec;
+  --hover: #eeeeee;
   --line: #e5e5e5;
+  --rule: #161616;
   --ink: #161616;
   --ink-soft: #3a3a3a;
   --muted: #666666;
@@ -19,14 +21,13 @@
   --accent-hover: #1212ff;
   --accent-active: #2323ff;
   --on-accent: #ffffff;
+  --flap: #161616;
+  --flap-ink: #ffffff;
+  --flap-split: #3a3a3a;
   --mark-pour: #000091;
   --mark-contre: #3a3a3a;
-  --mark-abstention: #929292;
+  --mark-abstention: #868686;
   --mark-absent: #e5e5e5;
-}
-
-:root[data-theme="light"] {
-  color-scheme: light;
 }
 
 :root[data-theme="dark"] {
@@ -36,6 +37,7 @@
   --raised: #242424;
   --hover: #2a2a2a;
   --line: #353535;
+  --rule: #cecece;
   --ink: #ffffff;
   --ink-soft: #cecece;
   --muted: #a6a6a6;
@@ -43,6 +45,9 @@
   --accent-hover: #a5a5fa;
   --accent-active: #c1c1fb;
   --on-accent: #161616;
+  --flap: #2e2e2e;
+  --flap-ink: #ffffff;
+  --flap-split: #161616;
   --mark-pour: #8585f6;
   --mark-contre: #cecece;
   --mark-abstention: #7b7b7b;
@@ -50,13 +55,14 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
+  :root[data-theme="system"] {
     color-scheme: dark;
     --bg: #161616;
     --surface: #1e1e1e;
     --raised: #242424;
     --hover: #2a2a2a;
     --line: #353535;
+    --rule: #cecece;
     --ink: #ffffff;
     --ink-soft: #cecece;
     --muted: #a6a6a6;
@@ -64,6 +70,9 @@
     --accent-hover: #a5a5fa;
     --accent-active: #c1c1fb;
     --on-accent: #161616;
+    --flap: #2e2e2e;
+    --flap-ink: #ffffff;
+    --flap-split: #161616;
     --mark-pour: #8585f6;
     --mark-contre: #cecece;
     --mark-abstention: #7b7b7b;
@@ -73,13 +82,14 @@
 
 @theme inline {
   --font-sans: "Public Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Spectral", Georgia, serif;
+  --font-display: "Barlow Semi Condensed", "Public Sans", ui-sans-serif, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-raised: var(--raised);
   --color-hover: var(--hover);
   --color-line: var(--line);
+  --color-rule: var(--rule);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
   --color-muted: var(--muted);
@@ -87,6 +97,8 @@
   --color-accent-hover: var(--accent-hover);
   --color-accent-active: var(--accent-active);
   --color-on-accent: var(--on-accent);
+  --color-flap: var(--flap);
+  --color-flap-ink: var(--flap-ink);
   --color-pour: var(--mark-pour);
   --color-contre: var(--mark-contre);
   --color-abstention: var(--mark-abstention);
@@ -94,9 +106,13 @@
 }
 
 @theme {
-  --container-hero: 680px;
-  --container-page: 72rem;
-  --default-transition-duration: 200ms;
+  --container-measure: 40rem;
+  --container-page: 80rem;
+  --text-display: 4.5rem;
+  --text-display--line-height: 0.95;
+  --text-display--letter-spacing: -0.02em;
+  --default-transition-duration: 160ms;
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 html {
@@ -110,6 +126,8 @@ body {
   color: var(--ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  caret-color: var(--accent);
+  accent-color: var(--accent);
 }
 
 h1,
@@ -132,6 +150,15 @@ address {
   font-style: normal;
 }
 
+a {
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
@@ -140,6 +167,10 @@ address {
 ::selection {
   background-color: var(--accent);
   color: var(--on-accent);
+}
+
+html {
+  scrollbar-color: var(--muted) var(--surface);
 }
 
 .tabular {
@@ -164,12 +195,68 @@ address {
   }
 }
 
+/* Split flap tiles: one tile per character, a hairline across the middle, a turnover on mount. */
+.flap {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 0.06em;
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.flap-cell {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  min-width: 0.66em;
+  padding: 0.08em 0.06em 0.06em;
+  border-radius: 0.06em;
+  background-color: var(--flap);
+  color: var(--flap-ink);
+  perspective: 4em;
+}
+
+.flap-cell::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  height: max(1px, 0.025em);
+  background-color: var(--flap-split);
+}
+
+.flap-gap {
+  display: inline-block;
+  width: 0.1em;
+}
+
+.flap-char {
+  display: block;
+  transform-origin: 50% 50%;
+  animation: flap-turn 520ms var(--ease-out-quint) both;
+  animation-delay: calc(var(--flap-index, 0) * 40ms);
+}
+
+@keyframes flap-turn {
+  0% {
+    transform: rotateX(-50deg);
+  }
+  60% {
+    transform: rotateX(12deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
-  .skeleton {
+  .skeleton,
+  .flap-char {
     animation: none;
   }
 }

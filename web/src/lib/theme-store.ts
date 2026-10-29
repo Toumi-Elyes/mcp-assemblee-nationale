@@ -1,4 +1,4 @@
-import { applyTheme, readStoredTheme, writeStoredTheme, type ThemeChoice } from "./theme";
+import { DEFAULT_THEME, applyTheme, readStoredTheme, writeStoredTheme, type ThemeChoice } from "./theme";
 
 const THEME_EVENT = "theme-change";
 const DARK_QUERY = "(prefers-color-scheme: dark)";
@@ -25,7 +25,7 @@ export function getThemeSnapshot(): ThemeChoice {
 }
 
 export function getServerThemeSnapshot(): ThemeChoice {
-  return "system";
+  return DEFAULT_THEME;
 }
 
 export function setTheme(choice: ThemeChoice): void {

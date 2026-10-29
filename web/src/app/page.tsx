@@ -6,7 +6,6 @@ import { FinalCta } from "@/components/final-cta";
 import { GuaranteesSection } from "@/components/guarantees-section";
 import { Hero } from "@/components/hero";
 import { LiveProvider } from "@/components/live-context";
-import { HowItWorks } from "@/components/how-it-works";
 import { InstallSection } from "@/components/install-section";
 import { LiveSection } from "@/components/live-section";
 import { Problem } from "@/components/problem";
@@ -60,7 +59,6 @@ const HomePage = async () => {
       <Hero chat={view.heroChat} generatedAt={view.generatedAt} />
       <Problem />
       <Benefits counters={view.counters} />
-      <HowItWorks />
       <Tagline />
       <LiveSection view={view} />
       </LiveProvider>

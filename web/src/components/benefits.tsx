@@ -1,9 +1,7 @@
-import { LinkIcon, LockOpenIcon, ScalesIcon, DatabaseIcon } from "@phosphor-icons/react/dist/ssr";
 import { formatNumber } from "@/lib/format";
 import type { HeroCounters } from "@/lib/data/view-types";
-import { Section } from "./section";
 
-type Benefit = { title: string; text: string; Icon: typeof LinkIcon };
+type Benefit = { title: string; text: string };
 
 function buildBenefits(counters: HeroCounters): Benefit[] {
   const base =
@@ -16,39 +14,35 @@ function buildBenefits(counters: HeroCounters): Benefit[] {
     {
       title: "Des réponses avec leur source",
       text: "Chaque scrutin cité renvoie vers la page de l'Assemblée nationale et celle de CIVIX. Vous vérifiez en un clic.",
-      Icon: LinkIcon,
     },
-    { title: "Les vrais chiffres, pas un souvenir", text: live, Icon: DatabaseIcon },
+    { title: "Les vrais chiffres, pas un souvenir", text: live },
     {
       title: "Gratuit et sans compte",
       text: "Une adresse à coller. Pas de clé, pas d'inscription, aucune donnée personnelle demandée.",
-      Icon: LockOpenIcon,
     },
     {
       title: "Des faits, sans classement",
       text: "Aucun député ni aucun groupe n'est noté. Les positions sont transmises telles qu'elles sont enregistrées.",
-      Icon: ScalesIcon,
     },
   ];
 }
 
 export const Benefits: React.FC<{ counters: HeroCounters }> = ({ counters }) => {
   return (
-    <Section split
- id="avantages" eyebrow="Ce que vous obtenez" title="Quatre garanties pour une réponse que vous pouvez vérifier">
-      <ul className="grid gap-6 sm:grid-cols-2">
-        {buildBenefits(counters).map((benefit) => (
-          <li key={benefit.title}>
-            <div className="h-full">
-              <article className="flex h-full flex-col gap-3 rounded-lg border border-line bg-raised p-6 transition hover:bg-hover">
-                <benefit.Icon aria-hidden="true" size={32} weight="bold" />
-                <h3 className="text-xl font-bold">{benefit.title}</h3>
-                <p className="text-base text-muted">{benefit.text}</p>
-              </article>
+    <section id="avantages" aria-labelledby="avantages-titre" className="pb-16 sm:pb-20">
+      <div className="mx-auto grid w-full max-w-page gap-8 px-4 sm:px-6 lg:grid-cols-12 lg:gap-12">
+        <h2 id="avantages-titre" className="font-display text-3xl font-semibold tracking-tight lg:col-span-4">
+          Quatre garanties pour une réponse que vous pouvez vérifier
+        </h2>
+        <dl className="grid gap-x-12 sm:grid-cols-2 lg:col-span-8">
+          {buildBenefits(counters).map((benefit) => (
+            <div key={benefit.title} className="flex flex-col gap-2 border-t border-rule py-5">
+              <dt className="font-display text-xl font-semibold leading-tight">{benefit.title}</dt>
+              <dd className="text-base text-ink-soft">{benefit.text}</dd>
             </div>
-          </li>
-        ))}
-      </ul>
-    </Section>
+          ))}
+        </dl>
+      </div>
+    </section>
   );
 };

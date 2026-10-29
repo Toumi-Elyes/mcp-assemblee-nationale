@@ -5,7 +5,7 @@ import { MagnifyingGlassIcon } from "@phosphor-icons/react";
 import type { DemoAnswer } from "@/lib/data/demo";
 import type { Depute, Position } from "@/lib/civix/types";
 import type { DemoDepute } from "@/lib/data/view-types";
-import { POSITION_LABELS, formatShortDay } from "@/lib/format";
+import { POSITION_LABELS, formatDay } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { BUTTON_PRIMARY, BUTTON_SECONDARY_SMALL, LINK_TEXT } from "./button-styles";
 import { markProps, type MarkKey } from "./position-bar";
@@ -28,70 +28,103 @@ const POSITION_MARK: Record<Position, MarkKey> = {
 
 const Skeleton: React.FC = () => {
   return (
-    <div aria-hidden="true" className="flex flex-col gap-3">
+    <div aria-hidden="true" className="flex flex-col">
       {[0, 1, 2].map((item) => (
-        <div key={item} className="rounded bg-surface p-4">
-          <div className="skeleton h-4 w-1/4 rounded" />
-          <div className="skeleton mt-3 h-4 w-full rounded" />
-          <div className="skeleton mt-2 h-4 w-3/4 rounded" />
+        <div key={item} className="flex flex-col gap-2 border-b border-line py-4">
+          <div className="skeleton h-4 w-1/5" />
+          <div className="skeleton h-4 w-full" />
+          <div className="skeleton h-4 w-2/3" />
         </div>
       ))}
     </div>
   );
 };
 
+const NO_RECORD_LABEL = "Aucun vote enregistré";
+
+const PositionMark: React.FC<{ position: Position }> = ({ position }) => {
+  if (position === "unknown") {
+    return (
+      <span className="inline-flex items-center gap-1.5 font-display text-base font-semibold text-muted">
+        <svg aria-hidden="true" viewBox="0 0 12 12" className="size-3.5">
+          <circle cx="6" cy="6" r="5" strokeWidth={1} strokeDasharray="2 2" fill="none" className="stroke-muted" />
+        </svg>
+        {NO_RECORD_LABEL}
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5 font-display text-base font-semibold">
+      <svg aria-hidden="true" viewBox="0 0 12 12" className="size-3.5">
+        <circle cx="6" cy="6" r="5.5" strokeWidth={1} className="stroke-ink-soft" {...markProps(POSITION_MARK[position])} />
+      </svg>
+      {POSITION_LABELS[position]}
+    </span>
+  );
+};
+
 const Results: React.FC<{ answer: DemoAnswer }> = ({ answer }) => {
   if (answer.entries.length === 0) {
     return (
-      <div className="flex flex-col gap-2 rounded bg-surface p-4">
-        <p className="text-base font-bold">Aucun scrutin trouvé pour « {answer.topic} »</p>
-        <p className="text-sm text-muted">
+      <div className="flex flex-col gap-2 border-y border-line py-5">
+        <p className="text-lg font-bold">Aucun scrutin trouvé pour « {answer.topic} »</p>
+        <p className="text-base text-ink-soft">
           Essayez un mot du titre officiel, par exemple « retraites » plutôt que le nom courant d'une réforme.
         </p>
       </div>
     );
   }
   return (
-    <div className="flex flex-col gap-3">
-      <p className="text-base">
-        Position de <strong className="font-bold">{answer.depute.fullName}</strong>
+    <div className="flex flex-col gap-4">
+      <p className="max-w-measure text-base text-ink-soft">
+        Position de <strong className="font-bold text-ink">{answer.depute.fullName}</strong>
         {answer.depute.groupAbbr !== null ? ` (${answer.depute.groupAbbr})` : ""} sur les {answer.entries.length}{" "}
         scrutins les plus pertinents pour « {answer.topic} »
         {answer.total !== null ? `, sur ${answer.total} au total` : ""}.
       </p>
-      <ul className="flex flex-col gap-2">
+      <ul className="flex flex-col border-t-2 border-rule">
         {answer.entries.map((entry) => (
-          <li key={entry.uid} className="flex flex-col gap-2 rounded bg-surface p-4">
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <li
+            key={entry.uid}
+            className="flex flex-col gap-2 border-b border-line py-4 sm:grid sm:grid-cols-[7rem_minmax(0,1fr)_11rem] sm:gap-x-6"
+          >
+            <span className="flex flex-wrap items-center gap-3 sm:contents">
               {entry.date !== null ? (
-                <time dateTime={entry.date} className="text-xs text-muted">
-                  {formatShortDay(entry.date)}
+                <time dateTime={entry.date} className="tabular font-display text-base font-semibold">
+                  {formatDay(entry.date)}
                 </time>
-              ) : null}
-              <ResultBadge result={entry.result} />
-              <span className="inline-flex items-center gap-1 text-sm font-bold">
-                <svg aria-hidden="true" viewBox="0 0 12 12" className="size-3">
-                  <circle cx="6" cy="6" r="5.5" strokeWidth={1} className="stroke-ink-soft" {...markProps(POSITION_MARK[entry.position])} />
-                </svg>
-                {POSITION_LABELS[entry.position]}
+              ) : (
+                <span className="text-sm text-muted">Date inconnue</span>
+              )}
+              <span className="sm:order-3">
+                <PositionMark position={entry.position} />
               </span>
-            </div>
-            <a href={`/scrutins/${entry.uid}`} className={`${LINK_TEXT} text-base`}>
-              {entry.title}
-            </a>
-            <p className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
-              {entry.assembleeUrl !== null ? (
-                <a href={entry.assembleeUrl} className={LINK_TEXT}>
-                  Source Assemblée nationale
-                </a>
-              ) : null}
-              <a href={entry.civixUrl} className={LINK_TEXT}>
-                Source CIVIX
+            </span>
+            <span className="flex min-w-0 flex-col gap-2 sm:order-2">
+              <a href={`/scrutins/${entry.uid}`} className="text-base font-medium text-ink underline decoration-line hover:text-accent hover:decoration-accent">
+                {entry.title}
               </a>
-            </p>
+              <span className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                <ResultBadge result={entry.result} />
+                {entry.assembleeUrl !== null ? (
+                  <a href={entry.assembleeUrl} className={LINK_TEXT}>
+                    Source Assemblée nationale
+                  </a>
+                ) : null}
+                <a href={entry.civixUrl} className={LINK_TEXT}>
+                  Source CIVIX
+                </a>
+              </span>
+            </span>
           </li>
         ))}
       </ul>
+      {answer.entries.some((entry) => entry.position === "unknown") ? (
+        <p className="max-w-measure text-sm text-ink-soft">
+          «&nbsp;{NO_RECORD_LABEL}&nbsp;» : la liste des votes de ce scrutin ne contient pas cette personne, par exemple
+          parce qu'elle n'était pas encore élue à cette date.
+        </p>
+      ) : null}
     </div>
   );
 };
@@ -233,140 +266,163 @@ export const DemoSection: React.FC<{ suggestions: Suggestions }> = ({ suggestion
     setFieldError((previous) => ({ ...previous, topic: undefined }));
   };
 
+  const blankClass =
+    "w-full border-0 border-b-2 border-rule bg-transparent px-1 py-1 font-display text-2xl font-semibold text-ink placeholder:font-normal placeholder:text-muted transition-colors hover:border-accent focus:border-accent focus:outline-none sm:text-3xl";
+
   return (
     <Section
       id="demo"
-      eyebrow="Essayez maintenant"
       title="Comment a voté un député sur un sujet ?"
       intro="C'est la question que votre assistant se pose en coulisses. Choisissez un député et un sujet : les résultats viennent des mêmes données, avec le lien de chaque source."
     >
-      <div className="grid gap-8 lg:grid-cols-5">
-        <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6 lg:col-span-2">
-          <div className="relative flex flex-col gap-2">
-            <label htmlFor="demo-depute" className="text-sm font-bold">
-              Député
-            </label>
-            <div className="relative">
-              <MagnifyingGlassIcon aria-hidden="true" size={20} className="pointer-events-none absolute left-3 top-3 text-muted" />
+      <div className="flex flex-col gap-10">
+        <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6 lg:flex-row lg:flex-wrap lg:items-end lg:gap-x-4">
+            <span aria-hidden="true" className="font-display text-2xl font-semibold text-ink-soft sm:text-3xl lg:pb-2">
+              Comment a voté
+            </span>
+            <div className="relative flex flex-col gap-1 lg:w-96">
+              <label htmlFor="demo-depute" className="text-sm font-bold text-ink-soft">
+                Député
+              </label>
+              <div className="relative">
+                <MagnifyingGlassIcon aria-hidden="true" size={22} className="pointer-events-none absolute left-1 top-3 text-muted" />
+                <input
+                  id="demo-depute"
+                  role="combobox"
+                  aria-expanded={listOpen}
+                  aria-controls="demo-depute-liste"
+                  aria-autocomplete="list"
+                  aria-describedby={fieldError.depute !== undefined ? "demo-depute-erreur" : undefined}
+                  aria-invalid={fieldError.depute !== undefined}
+                  autoComplete="off"
+                  value={query}
+                  onChange={onQueryChange}
+                  onKeyDown={onKeyDown}
+                  placeholder="un nom"
+                  className={`${blankClass} pl-8`}
+                />
+              </div>
+              {listOpen ? (
+                <ul
+                  id="demo-depute-liste"
+                  role="listbox"
+                  aria-label="Députés correspondants"
+                  className="absolute inset-x-0 top-full z-10 mt-1 flex listbox-height flex-col overflow-auto border border-rule bg-raised shadow-lg shadow-black/10"
+                >
+                  {candidates.length === 0 ? (
+                    <li className="px-3 py-2 text-sm text-muted">Aucun député ne correspond à cette recherche.</li>
+                  ) : (
+                    candidates.map((candidate, index) => (
+                      <li
+                        key={candidate.uid}
+                        role="option"
+                        aria-selected={index === activeIndex}
+                        onClick={() => {
+                          pick(candidate);
+                        }}
+                        className={cn(
+                          "cursor-pointer border-b border-line px-3 py-2 text-sm transition-colors last:border-b-0 hover:bg-hover",
+                          index === activeIndex ? "bg-hover" : undefined,
+                        )}
+                      >
+                        <span className="font-bold">{candidate.fullName}</span>
+                        <span className="text-muted">
+                          {candidate.groupAbbr !== null ? ` ${candidate.groupAbbr}` : ""}
+                          {candidate.department !== null ? `, ${candidate.department}` : ""}
+                        </span>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              ) : null}
+            </div>
+            <span aria-hidden="true" className="font-display text-2xl font-semibold text-ink-soft sm:text-3xl lg:pb-2">
+              sur
+            </span>
+            <div className="flex flex-col gap-1 lg:w-80">
+              <label htmlFor="demo-sujet" className="text-sm font-bold text-ink-soft">
+                Sujet
+              </label>
               <input
-                id="demo-depute"
-                role="combobox"
-                aria-expanded={listOpen}
-                aria-controls="demo-depute-liste"
-                aria-autocomplete="list"
-                aria-describedby={fieldError.depute !== undefined ? "demo-depute-erreur" : undefined}
-                aria-invalid={fieldError.depute !== undefined}
-                autoComplete="off"
-                value={query}
-                onChange={onQueryChange}
-                onKeyDown={onKeyDown}
-                placeholder="Commencez à taper un nom"
-                className="w-full rounded border border-line bg-raised py-2 pl-10 pr-3 text-base transition hover:bg-hover"
+                id="demo-sujet"
+                value={topic}
+                onChange={(event) => {
+                  setTopic(event.target.value);
+                }}
+                aria-describedby={fieldError.topic !== undefined ? "demo-sujet-erreur" : undefined}
+                aria-invalid={fieldError.topic !== undefined}
+                maxLength={80}
+                placeholder="budget, retraites…"
+                className={blankClass}
               />
             </div>
-            {listOpen ? (
-              <ul
-                id="demo-depute-liste"
-                role="listbox"
-                aria-label="Députés correspondants"
-                className="absolute inset-x-0 top-20 z-10 flex listbox-height flex-col gap-1 overflow-auto rounded-lg border border-line bg-raised p-1"
-              >
-                {candidates.length === 0 ? (
-                  <li className="px-3 py-2 text-sm text-muted">Aucun député ne correspond à cette recherche.</li>
-                ) : (
-                  candidates.map((candidate, index) => (
-                    <li
-                      key={candidate.uid}
-                      role="option"
-                      aria-selected={index === activeIndex}
-                      onClick={() => {
-                        pick(candidate);
-                      }}
-                      className={cn(
-                        "cursor-pointer rounded px-3 py-2 text-sm transition hover:bg-hover",
-                        index === activeIndex ? "bg-hover" : undefined,
-                      )}
-                    >
-                      <span className="font-bold">{candidate.fullName}</span>
-                      <span className="text-muted">
-                        {candidate.groupAbbr !== null ? ` ${candidate.groupAbbr}` : ""}
-                        {candidate.department !== null ? `, ${candidate.department}` : ""}
-                      </span>
-                    </li>
-                  ))
-                )}
-              </ul>
-            ) : null}
-            <p className="min-h-6 text-sm text-muted" aria-live="polite">
-              {searching ? "Recherche en cours" : null}
-            </p>
-            {fieldError.depute !== undefined ? (
-              <p id="demo-depute-erreur" className="text-sm font-bold">
-                {fieldError.depute}
-              </p>
-            ) : null}
-            {suggestions.deputes.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {suggestions.deputes.map((depute) => (
-                  <button key={depute.uid} type="button" onClick={onSuggestedDeputy(depute)} className={BUTTON_SECONDARY_SMALL}>
-                    {depute.fullName}
-                  </button>
-                ))}
-              </div>
-            ) : null}
+            <span aria-hidden="true" className="hidden font-display text-3xl font-semibold text-ink-soft lg:block lg:pb-2">
+              ?
+            </span>
+            <button
+              type="submit"
+              disabled={status === "loading"}
+              className={`${BUTTON_PRIMARY} self-start disabled:opacity-50 lg:mb-1 lg:ml-4 lg:self-end`}
+            >
+              Voir les votes
+            </button>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label htmlFor="demo-sujet" className="text-sm font-bold">
-              Sujet
-            </label>
-            <input
-              id="demo-sujet"
-              value={topic}
-              onChange={(event) => {
-                setTopic(event.target.value);
-              }}
-              aria-describedby={fieldError.topic !== undefined ? "demo-sujet-erreur" : undefined}
-              aria-invalid={fieldError.topic !== undefined}
-              maxLength={80}
-              placeholder="Par exemple : budget, retraites, logement"
-              className="rounded border border-line bg-raised px-3 py-2 text-base transition hover:bg-hover"
-            />
-            {fieldError.topic !== undefined ? (
-              <p id="demo-sujet-erreur" className="text-sm font-bold">
-                {fieldError.topic}
-              </p>
+          <p className="min-h-5 text-sm text-muted" aria-live="polite">
+            {searching ? "Recherche en cours" : null}
+          </p>
+          {fieldError.depute !== undefined ? (
+            <p id="demo-depute-erreur" className="-mt-4 text-sm font-bold">
+              {fieldError.depute}
+            </p>
+          ) : null}
+          {fieldError.topic !== undefined ? (
+            <p id="demo-sujet-erreur" className="-mt-4 text-sm font-bold">
+              {fieldError.topic}
+            </p>
+          ) : null}
+
+          <div className="grid gap-4 border-t border-line pt-4 md:grid-cols-2">
+            {suggestions.deputes.length > 0 ? (
+              <div className="flex flex-col gap-2">
+                <p className="text-sm text-muted">Députés suggérés</p>
+                <div className="flex flex-wrap gap-2">
+                  {suggestions.deputes.map((depute) => (
+                    <button key={depute.uid} type="button" onClick={onSuggestedDeputy(depute)} className={BUTTON_SECONDARY_SMALL}>
+                      {depute.fullName}
+                    </button>
+                  ))}
+                </div>
+              </div>
             ) : null}
             {suggestions.topics.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {suggestions.topics.map((value) => (
-                  <button key={value} type="button" onClick={onSuggestedTopic(value)} className={BUTTON_SECONDARY_SMALL}>
-                    {value.length > 48 ? `${value.slice(0, 47)}…` : value}
-                  </button>
-                ))}
+              <div className="flex flex-col gap-2">
+                <p className="text-sm text-muted">Dossiers récemment votés</p>
+                <div className="flex flex-wrap gap-2">
+                  {suggestions.topics.map((value) => (
+                    <button key={value} type="button" onClick={onSuggestedTopic(value)} className={BUTTON_SECONDARY_SMALL}>
+                      {value.length > 48 ? `${value.slice(0, 47)}…` : value}
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : null}
           </div>
-
-          <button type="submit" disabled={status === "loading"} className={`${BUTTON_PRIMARY} self-start disabled:opacity-50`}>
-            Voir les votes
-          </button>
         </form>
 
-        <div className="flex flex-col gap-3 lg:col-span-3" aria-live="polite" aria-busy={status === "loading"}>
+        <div className="flex flex-col gap-3" aria-live="polite" aria-busy={status === "loading"}>
           {status === "idle" ? (
-            <div className="flex h-full flex-col justify-center gap-2 rounded-lg border border-line bg-surface p-6">
-              <p className="text-lg font-bold">Les résultats apparaissent ici</p>
-              <p className="text-base text-muted">
-                Choisissez un député dans les suggestions ou tapez son nom, ajoutez un sujet, puis lancez la recherche.
-              </p>
-            </div>
+            <p className="border-y border-line py-5 text-base text-ink-soft">
+              Les résultats apparaissent ici. Choisissez un député dans les suggestions ou tapez son nom, ajoutez un
+              sujet, puis lancez la recherche.
+            </p>
           ) : null}
           {status === "loading" ? <Skeleton /> : null}
           {status === "error" ? (
-            <div role="alert" className="flex flex-col gap-2 rounded-lg border border-line bg-surface p-6">
+            <div role="alert" className="flex flex-col gap-2 border-y border-line py-5">
               <p className="text-lg font-bold">La recherche n'a pas abouti</p>
-              <p className="text-base text-muted">{message}</p>
+              <p className="text-base text-ink-soft">{message}</p>
             </div>
           ) : null}
           {status === "done" && answer !== null ? <Results answer={answer} /> : null}

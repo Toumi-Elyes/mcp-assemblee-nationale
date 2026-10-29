@@ -8,8 +8,8 @@ const ErrorPage: React.FC<{ error: Error; reset: () => void }> = ({ reset }) => 
   return (
     <main id="contenu" className="mx-auto flex w-full max-w-page flex-col items-start gap-6 px-4 pb-24 pt-12 sm:px-6">
       <WarningCircleIcon aria-hidden="true" size={32} weight="bold" />
-      <h1 className="max-w-hero font-serif text-4xl font-bold">Données momentanément indisponibles</h1>
-      <p role="alert" className="max-w-hero text-lg text-muted">
+      <h1 className="max-w-3xl font-display text-5xl font-semibold tracking-tight">Données momentanément indisponibles</h1>
+      <p role="alert" className="max-w-measure text-lg text-ink-soft">
         La source des données ne répond pas pour le moment. Réessayez dans quelques minutes.
       </p>
       <div className="flex flex-wrap gap-3">

@@ -17,7 +17,9 @@ export function markProps(key: MarkKey): { className?: string; fill?: string } {
   return { className: SEGMENTS.find((segment) => segment.key === key)?.fill };
 }
 
-export const PositionBar: React.FC<{ counts: Counts; label: string }> = ({ counts, label }) => {
+type PositionBarProps = { counts: Counts; label: string; size?: "regular" | "large" };
+
+export const PositionBar: React.FC<PositionBarProps> = ({ counts, label, size = "regular" }) => {
   const total = counts.pour + counts.contre + counts.abstention + counts.non_votant;
   const summary = `${label} : ${SEGMENTS.map((segment) => `${formatNumber(counts[segment.key])} ${segment.label.toLowerCase()}`).join(", ")}`;
   const placed = SEGMENTS.reduce<Array<{ key: MarkKey; fill: string; x: number; width: number }>>((list, segment) => {
@@ -26,7 +28,7 @@ export const PositionBar: React.FC<{ counts: Counts; label: string }> = ({ count
     return [...list, { key: segment.key, fill: segment.fill, x, width }];
   }, []);
   return (
-    <svg role="img" aria-label={summary} className="h-2 w-full overflow-hidden rounded" preserveAspectRatio="none">
+    <svg role="img" aria-label={summary} className={size === "large" ? "h-6 w-full" : "h-2 w-full"} preserveAspectRatio="none">
       {total === 0 ? <rect width="100%" height="100%" className="fill-absent" /> : null}
       {placed.map((segment) => (
         <rect key={segment.key} x={`${segment.x}%`} width={`${segment.width}%`} height="100%" {...markProps(segment.key)} />

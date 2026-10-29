@@ -7,6 +7,31 @@ import { CopyButton } from "./copy-button";
 import { CopyField } from "./copy-field";
 import { Section } from "./section";
 
+const Stop: React.FC<{ index: number; title: string; last?: boolean; children: React.ReactNode }> = ({
+  index,
+  title,
+  last = false,
+  children,
+}) => {
+  return (
+    <li className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-5">
+      <div aria-hidden="true" className="flex flex-col items-center">
+        <span className="grid size-8 shrink-0 place-items-center rounded-full border-2 border-rule bg-bg font-display text-base font-bold">
+          {index}
+        </span>
+        {last ? null : <span className="w-0.5 flex-1 bg-rule" />}
+      </div>
+      <div className={cn("flex min-w-0 flex-col gap-4", last ? "pb-0" : "pb-12")}>
+        <h3 className="pt-0.5 font-display text-2xl font-semibold tracking-tight">
+          <span className="sr-only">Étape {index} : </span>
+          {title}
+        </h3>
+        {children}
+      </div>
+    </li>
+  );
+};
+
 export const InstallSection: React.FC = () => {
   const [selected, setSelected] = useState<AssistantId>("claude");
   const guide = ASSISTANTS.find((item) => item.id === selected) ?? ASSISTANTS[0];
@@ -30,25 +55,18 @@ export const InstallSection: React.FC = () => {
   }
 
   return (
-    <Section split
+    <Section
       id="installer"
-      eyebrow="Installer"
       title="Ajoutez le connecteur en deux minutes"
       intro="Copiez l'adresse, puis suivez les étapes de votre assistant. Aucun compte à créer chez nous, aucune clé à générer."
     >
-      <div className="flex flex-col gap-8">
-        <div className="flex flex-col gap-3">
-          <p className="text-sm font-bold">Étape 1. L'adresse du connecteur</p>
-          <CopyField />
-        </div>
+      <ol className="flex flex-col">
+        <Stop index={1} title="L'adresse du connecteur">
+          <CopyField id="adresse-connecteur-installation" className="max-w-2xl" />
+        </Stop>
 
-        <div className="flex flex-col gap-4">
-          <p className="text-sm font-bold">Étape 2. Votre assistant</p>
-          <div
-            role="tablist"
-            aria-label="Assistant"
-            className="flex flex-wrap gap-1 self-start rounded-lg border border-line bg-surface p-1"
-          >
+        <Stop index={2} title="Votre assistant">
+          <div role="tablist" aria-label="Assistant" className="flex max-w-full gap-x-1 self-start overflow-x-auto border-b border-line">
             {ASSISTANTS.map((item) => (
               <button
                 key={item.id}
@@ -63,8 +81,8 @@ export const InstallSection: React.FC = () => {
                 }}
                 onKeyDown={onTabKey}
                 className={cn(
-                  "rounded px-3 py-2 text-base font-bold transition",
-                  item.id === selected ? "bg-raised text-ink" : "text-muted hover:bg-hover hover:text-ink",
+                  "-mb-px shrink-0 whitespace-nowrap border-b-2 px-3 py-2 font-display text-lg font-semibold transition-colors",
+                  item.id === selected ? "border-rule text-ink" : "border-transparent text-muted hover:text-accent",
                 )}
               >
                 {item.name}
@@ -76,40 +94,39 @@ export const InstallSection: React.FC = () => {
             id="assistant-panneau"
             role="tabpanel"
             aria-labelledby={`assistant-${guide.id}`}
-            className="flex flex-col gap-6 rounded-lg border border-line bg-surface p-6"
+            className="flex max-w-3xl flex-col gap-5 pt-2"
           >
             <p className="text-sm text-muted">{guide.availability}</p>
-            <ol className="flex flex-col gap-3 text-base">
+            <ol className="flex flex-col text-base">
               {guide.steps.map((step, index) => (
-                <li key={step} className="flex gap-3">
-                  <span className="tabular w-6 shrink-0 text-muted">{index + 1}.</span>
+                <li key={step} className="flex gap-4 border-b border-line py-3">
+                  <span className="tabular w-5 shrink-0 font-display font-semibold text-muted">{index + 1}</span>
                   <span>{step}</span>
                 </li>
               ))}
             </ol>
             {guide.sample !== undefined ? (
-              <div className="flex flex-col gap-2 rounded bg-raised p-3">
+              <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-sm font-bold">{guide.sample.label}</p>
                   <CopyButton value={guide.sample.code} label="Copier" variant="secondary" />
                 </div>
-                <pre className="overflow-x-auto rounded bg-surface p-3 font-mono text-sm">
+                <pre className="overflow-x-auto rounded-sm bg-surface p-4 font-mono text-sm">
                   <code>{guide.sample.code}</code>
                 </pre>
               </div>
             ) : null}
-            <p className="text-sm text-muted">{guide.note}</p>
+            <p className="text-sm text-ink-soft">{guide.note}</p>
           </div>
-        </div>
+        </Stop>
 
-        <div className="flex max-w-hero flex-col gap-2 rounded-lg border border-line bg-raised p-6">
-          <p className="text-base font-bold">Étape 3. Demandez</p>
-          <p className="text-base text-muted">
+        <Stop index={3} title="Demandez" last>
+          <p className="max-w-measure text-base text-ink-soft">
             Activez le connecteur dans la conversation, puis écrivez par exemple : « Utilise l'outil Assemblée nationale
             pour me dire comment a voté ma députée sur le budget. » Citer l'outil évite que l'assistant réponde de mémoire.
           </p>
-        </div>
-      </div>
+        </Stop>
+      </ol>
     </Section>
   );
 };

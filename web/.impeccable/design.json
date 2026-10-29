@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-30T00:00:00Z",
+  "title": "Design System: MCP Assemblée nationale",
+  "extensions": {
+    "colorMeta": {
+      "bg": { "role": "neutral", "displayName": "Papier", "canonical": "#ffffff", "tonalRamp": ["#161616", "#3a3a3a", "#666666", "#929292", "#cecece", "#e5e5e5", "#f6f6f6", "#ffffff"] },
+      "surface": { "role": "neutral", "displayName": "Gris de passage", "canonical": "#f6f6f6", "tonalRamp": ["#161616", "#3a3a3a", "#666666", "#929292", "#cecece", "#e5e5e5", "#eeeeee", "#f6f6f6"] },
+      "raised": { "role": "neutral", "displayName": "Papier relevé", "canonical": "#ffffff", "tonalRamp": ["#161616", "#3a3a3a", "#666666", "#929292", "#cecece", "#e5e5e5", "#f6f6f6", "#ffffff"] },
+      "hover": { "role": "neutral", "displayName": "Gris de survol", "canonical": "#eeeeee", "tonalRamp": ["#161616", "#3a3a3a", "#666666", "#929292", "#cecece", "#e5e5e5", "#eeeeee", "#f6f6f6"] },
+      "line": { "role": "neutral", "displayName": "Filet", "canonical": "#e5e5e5", "tonalRamp": ["#161616", "#3a3a3a", "#666666", "#929292", "#cecece", "#e5e5e5", "#eeeeee", "#f6f6f6"] },
+      "rule": { "role": "neutral", "displayName": "Trait d'encre", "canonical": "#161616", "tonalRamp": ["#161616", "#2a2a2a", "#3a3a3a", "#666666", "#929292", "#cecece", "#e5e5e5", "#f6f6f6"] },
+      "ink": { "role": "neutral", "displayName": "Encre", "canonical": "#161616", "tonalRamp": ["#161616", "#2a2a2a", "#3a3a3a", "#666666", "#929292", "#cecece", "#e5e5e5", "#f6f6f6"] },
+      "ink-soft": { "role": "neutral", "displayName": "Encre douce", "canonical": "#3a3a3a", "tonalRamp": ["#161616", "#2a2a2a", "#3a3a3a", "#666666", "#929292", "#cecece", "#e5e5e5", "#f6f6f6"] },
+      "muted": { "role": "neutral", "displayName": "Gris de légende", "canonical": "#666666", "tonalRamp": ["#161616", "#2a2a2a", "#3a3a3a", "#666666", "#929292", "#cecece", "#e5e5e5", "#f6f6f6"] },
+      "accent": { "role": "primary", "displayName": "Bleu France", "canonical": "#000091", "tonalRamp": ["#00006d", "#000091", "#1212ff", "#2323ff", "#6a6af4", "#8585f6", "#cacafb", "#ececfe"] },
+      "accent-hover": { "role": "primary", "displayName": "Bleu France, survol", "canonical": "#1212ff", "tonalRamp": ["#00006d", "#000091", "#1212ff", "#2323ff", "#6a6af4", "#8585f6", "#cacafb", "#ececfe"] },
+      "accent-active": { "role": "primary", "displayName": "Bleu France, appui", "canonical": "#2323ff", "tonalRamp": ["#00006d", "#000091", "#1212ff", "#2323ff", "#6a6af4", "#8585f6", "#cacafb", "#ececfe"] },
+      "on-accent": { "role": "neutral", "displayName": "Texte sur bleu", "canonical": "#ffffff", "tonalRamp": ["#161616", "#3a3a3a", "#666666", "#929292", "#cecece", "#e5e5e5", "#f6f6f6", "#ffffff"] },
+      "flap": { "role": "neutral", "displayName": "Tuile", "canonical": "#161616", "tonalRamp": ["#161616", "#2a2a2a", "#2e2e2e", "#3a3a3a", "#666666", "#929292", "#cecece", "#f6f6f6"] },
+      "flap-ink": { "role": "neutral", "displayName": "Chiffre de tuile", "canonical": "#ffffff", "tonalRamp": ["#161616", "#3a3a3a", "#666666", "#929292", "#cecece", "#e5e5e5", "#f6f6f6", "#ffffff"] },
+      "flap-split": { "role": "neutral", "displayName": "Coupe de tuile", "canonical": "#3a3a3a", "tonalRamp": ["#161616", "#2a2a2a", "#3a3a3a", "#666666", "#929292", "#cecece", "#e5e5e5", "#f6f6f6"] },
+      "mark-pour": { "role": "primary", "displayName": "Marque pour", "canonical": "#000091", "tonalRamp": ["#00006d", "#000091", "#1212ff", "#2323ff", "#6a6af4", "#8585f6", "#cacafb", "#ececfe"] },
+      "mark-contre": { "role": "neutral", "displayName": "Marque contre (hachures)", "canonical": "#3a3a3a", "tonalRamp": ["#161616", "#2a2a2a", "#3a3a3a", "#666666", "#929292", "#cecece", "#e5e5e5", "#f6f6f6"] },
+      "mark-abstention": { "role": "neutral", "displayName": "Marque abstention", "canonical": "#868686", "tonalRamp": ["#161616", "#3a3a3a", "#666666", "#868686", "#a6a6a6", "#cecece", "#e5e5e5", "#f6f6f6"] },
+      "mark-absent": { "role": "neutral", "displayName": "Marque non votant", "canonical": "#e5e5e5", "tonalRamp": ["#161616", "#3a3a3a", "#666666", "#929292", "#cecece", "#e5e5e5", "#eeeeee", "#f6f6f6"] },
+      "bg-dark": { "role": "neutral", "displayName": "Papier, sombre", "canonical": "#161616" },
+      "surface-dark": { "role": "neutral", "displayName": "Gris de passage, sombre", "canonical": "#1e1e1e" },
+      "raised-dark": { "role": "neutral", "displayName": "Papier relevé, sombre", "canonical": "#242424" },
+      "hover-dark": { "role": "neutral", "displayName": "Gris de survol, sombre", "canonical": "#2a2a2a" },
+      "line-dark": { "role": "neutral", "displayName": "Filet, sombre", "canonical": "#353535" },
+      "rule-dark": { "role": "neutral", "displayName": "Trait d'encre, sombre", "canonical": "#cecece" },
+      "ink-dark": { "role": "neutral", "displayName": "Encre, sombre", "canonical": "#ffffff" },
+      "ink-soft-dark": { "role": "neutral", "displayName": "Encre douce, sombre", "canonical": "#cecece" },
+      "muted-dark": { "role": "neutral", "displayName": "Gris de légende, sombre", "canonical": "#a6a6a6" },
+      "accent-dark": { "role": "primary", "displayName": "Bleu France, sombre", "canonical": "#8585f6", "tonalRamp": ["#000091", "#1212ff", "#2323ff", "#6a6af4", "#8585f6", "#a5a5fa", "#c1c1fb", "#ececfe"] },
+      "accent-hover-dark": { "role": "primary", "displayName": "Bleu France, survol sombre", "canonical": "#a5a5fa" },
+      "accent-active-dark": { "role": "primary", "displayName": "Bleu France, appui sombre", "canonical": "#c1c1fb" },
+      "on-accent-dark": { "role": "neutral", "displayName": "Texte sur bleu, sombre", "canonical": "#161616" },
+      "flap-dark": { "role": "neutral", "displayName": "Tuile, sombre", "canonical": "#2e2e2e" },
+      "flap-split-dark": { "role": "neutral", "displayName": "Coupe de tuile, sombre", "canonical": "#161616" },
+      "mark-pour-dark": { "role": "primary", "displayName": "Marque pour, sombre", "canonical": "#8585f6" },
+      "mark-contre-dark": { "role": "neutral", "displayName": "Marque contre, sombre", "canonical": "#cecece" },
+      "mark-abstention-dark": { "role": "neutral", "displayName": "Marque abstention, sombre", "canonical": "#7b7b7b" },
+      "mark-absent-dark": { "role": "neutral", "displayName": "Marque non votant, sombre", "canonical": "#353535" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Titre principal de l'accueil, deux lignes, 4.5rem sur grand écran." },
+      "headline": { "displayName": "Headline", "purpose": "Titres de section (2.25rem à 3rem) et du tableau de la semaine." },
+      "title": { "displayName": "Title", "purpose": "Titres de tableaux numérotés, arrêts de la ligne, FAQ, nom du site." },
+      "board": { "displayName": "Board", "purpose": "Dates du tableau, sigles et effectifs, chiffres tabulaires." },
+      "body": { "displayName": "Body", "purpose": "Lecture, mesure de 40rem." },
+      "lead": { "displayName": "Lead", "purpose": "Introductions de section en encre douce." },
+      "small": { "displayName": "Small", "purpose": "Légendes, effectifs, métadonnées." },
+      "label": { "displayName": "Label", "purpose": "Capitales Barlow : têtes de colonnes, interlocuteurs, tuiles de résultat. Jamais au dessus d'un titre." },
+      "mono": { "displayName": "Mono", "purpose": "Adresse du connecteur, noms d'outils, code. Jamais les chiffres." }
+    },
+    "shadows": [
+      { "name": "overlay-dialog", "value": "0 25px 50px -12px rgb(0 0 0 / 0.3)", "purpose": "Boîte de dialogue « Paramètres d'affichage », sur un voile rgb(0 0 0 / 0.5). Calques seulement." },
+      { "name": "overlay-listbox", "value": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)", "purpose": "Liste de suggestions du champ député. Calques seulement." }
+    ],
+    "motion": [
+      { "name": "ease-out-quint", "value": "cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Courbe du retournement des tuiles." },
+      { "name": "duration-default", "value": "160ms", "purpose": "Transitions de couleur par défaut (boutons : 150ms)." },
+      { "name": "flap-turn", "value": "520ms ease-out-quint, rotateX(-50deg) puis 12deg puis 0, 40ms de décalage par caractère", "purpose": "Retournement de chaque caractère à l'affichage, puis des seuls caractères modifiés quand l'actualisation change la valeur ; supprimé sous prefers-reduced-motion." },
+      { "name": "skeleton-pulse", "value": "1400ms ease infinite alternate, opacité 1 à 0.45", "purpose": "Squelettes de chargement ; supprimé sous prefers-reduced-motion." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Bouton principal",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Aplat Bleu France, l'action principale (Copier l'adresse, Réessayer).",
+      "html": "<button class=\"ds-btn-primary\">Copier l'adresse</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 4px; padding: 10px 16px; background: var(--accent, #000091); color: var(--on-accent, #ffffff); font-family: 'Public Sans', ui-sans-serif, sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background-color 150ms; } .ds-btn-primary:hover { background: var(--accent-hover, #1212ff); } .ds-btn-primary:active { background: var(--accent-active, #2323ff); } .ds-btn-primary:focus-visible { outline: 2px solid var(--accent, #000091); outline-offset: 2px; }"
+    },
+    {
+      "name": "Bouton secondaire",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Fond papier, filet et texte Bleu France.",
+      "html": "<a class=\"ds-btn-secondary\" href=\"#\">Retour à l'accueil</a>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--accent, #000091); border-radius: 4px; padding: 10px 16px; background: var(--bg, #ffffff); color: var(--accent, #000091); font-family: 'Public Sans', ui-sans-serif, sans-serif; font-size: 1rem; font-weight: 700; text-decoration: none; transition: background-color 150ms; } .ds-btn-secondary:hover { background: var(--hover, #eeeeee); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--accent, #000091); outline-offset: 2px; }"
+    },
+    {
+      "name": "Champ d'adresse et copie",
+      "kind": "input",
+      "refersTo": "copy-field",
+      "description": "Adresse du connecteur en mono, lecture seule, bouton attaché.",
+      "html": "<div class=\"ds-copy\"><input class=\"ds-copy-input\" readonly value=\"https://mcp-assemblee-nationale.vercel.app/mcp\" aria-label=\"Adresse du connecteur\"><button class=\"ds-copy-btn\">Copier l'adresse</button></div>",
+      "css": ".ds-copy { display: flex; align-items: stretch; max-width: 36rem; } .ds-copy-input { flex: 1; min-width: 0; border: 1px solid var(--rule, #161616); border-right: 0; border-radius: 4px 0 0 4px; padding: 10px 12px; background: var(--bg, #ffffff); color: var(--ink, #161616); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.875rem; } .ds-copy-input:focus-visible { outline: 2px solid var(--accent, #000091); outline-offset: 2px; } .ds-copy-btn { border: 0; border-radius: 0 4px 4px 0; padding: 10px 16px; background: var(--accent, #000091); color: var(--on-accent, #ffffff); font-family: 'Public Sans', ui-sans-serif, sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background-color 150ms; } .ds-copy-btn:hover { background: var(--accent-hover, #1212ff); } .ds-copy-btn:focus-visible { outline: 2px solid var(--accent, #000091); outline-offset: 2px; }"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "description": "Ligne non officielle, puis en tête blanc à filet ; page courante soulignée d'encre.",
+      "html": "<header class=\"ds-nav\"><p class=\"ds-nav-strip\">Projet indépendant et non officiel · données de l'Assemblée nationale via CIVIX</p><div class=\"ds-nav-bar\"><span class=\"ds-nav-name\">MCP Assemblée nationale</span><nav><a class=\"ds-nav-link\" aria-current=\"page\" href=\"#\">Accueil</a><a class=\"ds-nav-link\" href=\"#\">Cette semaine</a><a class=\"ds-nav-link\" href=\"#\">Installer</a></nav></div></header>",
+      "css": ".ds-nav { background: var(--bg, #ffffff); color: var(--ink, #161616); } .ds-nav-strip { margin: 0; padding: 8px 24px; color: var(--ink-soft, #3a3a3a); font-family: 'Public Sans', ui-sans-serif, sans-serif; font-size: 0.75rem; } .ds-nav-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 32px; padding: 12px 24px; border-bottom: 1px solid var(--line, #e5e5e5); } .ds-nav-name { font-family: 'Barlow Semi Condensed', 'Public Sans', sans-serif; font-size: 1.5rem; font-weight: 700; letter-spacing: -0.025em; line-height: 1; } .ds-nav nav { display: flex; gap: 20px; } .ds-nav-link { padding: 8px 4px; border-bottom: 2px solid transparent; color: var(--ink, #161616); font-family: 'Barlow Semi Condensed', 'Public Sans', sans-serif; font-size: 1.125rem; font-weight: 600; text-decoration: none; transition: color 160ms; } .ds-nav-link:hover { color: var(--accent, #000091); } .ds-nav-link[aria-current='page'] { border-bottom-color: var(--rule, #161616); } .ds-nav-link:focus-visible { outline: 2px solid var(--accent, #000091); outline-offset: 2px; }"
+    },
+    {
+      "name": "Tuile à palettes",
+      "kind": "custom",
+      "refersTo": "flap-cell",
+      "description": "Un caractère par cellule encre, trait de coupe au milieu, retournement à l'affichage.",
+      "html": "<span class=\"ds-flap\" role=\"img\" aria-label=\"Exemple de compteur\"><span class=\"ds-flap-cell\"><span class=\"ds-flap-char\" style=\"--i:0\">4</span></span><span class=\"ds-flap-gap\"></span><span class=\"ds-flap-cell\"><span class=\"ds-flap-char\" style=\"--i:1\">4</span></span><span class=\"ds-flap-cell\"><span class=\"ds-flap-char\" style=\"--i:2\">1</span></span><span class=\"ds-flap-cell\"><span class=\"ds-flap-char\" style=\"--i:3\">2</span></span></span>",
+      "css": ".ds-flap { display: inline-flex; align-items: stretch; gap: 0.06em; font-family: 'Barlow Semi Condensed', 'Public Sans', sans-serif; font-size: 3.75rem; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1; } .ds-flap-cell { position: relative; display: inline-grid; place-items: center; min-width: 0.66em; padding: 0.08em 0.06em 0.06em; border-radius: 0.06em; background: var(--flap, #161616); color: var(--flap-ink, #ffffff); perspective: 4em; } .ds-flap-cell::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: max(1px, 0.025em); background: var(--flap-split, #3a3a3a); } .ds-flap-gap { display: inline-block; width: 0.1em; } .ds-flap-char { display: block; animation: ds-flap-turn 520ms cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(var(--i, 0) * 40ms); } @keyframes ds-flap-turn { 0% { transform: rotateX(-50deg); } 60% { transform: rotateX(12deg); } 100% { transform: rotateX(0deg); } } @media (prefers-reduced-motion: reduce) { .ds-flap-char { animation: none; } }"
+    },
+    {
+      "name": "Tuile de résultat",
+      "kind": "chip",
+      "refersTo": "result-tile",
+      "description": "Adopté et rejeté dans la même tuile encre, distingués par l'icône et le mot.",
+      "html": "<span class=\"ds-result\"><svg viewBox=\"0 0 256 256\" width=\"14\" height=\"14\" aria-hidden=\"true\"><path d=\"M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z\" fill=\"currentColor\"/></svg>Adopté</span> <span class=\"ds-result\"><svg viewBox=\"0 0 256 256\" width=\"14\" height=\"14\" aria-hidden=\"true\"><path d=\"M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z\" fill=\"currentColor\"/></svg>Rejeté</span>",
+      "css": ".ds-result { display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; padding: 2px 6px; background: var(--flap, #161616); color: var(--flap-ink, #ffffff); font-family: 'Barlow Semi Condensed', 'Public Sans', sans-serif; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.025em; text-transform: uppercase; }"
+    },
+    {
+      "name": "Ligne du tableau",
+      "kind": "custom",
+      "description": "Date, scrutin avec barre de positions, résultat ; filets pleine largeur, aucune boîte.",
+      "html": "<ul class=\"ds-board\"><li class=\"ds-row\"><time class=\"ds-row-date\">28 oct.</time><span class=\"ds-row-main\"><a class=\"ds-row-title\" href=\"#\">Intitulé du scrutin (exemple de mise en forme)</a><svg class=\"ds-bar\" viewBox=\"0 0 100 8\" preserveAspectRatio=\"none\" role=\"img\" aria-label=\"Répartition des votes\"><defs><pattern id=\"ds-contre\" width=\"4\" height=\"4\" patternUnits=\"userSpaceOnUse\" patternTransform=\"rotate(45)\"><rect width=\"4\" height=\"4\" fill=\"#ffffff\"/><rect width=\"2\" height=\"4\" fill=\"#3a3a3a\"/></pattern></defs><rect x=\"0\" width=\"52\" height=\"8\" fill=\"#000091\"/><rect x=\"52\" width=\"30\" height=\"8\" fill=\"url(#ds-contre)\"/><rect x=\"82\" width=\"8\" height=\"8\" fill=\"#868686\"/><rect x=\"90\" width=\"10\" height=\"8\" fill=\"#e5e5e5\"/></svg><span class=\"ds-row-counts\">Exemple de mise en forme, valeurs non réelles</span></span><span class=\"ds-row-result\">ADOPTÉ</span></li></ul>",
+      "css": ".ds-board { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule, #161616); font-family: 'Public Sans', ui-sans-serif, sans-serif; color: var(--ink, #161616); } .ds-row { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr) 6.5rem; column-gap: 20px; align-items: start; padding: 14px 0; border-bottom: 1px solid var(--line, #e5e5e5); } .ds-row-date { font-family: 'Barlow Semi Condensed', 'Public Sans', sans-serif; font-size: 1.125rem; font-weight: 600; line-height: 1.5rem; font-variant-numeric: tabular-nums; } .ds-row-main { display: flex; flex-direction: column; gap: 6px; min-width: 0; } .ds-row-title { color: var(--ink, #161616); font-weight: 500; line-height: 1.5rem; text-decoration: underline; text-decoration-color: var(--line, #e5e5e5); text-underline-offset: 0.2em; } .ds-row-title:hover { color: var(--accent, #000091); text-decoration-color: var(--accent, #000091); } .ds-row-title:focus-visible { outline: 2px solid var(--accent, #000091); outline-offset: 2px; } .ds-bar { width: 100%; height: 8px; } .ds-row-counts { font-size: 0.875rem; color: var(--ink-soft, #3a3a3a); } .ds-row-result { justify-self: end; border-radius: 4px; padding: 2px 6px; background: var(--flap, #161616); color: var(--flap-ink, #ffffff); font-family: 'Barlow Semi Condensed', 'Public Sans', sans-serif; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.025em; }"
+    },
+    {
+      "name": "Ligne d'installation",
+      "kind": "custom",
+      "refersTo": "install-stop",
+      "description": "Trois arrêts ronds reliés par un trait d'encre de 2 px ; le départ est plein.",
+      "html": "<ol class=\"ds-line\"><li class=\"ds-stop ds-stop-current\"><span class=\"ds-stop-dot\">1</span><span class=\"ds-stop-title\">Copiez l'adresse</span></li><li class=\"ds-stop\"><span class=\"ds-stop-dot\">2</span><span class=\"ds-stop-title\">Collez l'adresse dans votre assistant</span></li><li class=\"ds-stop ds-stop-last\"><span class=\"ds-stop-dot\">3</span><span class=\"ds-stop-title\">Posez votre question</span></li></ol>",
+      "css": ".ds-line { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); list-style: none; margin: 0; padding: 0; color: var(--ink, #161616); } .ds-stop { position: relative; display: flex; flex-direction: column; gap: 8px; padding-right: 32px; } .ds-stop::before { content: ''; position: absolute; top: 13px; left: 28px; right: 0; height: 2px; background: var(--rule, #161616); } .ds-stop-last::before { background: var(--line, #e5e5e5); } .ds-stop-dot { position: relative; display: grid; place-items: center; width: 28px; height: 28px; border: 2px solid var(--rule, #161616); border-radius: 9999px; background: var(--bg, #ffffff); font-family: 'Barlow Semi Condensed', 'Public Sans', sans-serif; font-size: 0.875rem; font-weight: 700; } .ds-stop-current .ds-stop-dot { background: var(--rule, #161616); color: var(--bg, #ffffff); } .ds-stop-title { font-family: 'Barlow Semi Condensed', 'Public Sans', sans-serif; font-size: 1.25rem; font-weight: 600; line-height: 1.25; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Le tableau des départs de l'Assemblée",
+    "overview": "Le registre de l'Assemblée affiché comme un tableau des départs de gare, posé sur une page éditoriale blanche. Les scrutins arrivent en lignes classées par l'heure, les plus récents en tête, chacun avec son volet d'état. Les chiffres se retournent dans des tuiles à palettes quand la donnée en direct change. L'installation est une ligne à trois arrêts. Le monde est celui de l'affichage public d'information : lisible de loin, factuel, sans commentaire.\n\nLa densité est celle d'un horaire : des filets pleine largeur, des colonnes, aucune boîte. La couleur est presque absente. L'encre et le papier portent tout, et le Bleu France n'apparaît que là où l'on peut agir. La colorimétrie reprend celle de data.gouv.fr (valeurs du système de design de l'État pour le thème sombre). Le projet s'en sert comme d'une palette, jamais comme d'une identité : rien ne doit faire croire à un site officiel.\n\nRefus confirmés : le hero partagé avec une capture de produit dans une boîte, puis des bandes alternées de cartes à icônes sous des surtitres ; le vert et le rouge pour les positions de vote ; tout signe de l'État (Marianne, bande tricolore, bloc « République Française », « .gouv »).",
+    "keyCharacteristics": [
+      "Page blanche, lignes réglées pleine largeur, aucune carte.",
+      "Tuiles à palettes encre et blanc pour les comptes, les dates et les états seulement.",
+      "Bleu France réservé aux actions, aux liens et à la marque « pour ».",
+      "Barlow Semi Condensed pour la signalétique, Public Sans pour la lecture.",
+      "Encodage des votes neutre : la forme porte l'information, jamais une couleur partisane.",
+      "Clair par défaut, quel que soit le réglage de l'appareil."
+    ],
+    "rules": [
+      { "name": "The Bleu d'action Rule", "body": "Le Bleu France ne colore que ce qu'on peut presser ou suivre, plus la marque « pour ». Les barres de tendance, d'adoption et de dossiers sont en encre sur piste pâle, jamais en bleu.", "section": "colors" },
+      { "name": "The Gris de passage Rule", "body": "Le gris de passage est réservé au fond de la section de données en direct. Aucune autre section ne prend de fond gris ; le rythme vient des filets, pas de bandes alternées.", "section": "colors" },
+      { "name": "The Ni vert ni rouge Rule", "body": "Pour, contre, abstention et non votant s'encodent par la forme (aplat, hachures, gris, pâle), avec libellés et effectifs dans la légende. Les couleurs d'information (vert, rouge, orange) ne sont jamais utilisées pour un vote ou un résultat.", "section": "colors" },
+      { "name": "The Pas d'État Rule", "body": "La colorimétrie de data.gouv.fr est une palette, pas un costume : pas de Marianne, pas de bande tricolore, pas de « République Française », pas de « .gouv ». La ligne « Projet indépendant et non officiel · données de l'Assemblée nationale via CIVIX » reste visible en tête de chaque page.", "section": "colors" },
+      { "name": "The Clair d'abord Rule", "body": "Le thème clair s'affiche à la première visite, quel que soit le réglage de l'appareil. Le choix (clair, sombre, système) se fait dans « Paramètres d'affichage », est gardé dans `localStorage` sous la clé `theme`, et un script en ligne dans `<head>` pose `data-theme` sur `<html>` avant le premier affichage dès qu'un choix existe. Les jetons sombres s'appliquent sous `[data-theme=\"dark\"]`, et sous `[data-theme=\"system\"]` quand l'appareil préfère le sombre.", "section": "colors" },
+      { "name": "The Signalétique Rule", "body": "Un chiffre qui s'affiche seul (tuile, date du tableau, effectif d'un groupe, libellé à côté d'une tuile) est en Barlow Semi Condensed à chasse tabulaire. Un chiffre pris dans une phrase de lecture (décomptes d'une ligne, légende, part d'un groupe, compte d'un dossier) reste en Public Sans à chasse tabulaire. Le mono ne sert qu'aux adresses, aux noms d'outils et au code.", "section": "typography" },
+      { "name": "The Pas d'italique Rule", "body": "`em`, `i`, `cite` et `address` sont forcés en romain. Les titres sont équilibrés (`text-wrap: balance`), les paragraphes soignés (`text-wrap: pretty`).", "section": "typography" },
+      { "name": "The Lignes réglées Rule", "body": "On sépare par des filets pleine largeur, jamais par des boîtes : 2 px d'encre pour ouvrir, 1 px de filet entre les lignes. Pas de grille de cartes.", "section": "layout" },
+      { "name": "The Chronologie Rule", "body": "La profondeur est le temps : dossiers et scrutins se suivent du plus récent au plus ancien, avec pour seule exception le vote sur l'ensemble d'un texte, placé en tête de son dossier. Aucune autre mise en avant éditoriale.", "section": "layout" },
+      { "name": "The Calque seulement Rule", "body": "Une ombre signale un calque qui recouvre la page (dialogue, liste déroulante), jamais une surface posée dessus. Aucune carte, aucun bouton, aucune tuile n'a d'ombre.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do séparer par des filets pleine largeur : 2 px d'encre pour ouvrir une section ou un tableau, 1 px de filet entre les lignes.",
+      "Do réserver le Bleu France aux boutons, aux liens, au focus et à la marque « pour ».",
+      "Do encoder pour en aplat bleu, contre en hachures diagonales, abstention en gris (#868686 en clair, #7b7b7b en sombre) et non votant en pâle, avec libellés et effectifs dans la légende.",
+      "Do distinguer adopté et rejeté par l'icône et le mot, dans des tuiles d'encre identiques.",
+      "Do mettre les comptes, les dates et les numéros dans des tuiles à palettes, et couper le retournement sous `prefers-reduced-motion`.",
+      "Do afficher le thème clair à la première visite et garder le choix sous la clé `theme`, appliqué avant le premier affichage.",
+      "Do n'afficher que des données réelles de CIVIX, avec un état « Données momentanément indisponibles » quand elles manquent.",
+      "Do garder la ligne « Projet indépendant et non officiel » visible en tête de chaque page."
+    ],
+    "donts": [
+      "Don't utiliser le vert ou le rouge (ni aucune couleur d'information) pour une position ou un résultat.",
+      "Don't utiliser Marianne, une bande tricolore, un bloc « République Française » ou « .gouv » dans l'interface.",
+      "Don't poser un surtitre en capitales au dessus d'un titre : les capitales Barlow sont réservées aux têtes de colonnes, aux interlocuteurs et aux tuiles de résultat.",
+      "Don't construire des grilles de cartes ni des bandes alternées de fonds gris ; le gris de passage n'appartient qu'à la section de données en direct.",
+      "Don't dessiner un hémicycle ni rien qui suggère une place politique : CIVIX ne donne aucun ordre de placement.",
+      "Don't mettre d'ombre, de flou ou de dégradé sur une surface de la page ; l'ombre est réservée aux calques (dialogue, liste de suggestions).",
+      "Don't utiliser le mono pour les chiffres, ni charger une police depuis un service externe.",
+      "Don't inventer de preuve : ni témoignage, ni logo, ni chiffre d'usage."
+    ]
+  }
+}

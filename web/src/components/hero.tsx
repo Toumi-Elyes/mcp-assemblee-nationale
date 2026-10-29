@@ -1,33 +1,49 @@
-import { CtaLink } from "./cta-link";
 import { ChatExample } from "./chat-example";
 import { HeroProof } from "./hero-proof";
+import { InstallLine } from "./install-line";
+import { WeekSection } from "./week-section";
 import type { HeroChat } from "@/lib/data/view-types";
 
 type HeroProps = { chat: HeroChat | null; generatedAt: Date };
 
 export const Hero: React.FC<HeroProps> = ({ chat, generatedAt }) => {
   return (
-    <section aria-labelledby="titre-principal" className="bg-bg pb-16 pt-12 sm:pb-24 sm:pt-16">
-      <div className="mx-auto grid w-full max-w-page items-start gap-12 px-4 sm:px-6 lg:grid-cols-12">
-        <div className="flex flex-col gap-6 lg:col-span-7">
-          <h1 id="titre-principal" className="max-w-hero font-serif text-5xl font-bold sm:text-6xl">
-            <span className="block">Sachez comment ont voté vos députés,</span>
-            <span className="block">source à l'appui</span>
-          </h1>
-          <p className="max-w-hero text-lg text-muted">
-            Ajoutez un connecteur gratuit à votre assistant IA. Il va chercher les vrais scrutins de l'Assemblée
-            nationale au lieu de répondre de mémoire, et il cite le lien de chacun.
-          </p>
-          <div className="flex flex-col items-start gap-3">
-            <CtaLink />
-            <p className="text-sm text-muted">Gratuit, sans compte, sans clé. Pour Claude et ChatGPT.</p>
+    <>
+      <section aria-labelledby="titre-principal" className="pb-6 pt-6 sm:pt-6">
+        <div className="mx-auto flex w-full max-w-page flex-col gap-5 px-4 sm:px-6">
+          <div className="grid gap-6 lg:grid-cols-12 lg:items-end lg:gap-8">
+            <div className="flex flex-col gap-3 lg:col-span-8">
+              <h1
+                id="titre-principal"
+                className="font-display text-4xl font-semibold leading-none tracking-tight sm:text-6xl lg:text-display"
+              >
+                <span className="lg:block lg:whitespace-nowrap">Sachez comment ont voté</span>{" "}
+                <span className="lg:block lg:whitespace-nowrap">vos députés, source à l'appui</span>
+              </h1>
+              <p className="max-w-measure text-base text-ink-soft">
+                Ajoutez un connecteur gratuit à votre assistant IA. Il va chercher les vrais scrutins de l'Assemblée
+                nationale au lieu de répondre de mémoire, et il cite le lien de chacun.
+              </p>
+            </div>
+            <div className="lg:col-span-4 lg:pb-1">
+              <HeroProof />
+            </div>
           </div>
-          <HeroProof />
+          <InstallLine fieldId="adresse-connecteur" headingId="ajouter-titre" compact className="border-t-2 border-rule pt-4" />
         </div>
-        <div className="lg:col-span-5 lg:mt-24">
-          <ChatExample chat={chat} generatedAt={generatedAt} />
+      </section>
+      <div id="en-direct" className="pb-16 sm:pb-20">
+        <div className="mx-auto grid w-full max-w-page gap-12 px-4 sm:px-6 lg:grid-cols-12">
+          <div className="lg:col-span-8">
+            <WeekSection />
+          </div>
+          <aside aria-label="Exemple de réponse" className="lg:col-span-4">
+            <div className="lg:sticky lg:top-6">
+              <ChatExample chat={chat} generatedAt={generatedAt} />
+            </div>
+          </aside>
         </div>
       </div>
-    </section>
+    </>
   );
 };

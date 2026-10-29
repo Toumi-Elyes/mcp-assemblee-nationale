@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeftIcon, ArrowSquareOutIcon } from "@phosphor-icons/react/dist/ssr";
 import { LINK_TEXT } from "@/components/button-styles";
 import { PositionBar, PositionLegend } from "@/components/position-bar";
+import { Flap } from "@/components/flap";
 import { ResultBadge } from "@/components/result-badge";
 import { Unavailable } from "@/components/unavailable";
 import { VotesExplorer } from "@/components/votes-explorer";
@@ -81,9 +82,9 @@ const Fact: React.FC<{ label: string; value: string | null }> = ({ label, value 
     return null;
   }
   return (
-    <div className="flex flex-col gap-1">
-      <dt className="text-xs text-muted">{label}</dt>
-      <dd className="text-sm font-medium">{value}</dd>
+    <div className="flex flex-col gap-1 border-t border-line pt-3">
+      <dt className="text-sm text-muted">{label}</dt>
+      <dd className="text-base font-medium">{value}</dd>
     </div>
   );
 };
@@ -107,36 +108,46 @@ const ScrutinPage = async ({ params }: PageProps) => {
   }
   const { data } = loaded;
   return (
-    <main id="contenu" className="mx-auto flex w-full max-w-page flex-col gap-12 px-4 pb-24 pt-12 sm:px-6">
-      <header className="flex flex-col gap-4">
+    <main id="contenu" className="mx-auto flex w-full max-w-page flex-col gap-14 px-4 pb-24 pt-10 sm:px-6">
+      <header className="flex flex-col gap-6">
         <BackLink />
-        <p className="text-sm text-muted">
-          {data.numero !== null ? `Scrutin n° ${data.numero}` : "Scrutin"}
-          {data.legislature !== null ? `, ${data.legislature}e législature` : ""}
-          {data.date !== null ? `, ${formatLongDay(data.date)}` : ""}
-        </p>
-        <h1 className="font-serif max-w-hero text-4xl font-bold">{data.title}</h1>
-        {data.dossier !== null ? <p className="max-w-hero text-lg text-muted">Dossier : {data.dossier.label}</p> : null}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          {data.numero !== null ? (
+            <span className="flex items-center gap-2">
+              <span className="font-display text-lg font-semibold">Scrutin n°</span>
+              <Flap value={String(data.numero)} label={String(data.numero)} className="text-3xl font-semibold" />
+            </span>
+          ) : (
+            <span className="font-display text-lg font-semibold">Scrutin</span>
+          )}
+          <span className="text-base text-ink-soft">
+            {data.legislature !== null ? `${data.legislature}e législature` : ""}
+            {data.legislature !== null && data.date !== null ? ", " : ""}
+            {data.date !== null ? formatLongDay(data.date) : ""}
+          </span>
+        </div>
+        <h1 className="max-w-4xl font-display text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">{data.title}</h1>
+        {data.dossier !== null ? <p className="max-w-measure text-lg text-ink-soft">Dossier : {data.dossier.label}</p> : null}
         <div className="flex flex-wrap items-center gap-3">
           <ResultBadge result={data.result} />
-          {data.resultLabel !== null ? <span className="text-sm text-muted">{data.resultLabel}</span> : null}
+          {data.resultLabel !== null ? <span className="text-sm text-ink-soft">{data.resultLabel}</span> : null}
         </div>
       </header>
 
-      <section aria-labelledby="resultat-titre" className="flex flex-col gap-4 rounded-lg border border-line bg-surface p-6">
-        <h2 id="resultat-titre" className="text-2xl font-bold">
+      <section aria-labelledby="resultat-titre" className="flex flex-col gap-5 border-t-2 border-rule pt-4">
+        <h2 id="resultat-titre" className="font-display text-3xl font-semibold tracking-tight">
           Résultat
         </h2>
         {data.counts !== null ? (
           <>
-            <PositionBar counts={data.counts} label="Résultat du scrutin" />
+            <PositionBar counts={data.counts} label="Résultat du scrutin" size="large" />
             <PositionLegend counts={data.counts} />
-            <p className="text-sm text-muted">{formatNumber(data.counts.total)} votants enregistrés.</p>
+            <p className="text-sm text-ink-soft">{formatNumber(data.counts.total)} votants enregistrés.</p>
           </>
         ) : (
           <p className="text-base text-muted">Les décomptes de ce scrutin ne sont pas disponibles.</p>
         )}
-        <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <dl className="mt-2 grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
           <Fact label="Type de vote" value={data.voteType} />
           <Fact label="Règle de majorité" value={data.majorityRule} />
           <Fact label="Mode de vote" value={data.voteMode} />
@@ -144,43 +155,48 @@ const ScrutinPage = async ({ params }: PageProps) => {
         </dl>
       </section>
 
-      <section aria-labelledby="groupes-titre" className="flex flex-col gap-4">
-        <h2 id="groupes-titre" className="text-2xl font-bold">
+      <section aria-labelledby="groupes-titre" className="flex flex-col gap-5 border-t-2 border-rule pt-4">
+        <h2 id="groupes-titre" className="font-display text-3xl font-semibold tracking-tight">
           Détail par groupe
         </h2>
         {data.byGroup.length === 0 ? (
           <p className="text-base text-muted">Le détail par groupe n'est pas disponible pour ce scrutin.</p>
         ) : (
-          <ul className="grid gap-3 md:grid-cols-2">
+          <ul className="flex flex-col">
             {data.byGroup.map((group) => (
-              <li key={`${group.abbr}-${group.label}`} className="flex flex-col gap-3 rounded-lg border border-line bg-raised p-6">
-                <p className="text-base font-bold">
-                  {group.abbr !== null ? `${group.abbr} ` : ""}
-                  <span className="font-normal text-muted">{group.label}</span>
+              <li
+                key={`${group.abbr}-${group.label}`}
+                className="flex flex-col gap-2 border-b border-line py-4 lg:grid lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:items-center lg:gap-x-8"
+              >
+                <p className="text-base">
+                  {group.abbr !== null ? <span className="font-display text-lg font-semibold">{group.abbr} </span> : null}
+                  <span className="text-ink-soft">{group.label}</span>
                 </p>
-                <PositionBar counts={group.counts} label={group.label} />
-                <PositionLegend counts={group.counts} />
+                <div className="flex flex-col gap-2">
+                  <PositionBar counts={group.counts} label={group.label} />
+                  <PositionLegend counts={group.counts} />
+                </div>
               </li>
             ))}
           </ul>
         )}
       </section>
 
-      <section aria-labelledby="declarations-titre" className="flex flex-col gap-4">
-        <h2 id="declarations-titre" className="text-2xl font-bold">
+      <section aria-labelledby="declarations-titre" className="flex flex-col gap-5 border-t-2 border-rule pt-4">
+        <h2 id="declarations-titre" className="font-display text-3xl font-semibold tracking-tight">
           Déclarations des groupes
         </h2>
         {!data.statementsAvailable ? (
           <p className="text-base text-muted">Les déclarations ne peuvent pas être chargées pour le moment.</p>
         ) : data.statements.length === 0 ? (
-          <p className="max-w-hero text-base text-muted">
+          <p className="max-w-measure text-base text-ink-soft">
             Aucun groupe n'a publié d'explication de vote pour ce scrutin. C'est fréquent.
           </p>
         ) : (
-          <ul className="grid gap-3 md:grid-cols-2">
+          <ul className="grid gap-x-10 md:grid-cols-2">
             {data.statements.map((statement) => (
-              <li key={`${statement.abbr}-${statement.text.slice(0, 24)}`} className="flex flex-col gap-2 rounded-lg border border-line bg-raised p-6">
-                <p className="text-base font-bold">
+              <li key={`${statement.abbr}-${statement.text.slice(0, 24)}`} className="flex flex-col gap-2 border-b border-line py-4">
+                <p className="font-display text-lg font-semibold">
                   {statement.abbr ?? statement.label}
                   {statement.position !== null ? <span className="font-normal text-muted">, {statement.position}</span> : null}
                 </p>
@@ -191,8 +207,8 @@ const ScrutinPage = async ({ params }: PageProps) => {
         )}
       </section>
 
-      <section aria-labelledby="votes-titre" className="flex flex-col gap-4">
-        <h2 id="votes-titre" className="text-2xl font-bold">
+      <section aria-labelledby="votes-titre" className="flex flex-col gap-5 border-t-2 border-rule pt-4">
+        <h2 id="votes-titre" className="font-display text-3xl font-semibold tracking-tight">
           Votes de chaque député
         </h2>
         {data.votes.length === 0 ? (
@@ -202,8 +218,8 @@ const ScrutinPage = async ({ params }: PageProps) => {
         )}
       </section>
 
-      <section aria-labelledby="sources-titre" className="flex flex-col gap-3">
-        <h2 id="sources-titre" className="text-2xl font-bold">
+      <section aria-labelledby="sources-titre" className="flex flex-col gap-4 border-t-2 border-rule pt-4">
+        <h2 id="sources-titre" className="font-display text-3xl font-semibold tracking-tight">
           Sources
         </h2>
         <ul className="flex flex-col gap-2 text-base">

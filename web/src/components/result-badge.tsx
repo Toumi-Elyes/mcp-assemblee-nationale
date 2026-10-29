@@ -1,14 +1,14 @@
-import { CheckCircleIcon, QuestionIcon, XCircleIcon } from "@phosphor-icons/react/dist/ssr";
+import { CheckIcon, QuestionIcon, XIcon } from "@phosphor-icons/react/dist/ssr";
 import type { VoteResult } from "@/lib/civix/types";
 import { RESULT_LABELS } from "@/lib/format";
 
-const ICONS = { adopte: CheckCircleIcon, rejete: XCircleIcon, inconnu: QuestionIcon } as const;
+const ICONS = { adopte: CheckIcon, rejete: XIcon, inconnu: QuestionIcon } as const;
 
 export const ResultBadge: React.FC<{ result: VoteResult }> = ({ result }) => {
   const Icon = ICONS[result];
   return (
-    <span className="inline-flex items-center gap-1 rounded border border-line bg-raised px-2 py-0.5 text-sm font-bold">
-      <Icon aria-hidden="true" size={16} weight="bold" />
+    <span className="inline-flex shrink-0 items-center gap-1 rounded-sm bg-flap px-1.5 py-0.5 font-display text-sm font-semibold uppercase tracking-wide text-flap-ink">
+      <Icon aria-hidden="true" size={14} weight="bold" />
       {RESULT_LABELS[result]}
     </span>
   );

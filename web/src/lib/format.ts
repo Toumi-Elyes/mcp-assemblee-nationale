@@ -75,3 +75,7 @@ export const RESULT_LABELS: Record<VoteResult, string> = {
 export function pluralize(count: number, singular: string, plural: string = `${singular}s`): string {
   return `${formatNumber(count)} ${count === 1 || count === 0 ? singular : plural}`;
 }
+
+export function endSentence(text: string): string {
+  return text.endsWith(".") ? text : `${text}.`;
+}

@@ -2,7 +2,7 @@ import type { VotesPerDay } from "@/lib/stats";
 import { formatShortDay } from "@/lib/format";
 
 const CHART_WIDTH = 300;
-const CHART_HEIGHT = 80;
+const CHART_HEIGHT = 120;
 const BAR_GAP_RATIO = 0.25;
 
 export const VotesPerDayChart: React.FC<{ data: VotesPerDay }> = ({ data }) => {
@@ -17,7 +17,7 @@ export const VotesPerDayChart: React.FC<{ data: VotesPerDay }> = ({ data }) => {
         aria-label={`Scrutins par jour du ${first ? formatShortDay(first.date) : ""} au ${last ? formatShortDay(last.date) : ""}, ${data.total} au total, maximum ${peak} en une journée`}
         viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
         preserveAspectRatio="none"
-        className="h-24 w-full"
+        className="h-40 w-full"
       >
         {data.days.map((day, index) => {
           const height = (day.count / peak) * CHART_HEIGHT;
@@ -28,14 +28,15 @@ export const VotesPerDayChart: React.FC<{ data: VotesPerDay }> = ({ data }) => {
               y={CHART_HEIGHT - height}
               width={slot * (1 - BAR_GAP_RATIO)}
               height={height}
-              className="fill-accent"
+              className="fill-ink"
             >
               <title>{`${formatShortDay(day.date)} : ${day.count} scrutins`}</title>
             </rect>
           );
         })}
+        <rect x={0} y={CHART_HEIGHT - 0.5} width={CHART_WIDTH} height={0.5} className="fill-muted" />
       </svg>
-      <figcaption className="flex justify-between text-xs text-muted">
+      <figcaption className="flex justify-between border-t border-line pt-2 text-xs text-muted">
         <span>{first ? formatShortDay(first.date) : ""}</span>
         <span className="tabular">max {peak} par jour</span>
         <span>{last ? formatShortDay(last.date) : ""}</span>

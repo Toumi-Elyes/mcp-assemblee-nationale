@@ -7,10 +7,12 @@ export const Unavailable: React.FC<UnavailableProps> = ({
   detail = "La source des données ne répond pas pour le moment. Réessayez dans quelques minutes : cette page se met à jour toute seule.",
 }) => {
   return (
-    <div role="status" className="flex max-w-hero flex-col gap-2 rounded-lg border border-line bg-raised p-6">
-      <WarningCircleIcon aria-hidden="true" size={24} weight="bold" />
-      <p className="text-lg font-bold">{title}</p>
-      <p className="text-base text-muted">{detail}</p>
+    <div role="status" className="flex max-w-measure gap-3 border-y border-line py-5">
+      <WarningCircleIcon aria-hidden="true" size={24} weight="bold" className="mt-0.5 shrink-0" />
+      <div className="flex flex-col gap-1">
+        <p className="text-lg font-bold">{title}</p>
+        <p className="text-base text-ink-soft">{detail}</p>
+      </div>
     </div>
   );
 };

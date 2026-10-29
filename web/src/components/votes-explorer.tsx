@@ -18,7 +18,7 @@ export type ExplorerVote = {
 const PAGE_SIZE = 60;
 const ALL = "tous";
 
-const fieldClass = "rounded border border-line bg-raised px-3 py-2 text-base transition hover:bg-hover";
+const fieldClass = "rounded-sm border border-rule bg-bg px-3 py-2 text-base transition-colors hover:border-accent";
 
 export const VotesExplorer: React.FC<{ votes: readonly ExplorerVote[]; groupOptions: readonly string[] }> = ({
   votes,
@@ -111,20 +111,20 @@ export const VotesExplorer: React.FC<{ votes: readonly ExplorerVote[]; groupOpti
       </p>
 
       {matches.length === 0 ? (
-        <div className="rounded-lg border border-line bg-surface p-6">
+        <div className="border-y border-line py-5">
           <p className="text-base font-bold">Aucun député ne correspond à ces filtres</p>
           <p className="text-sm text-muted">Modifiez le nom, la position ou le groupe pour élargir la liste.</p>
         </div>
       ) : (
-        <ul className="grid gap-2 sm:grid-cols-2">
+        <ul className="grid border-t border-rule sm:grid-cols-2 sm:gap-x-8">
           {shown.map((vote) => (
-            <li key={vote.uid} className="flex items-center justify-between gap-3 rounded bg-surface px-3 py-2 text-sm">
+            <li key={vote.uid} className="flex items-center justify-between gap-3 border-b border-line py-2 text-sm">
               <span>
                 <span className="font-medium">{vote.name}</span>
                 {vote.groupAbbr !== null ? <span className="text-muted"> {vote.groupAbbr}</span> : null}
                 {vote.byDelegation ? <span className="text-muted"> par délégation</span> : null}
               </span>
-              <span className="font-bold">{POSITION_LABELS[vote.position]}</span>
+              <span className="font-display text-base font-semibold">{POSITION_LABELS[vote.position]}</span>
             </li>
           ))}
         </ul>
