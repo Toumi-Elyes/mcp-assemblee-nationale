@@ -29,7 +29,7 @@ Un **connecteur** à ajouter à votre assistant IA. Il lui donne accès aux **do
 - **Neutre** : les chiffres sont transmis tels quels, sans analyse politique.
 - **Sourcé** : chaque réponse renvoie vers la page du scrutin.
 
-> Un connecteur, c'est un petit service que l'IA peut appeler pour trouver une information. Celui-ci repose sur MCP, un standard ouvert que Claude, ChatGPT et Gemini savent utiliser.
+> Un connecteur, c'est un petit service que l'IA peut appeler pour trouver une information. Celui-ci repose sur MCP, un standard ouvert que Claude, ChatGPT et Gemini CLI savent utiliser.
 
 Les données viennent de l'[API publique CIVIX](https://www.data.gouv.fr/dataservices/api-publique-civix) (data.gouv.fr), qui republie les données ouvertes de l'Assemblée nationale.
 
