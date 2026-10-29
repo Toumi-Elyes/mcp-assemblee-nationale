@@ -497,7 +497,7 @@ Le serveur public tourne sur [Vercel](https://vercel.com) (région de Paris, `cd
 3. Votre adresse à partager est `https://<votre-projet>.vercel.app/mcp`. Vérifiez avec `https://<votre-projet>.vercel.app/health`.
 4. Ajoutez une limitation de débit sur le pare-feu de votre projet : le code limite le nombre d'appels vers CIVIX par demande, pas le nombre de demandes.
 
-Chaque push sur `main` redéploie le serveur. Pour déployer en ligne de commande, utilisez un token Vercel dans la variable `VERCEL_TOKEN`, rangée dans un fichier `.env` ignoré par git.
+Pour votre propre copie, chaque push sur votre branche principale redéploie le serveur.
 
 Pour un autre hébergeur (Render, Fly.io, un VPS…) :
 
