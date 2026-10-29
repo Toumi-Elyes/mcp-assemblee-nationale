@@ -43,3 +43,7 @@ Une faille de sécurité ne s'ouvre pas en issue : voir [SECURITY.md](SECURITY.m
 ## Règle de neutralité
 
 Le serveur restitue des données publiques, sans opinion. Les sorties ne doivent contenir aucune interprétation politique, aucun jugement sur un député ou un groupe, aucun qualificatif partisan : uniquement des faits (positions, décomptes, résultats officiels), toujours accompagnés du lien source. Toute contribution qui ajoute de l'analyse, du classement ou de l'éditorial sera refusée.
+
+## Déploiement
+
+Il n'y a aucun déploiement manuel. Le serveur MCP et la page de démo sont déployés automatiquement par l'intégration GitHub de Vercel quand une pull request est fusionnée sur `main`, après revue et CI verte. Les pull requests ont un déploiement de prévisualisation privé.
