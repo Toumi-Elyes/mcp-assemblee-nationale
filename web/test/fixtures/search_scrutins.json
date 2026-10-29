@@ -1,0 +1,266 @@
+{
+ "publisher": "CIVIX.fr",
+ "api_version": "v1",
+ "retrieved_at": "2026-10-29T20:25:42.330Z",
+ "license": {
+  "name": "Open Data – Assemblée nationale",
+  "notice": "Données publiques de l'Assemblée nationale, présentées par CIVIX.fr (initiative indépendante)."
+ },
+ "schema_version": "2026-04-29",
+ "answer": "Cette page renvoie 3 résultat(s).",
+ "canonical_url": "https://www.civix.fr/api/v1/scrutins?search=retraites&page=1&page_size=3",
+ "confidence": "high",
+ "meta": {
+  "schema_version": "2026-04-29",
+  "api_version": "v1",
+  "retrieved_at": "2026-10-29T20:25:42.330Z",
+  "last_updated": "2026-10-29T20:25:42.330Z",
+  "query": {
+   "search": "retraites",
+   "page": 1,
+   "page_size": 3,
+   "legislature": null,
+   "type": null,
+   "tags": null
+  },
+  "pagination": {
+   "page": 1,
+   "page_size": 3,
+   "next_page": 2,
+   "count_total": 12,
+   "count_returned": 3
+  }
+ },
+ "summary": "Recherche de scrutins contenant \"retraites\" : 3 résultat(s) sur la page 1.",
+ "source": {
+  "type": "dataset",
+  "provider": "Assemblée nationale",
+  "via": "CIVIX.fr",
+  "source_urls": [
+   "https://www.assemblee-nationale.fr"
+  ],
+  "civix_urls": {
+   "page": "https://www.civix.fr/api",
+   "api": "https://www.civix.fr/api/v1/scrutins?search=retraites&page=1&page_size=3"
+  }
+ },
+ "citation": {
+  "text": "Selon CIVIX.fr (données publiques de l'Assemblée nationale, consultées le 29 octobre 2026), la recherche de scrutins pour \"retraites\" renvoie 3 résultat(s) sur la page 1.",
+  "url": "https://www.civix.fr/api/v1/scrutins?search=retraites&page=1&page_size=3"
+ },
+ "data": {
+  "type": "scrutins",
+  "attributes": {
+   "query": {
+    "search": "retraites",
+    "page": 1,
+    "page_size": 3,
+    "legislature": null
+   },
+   "results": [
+    {
+     "uid": "VTANR5L17V7324",
+     "legislature": 17,
+     "numero": 7324,
+     "date_scrutin": "2026-06-04T00:00:00+00:00",
+     "titre": "l'ensemble de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+     "objet": {
+      "libelle": "l'ensemble de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+      "dossierLegislatif": {
+       "libelle": "Mesures de justice en faveur de la revalorisation des pensions de retraites agricoles",
+       "dossierRef": "DLR5L17N51955"
+      },
+      "referenceLegislative": null
+     },
+     "objet_libelle": "l'ensemble de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+     "sort": {
+      "code": "adopté",
+      "libelle": "l'Assemblée nationale a adopté"
+     },
+     "type_vote": {
+      "codeTypeVote": "SPO",
+      "libelleTypeVote": "scrutin public ordinaire",
+      "typeMajorite": "Majorité absolue des suffrages exprimés"
+     },
+     "question": "l'ensemble de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+     "type": "texte",
+     "context": "Proposition de loi",
+     "sort_code": "adopté",
+     "type_primary": null,
+     "tags": []
+    },
+    {
+     "uid": "VTANR5L17V7323",
+     "legislature": 17,
+     "numero": 7323,
+     "date_scrutin": "2026-06-04T00:00:00+00:00",
+     "titre": "l'amendement n° 10 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+     "objet": {
+      "libelle": "l'amendement n° 10 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+      "dossierLegislatif": {
+       "libelle": "Mesures de justice en faveur de la revalorisation des pensions de retraites agricoles",
+       "dossierRef": "DLR5L17N51955"
+      },
+      "referenceLegislative": null
+     },
+     "objet_libelle": "l'amendement n° 10 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+     "sort": {
+      "code": "rejeté",
+      "libelle": "L'Assemblée nationale n'a pas adopté"
+     },
+     "type_vote": {
+      "codeTypeVote": "SPO",
+      "libelleTypeVote": "scrutin public ordinaire",
+      "typeMajorite": "Majorité absolue des suffrages exprimés"
+     },
+     "question": "l'amendement n° 10 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+     "type": "amendement",
+     "context": "Proposition de loi",
+     "sort_code": "rejeté",
+     "type_primary": null,
+     "tags": []
+    },
+    {
+     "uid": "VTANR5L17V7322",
+     "legislature": 17,
+     "numero": 7322,
+     "date_scrutin": "2026-06-04T00:00:00+00:00",
+     "titre": "l'amendement n° 9 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+     "objet": {
+      "libelle": "l'amendement n° 9 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+      "dossierLegislatif": {
+       "libelle": "Mesures de justice en faveur de la revalorisation des pensions de retraites agricoles",
+       "dossierRef": "DLR5L17N51955"
+      },
+      "referenceLegislative": null
+     },
+     "objet_libelle": "l'amendement n° 9 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+     "sort": {
+      "code": "adopté",
+      "libelle": "l'Assemblée nationale a adopté"
+     },
+     "type_vote": {
+      "codeTypeVote": "SPO",
+      "libelleTypeVote": "scrutin public ordinaire",
+      "typeMajorite": "Majorité absolue des suffrages exprimés"
+     },
+     "question": "l'amendement n° 9 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+     "type": "amendement",
+     "context": "Proposition de loi",
+     "sort_code": "adopté",
+     "type_primary": null,
+     "tags": []
+    }
+   ],
+   "pagination": {
+    "page": 1,
+    "page_size": 3,
+    "next_page": 2,
+    "count_total": 12,
+    "count_returned": 3
+   }
+  },
+  "results": [
+   {
+    "uid": "VTANR5L17V7324",
+    "legislature": 17,
+    "numero": 7324,
+    "date_scrutin": "2026-06-04T00:00:00+00:00",
+    "titre": "l'ensemble de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "objet": {
+     "libelle": "l'ensemble de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+     "dossierLegislatif": {
+      "libelle": "Mesures de justice en faveur de la revalorisation des pensions de retraites agricoles",
+      "dossierRef": "DLR5L17N51955"
+     },
+     "referenceLegislative": null
+    },
+    "objet_libelle": "l'ensemble de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "sort": {
+     "code": "adopté",
+     "libelle": "l'Assemblée nationale a adopté"
+    },
+    "type_vote": {
+     "codeTypeVote": "SPO",
+     "libelleTypeVote": "scrutin public ordinaire",
+     "typeMajorite": "Majorité absolue des suffrages exprimés"
+    },
+    "question": "l'ensemble de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "type": "texte",
+    "context": "Proposition de loi",
+    "sort_code": "adopté",
+    "type_primary": null,
+    "tags": []
+   },
+   {
+    "uid": "VTANR5L17V7323",
+    "legislature": 17,
+    "numero": 7323,
+    "date_scrutin": "2026-06-04T00:00:00+00:00",
+    "titre": "l'amendement n° 10 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "objet": {
+     "libelle": "l'amendement n° 10 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+     "dossierLegislatif": {
+      "libelle": "Mesures de justice en faveur de la revalorisation des pensions de retraites agricoles",
+      "dossierRef": "DLR5L17N51955"
+     },
+     "referenceLegislative": null
+    },
+    "objet_libelle": "l'amendement n° 10 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "sort": {
+     "code": "rejeté",
+     "libelle": "L'Assemblée nationale n'a pas adopté"
+    },
+    "type_vote": {
+     "codeTypeVote": "SPO",
+     "libelleTypeVote": "scrutin public ordinaire",
+     "typeMajorite": "Majorité absolue des suffrages exprimés"
+    },
+    "question": "l'amendement n° 10 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "type": "amendement",
+    "context": "Proposition de loi",
+    "sort_code": "rejeté",
+    "type_primary": null,
+    "tags": []
+   },
+   {
+    "uid": "VTANR5L17V7322",
+    "legislature": 17,
+    "numero": 7322,
+    "date_scrutin": "2026-06-04T00:00:00+00:00",
+    "titre": "l'amendement n° 9 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "objet": {
+     "libelle": "l'amendement n° 9 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+     "dossierLegislatif": {
+      "libelle": "Mesures de justice en faveur de la revalorisation des pensions de retraites agricoles",
+      "dossierRef": "DLR5L17N51955"
+     },
+     "referenceLegislative": null
+    },
+    "objet_libelle": "l'amendement n° 9 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "sort": {
+     "code": "adopté",
+     "libelle": "l'Assemblée nationale a adopté"
+    },
+    "type_vote": {
+     "codeTypeVote": "SPO",
+     "libelleTypeVote": "scrutin public ordinaire",
+     "typeMajorite": "Majorité absolue des suffrages exprimés"
+    },
+    "question": "l'amendement n° 9 de M. Alexandre après l'article 6 de la proposition de loi portant plusieurs mesures de justice en faveur de la revalorisation des pensions de retraites agricoles (première lecture).",
+    "type": "amendement",
+    "context": "Proposition de loi",
+    "sort_code": "adopté",
+    "type_primary": null,
+    "tags": []
+   }
+  ],
+  "pagination": {
+   "page": 1,
+   "page_size": 3,
+   "next_page": 2,
+   "count_total": 12,
+   "count_returned": 3
+  }
+ }
+}

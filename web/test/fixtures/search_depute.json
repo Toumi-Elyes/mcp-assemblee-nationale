@@ -1,0 +1,162 @@
+{
+ "publisher": "CIVIX.fr",
+ "api_version": "v1",
+ "retrieved_at": "2026-10-29T20:26:11.792Z",
+ "license": {
+  "name": "Open Data – Assemblée nationale",
+  "notice": "Données publiques de l'Assemblée nationale, présentées par CIVIX.fr (initiative indépendante)."
+ },
+ "schema_version": "2026-04-29",
+ "answer": "Cette page renvoie 6 résultat(s).",
+ "canonical_url": "https://www.civix.fr/api/v1/search?search=Abadie&page=1&page_size=3",
+ "confidence": "high",
+ "meta": {
+  "schema_version": "2026-04-29",
+  "api_version": "v1",
+  "retrieved_at": "2026-10-29T20:26:11.792Z",
+  "last_updated": "2026-10-29T20:26:11.792Z",
+  "query": {
+   "search": "Abadie",
+   "page": 1,
+   "page_size": 3
+  },
+  "pagination": {
+   "page": 1,
+   "page_size": 3
+  }
+ },
+ "summary": "Recherche pour \"Abadie\" : 6 résultat(s) sur la page 1.",
+ "source": {
+  "type": "dataset",
+  "provider": "Assemblée nationale",
+  "via": "CIVIX.fr",
+  "source_urls": [
+   "https://www.assemblee-nationale.fr"
+  ],
+  "civix_urls": {
+   "page": "https://www.civix.fr/api",
+   "api": "https://www.civix.fr/api/v1/search?search=Abadie&page=1&page_size=3"
+  }
+ },
+ "citation": {
+  "text": "Selon CIVIX.fr (données publiques de l'Assemblée nationale, consultées le 29 octobre 2026), la recherche pour \"Abadie\" renvoie 6 résultat(s).",
+  "url": "https://www.civix.fr/api/v1/search?search=Abadie&page=1&page_size=3"
+ },
+ "query": {
+  "search": "Abadie",
+  "page": 1,
+  "page_size": 3
+ },
+ "results": {
+  "deputes": [
+   {
+    "acteur_uid": "PA793214",
+    "prenom": "Audrey",
+    "nom": "Abadie-Amiel",
+    "groupe_libelle_abrev": "LIOT",
+    "circ_departement": "Ariège",
+    "slug": "audrey-abadie-amiel"
+   }
+  ],
+  "scrutins": [
+   {
+    "uid": "VTANR5L17V5492",
+    "titre": "l'amendement n° 211 de Mme Abadie-Amiel à l'article 14 de la proposition de loi visant à garantir l'égal accès de tous à l'accompagnement et aux soins palliatifs (deuxième lecture).",
+    "date_scrutin": "2026-02-18T00:00:00+00:00",
+    "numero": 5492,
+    "type_vote": "scrutin public ordinaire"
+   },
+   {
+    "uid": "VTANR5L16V2306",
+    "titre": "l'amendement n° 808 de M. Abadie à l'article premier et rapport annexé du projet de loi d'orientation et de programmation du ministère de la justice 2023-2027 (première lecture).",
+    "date_scrutin": "2023-07-13T00:00:00+00:00",
+    "numero": 2306,
+    "type_vote": "scrutin public ordinaire"
+   },
+   {
+    "uid": "VTANR5L16V2269",
+    "titre": "l'amendement n° 873 de Mme Abadie à l'article premier et rapport annexé du projet de loi d'orientation et de programmation du ministère de la justice 2023-2027 (première lecture).",
+    "date_scrutin": "2023-07-12T00:00:00+00:00",
+    "numero": 2269,
+    "type_vote": "scrutin public ordinaire"
+   },
+   {
+    "uid": "VTANR5L16V2177",
+    "titre": "l'amendement n° 729 de Mme Abadie et l'amendement identique suivant à l'article 4 du projet de loi d'orientation et de programmation du ministère de la justice 2023-2027 (première lecture).",
+    "date_scrutin": "2023-07-06T00:00:00+00:00",
+    "numero": 2177,
+    "type_vote": "scrutin public ordinaire"
+   },
+   {
+    "uid": "VTANR5L16V2176",
+    "titre": "l'amendement n° 648 de Mme Abadie et l'amendement identique suivant à l'article 4 du projet de loi d'orientation et de programmation du ministère de la justice 2023-2027 (première lecture).",
+    "date_scrutin": "2023-07-06T00:00:00+00:00",
+    "numero": 2176,
+    "type_vote": "scrutin public ordinaire"
+   }
+  ],
+  "groupes": [],
+  "dossiers": []
+ },
+ "total": 6,
+ "data": {
+  "type": "search",
+  "attributes": {
+   "query": "Abadie",
+   "page": 1,
+   "page_size": 3,
+   "results": {
+    "deputes": [
+     {
+      "acteur_uid": "PA793214",
+      "prenom": "Audrey",
+      "nom": "Abadie-Amiel",
+      "groupe_libelle_abrev": "LIOT",
+      "circ_departement": "Ariège",
+      "slug": "audrey-abadie-amiel"
+     }
+    ],
+    "scrutins": [
+     {
+      "uid": "VTANR5L17V5492",
+      "titre": "l'amendement n° 211 de Mme Abadie-Amiel à l'article 14 de la proposition de loi visant à garantir l'égal accès de tous à l'accompagnement et aux soins palliatifs (deuxième lecture).",
+      "date_scrutin": "2026-02-18T00:00:00+00:00",
+      "numero": 5492,
+      "type_vote": "scrutin public ordinaire"
+     },
+     {
+      "uid": "VTANR5L16V2306",
+      "titre": "l'amendement n° 808 de M. Abadie à l'article premier et rapport annexé du projet de loi d'orientation et de programmation du ministère de la justice 2023-2027 (première lecture).",
+      "date_scrutin": "2023-07-13T00:00:00+00:00",
+      "numero": 2306,
+      "type_vote": "scrutin public ordinaire"
+     },
+     {
+      "uid": "VTANR5L16V2269",
+      "titre": "l'amendement n° 873 de Mme Abadie à l'article premier et rapport annexé du projet de loi d'orientation et de programmation du ministère de la justice 2023-2027 (première lecture).",
+      "date_scrutin": "2023-07-12T00:00:00+00:00",
+      "numero": 2269,
+      "type_vote": "scrutin public ordinaire"
+     },
+     {
+      "uid": "VTANR5L16V2177",
+      "titre": "l'amendement n° 729 de Mme Abadie et l'amendement identique suivant à l'article 4 du projet de loi d'orientation et de programmation du ministère de la justice 2023-2027 (première lecture).",
+      "date_scrutin": "2023-07-06T00:00:00+00:00",
+      "numero": 2177,
+      "type_vote": "scrutin public ordinaire"
+     },
+     {
+      "uid": "VTANR5L16V2176",
+      "titre": "l'amendement n° 648 de Mme Abadie et l'amendement identique suivant à l'article 4 du projet de loi d'orientation et de programmation du ministère de la justice 2023-2027 (première lecture).",
+      "date_scrutin": "2023-07-06T00:00:00+00:00",
+      "numero": 2176,
+      "type_vote": "scrutin public ordinaire"
+     }
+    ],
+    "groupes": [],
+    "dossiers": []
+   },
+   "total": 6
+  }
+ }
+}
