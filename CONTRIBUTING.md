@@ -15,7 +15,7 @@ poetry install
 ```bash
 poetry run ruff check .            # lint
 poetry run ruff format .           # formatage
-poetry run mypy src tests          # typage strict
+poetry run mypy src tests api      # typage strict
 poetry run pytest                  # tests (API simulée, sans réseau)
 CIVIX_LIVE=1 poetry run pytest tests/live   # tests contre l'API réelle
 poetry run mcp-assemblee-nationale          # serveur stdio
@@ -23,6 +23,16 @@ poetry run mcp-assemblee-nationale --http --port 8765   # HTTP sur /mcp
 ```
 
 Avant d'ouvrir une pull request, `ruff check`, `ruff format --check`, `mypy` et `pytest` doivent passer (c'est ce que fait la CI).
+
+## Proposer un changement
+
+La branche `main` est protégée : on ne pousse pas dessus directement.
+
+1. Forkez le dépôt (ou créez une branche si vous avez les droits), puis travaillez sur une branche dédiée.
+2. Ouvrez une pull request vers `main`.
+3. La CI doit être verte (lint, format, typage, tests) avant la fusion.
+
+Une faille de sécurité ne s'ouvre pas en issue : voir [SECURITY.md](SECURITY.md).
 
 ## Règles de code
 

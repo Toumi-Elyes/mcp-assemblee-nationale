@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320" role="img" aria-labelledby="title desc">
+  <title id="title">MCP Assemblée nationale</title>
+  <desc id="desc">Demandez à votre assistant IA comment ont voté les députés, avec les sources. Projet indépendant et non officiel.</desc>
+  <rect width="1200" height="320" fill="#ffffff"/>
+  <rect x="0.5" y="0.5" width="1199" height="319" fill="none" stroke="#e5e5e5"/>
+  <rect x="0" y="0" width="1200" height="8" fill="#000091"/>
+  <g fill="none" stroke="#000091" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M104 110 L180 64 L256 110 Z"/>
+    <path d="M118 128 V196 M156 128 V196 M204 128 V196 M242 128 V196"/>
+    <path d="M96 214 H264 M84 238 H276"/>
+  </g>
+  <g font-family="'Public Sans', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+    <text x="340" y="132" font-size="60" font-weight="700" fill="#161616">MCP Assemblée nationale</text>
+    <text x="340" y="184" font-size="28" fill="#3a3a3a">Comment ont voté les députés ? Demandez à votre IA.</text>
+    <text x="340" y="232" font-size="22" fill="#666666">Gratuit · sans compte · sources citées · données ouvertes</text>
+    <text x="340" y="272" font-size="18" fill="#666666">Projet indépendant et non officiel</text>
+  </g>
+</svg>
