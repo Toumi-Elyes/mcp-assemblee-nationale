@@ -22,7 +22,7 @@ from assemblee_mcp.formatting import (
     position_from_votes,
     position_unavailable,
 )
-from assemblee_mcp.limits import DEFAULT_PAGE_SIZE, DIRECTORY_MAX_CALLS
+from assemblee_mcp.limits import COMMENT_MAX_CALLS, DEFAULT_PAGE_SIZE
 from assemblee_mcp.pagination import paginate
 from assemblee_mcp.tools.common import (
     GroupeAbbreviation,
@@ -58,7 +58,7 @@ class DeputeTools(ToolSet):
         """Outils exposés."""
         return (self.rechercher_deputes, self.obtenir_depute, self.comment_a_vote)
 
-    @limited(DIRECTORY_MAX_CALLS)
+    @civix_tool
     async def rechercher_deputes(
         self,
         nom: Annotated[
@@ -87,11 +87,34 @@ class DeputeTools(ToolSet):
         return format_deputes(shown, f"Députés correspondant à « {nom} »", hint)
 
     @civix_tool
-    async def obtenir_depute(self, uid: DeputeUid) -> str:
-        """Fiche d'un député : groupe, circonscription, législature, liens officiels."""
-        return format_depute(await self.client.get_depute(uid.upper()))
+    async def obtenir_depute(
+        self,
+        uid: Annotated[
+            DeputeUid | None, Field(description="Identifiant du député (PA…), à la place de `nom`.")
+        ] = None,
+        nom: Annotated[
+            str | None,
+            Field(
+                description="Nom du député, à la place de `uid` (accents et casse ignorés).",
+                min_length=2,
+                max_length=100,
+            ),
+        ] = None,
+    ) -> str:
+        """Fiche d'un député : groupe, circonscription, législature, liens officiels.
 
-    @civix_tool
+        Indiquer `uid` ou `nom` (si le nom est ambigu, les candidats sont listés).
+        """
+        if (uid is None) == (nom is None):
+            raise ToolError("Indiquez soit `uid`, soit `nom` (un seul des deux).")
+        if uid is not None:
+            return format_depute(await self.client.get_depute(uid.upper()))
+        resolved = await resolve_depute(self.client, str(nom))
+        if isinstance(resolved, str):
+            return resolved
+        return format_depute(await self.client.get_depute(resolved.uid))
+
+    @limited(COMMENT_MAX_CALLS)
     async def comment_a_vote(
         self,
         depute: Annotated[

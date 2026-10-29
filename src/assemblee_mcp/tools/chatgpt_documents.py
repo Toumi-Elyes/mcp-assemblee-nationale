@@ -16,7 +16,12 @@ from assemblee_mcp.formatting import (
     format_scrutin,
     truncate,
 )
-from assemblee_mcp.links import civix_depute_url, civix_groupe_url, civix_scrutin_url
+from assemblee_mcp.links import (
+    assemblee_scrutin_url,
+    civix_depute_url,
+    civix_groupe_url,
+    civix_scrutin_url,
+)
 
 SEARCH_TITLE_LENGTH = 200
 SCRUTIN_PREFIX = "scrutin"
@@ -136,7 +141,7 @@ async def fetch_scrutin(client: CivixClient, uid: str) -> FetchPayload:
             "numero": scrutin.numero,
             "resultat": scrutin.result_label,
             "adopte": scrutin.is_adopted,
-            "source_assemblee": response.source.assemblee_url,
+            "source_assemblee": assemblee_scrutin_url(scrutin.legislature, scrutin.numero),
         },
     )
 

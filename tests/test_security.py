@@ -6,7 +6,7 @@ import respx
 from fastmcp import Client, FastMCP
 from fastmcp.exceptions import ToolError
 
-from assemblee_mcp import formatting
+from assemblee_mcp import formatting, limits
 from assemblee_mcp.civix import lookup
 from assemblee_mcp.civix.budget import CallBudget, CivixBudgetError, current_budget
 from assemblee_mcp.civix.client import CivixClient, segment
@@ -190,13 +190,25 @@ async def test_unknown_group_is_a_clear_error_without_crawl(
     assert civix_mock.paths() == ["/groupes"]
 
 
-async def test_comment_a_vote_skips_directory_crawl_for_unknown_name(
+async def test_unknown_name_reads_the_directory_outside_the_call_budget(
     mcp_client: McpClient, civix_mock: CivixStub
 ) -> None:
     text = await call(mcp_client, "comment_a_vote", depute="Zzzzz Yyyyy", sujet="retraites")
+
     assert "aucun député trouvé" in text
-    assert "/deputes" not in civix_mock.paths()
-    assert len(civix_mock.requests) <= 3
+    directory_pages = [path for path in civix_mock.paths() if path == "/deputes"]
+    assert 1 <= len(directory_pages) <= limits.MAX_DIRECTORY_PAGES
+
+
+async def test_directory_is_read_once_then_served_from_memory(
+    mcp_client: McpClient, civix_mock: CivixStub
+) -> None:
+    await call(mcp_client, "comment_a_vote", depute="Zzzzz Yyyyy", sujet="retraites")
+    pages_after_first = civix_mock.paths().count("/deputes")
+
+    await call(mcp_client, "comment_a_vote", depute="Qqqqq Wwwww", sujet="retraites")
+
+    assert civix_mock.paths().count("/deputes") == pages_after_first
 
 
 async def test_comment_a_vote_normal_use_fits_the_budget(
@@ -317,11 +329,11 @@ def test_source_and_links_ignore_unsafe_urls() -> None:
     source = Source(
         source_urls=[
             "https://evil.test/x",
-            "https://www.assemblee-nationale.fr/dyn/17/scrutins/jo1",
+            "https://www.assemblee-nationale.fr/dyn/deputes/PA1",
         ],
         civix_urls={"page": "javascript:alert(1)"},
     )
-    assert source.assemblee_url == "https://www.assemblee-nationale.fr/dyn/17/scrutins/jo1"
+    assert source.assemblee_url == "https://www.assemblee-nationale.fr/dyn/deputes/PA1"
     assert source.civix_page is None
     assert Source(source_urls=["https://evil.test/x"]).assemblee_url is None
     depute = Depute(

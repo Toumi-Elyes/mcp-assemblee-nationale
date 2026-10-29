@@ -13,10 +13,15 @@ from assemblee_mcp.formatting import format_no_scrutin
 from assemblee_mcp.limits import (
     ANALYTICS_DEADLINE_SECONDS,
     ANALYTICS_MAX_CALLS,
+    DEFAULT_ANALYSED_SCRUTINS,
     LISTING_MAX_CALLS,
 )
 from assemblee_mcp.tools.analyses.parameters import KindParameter, MaxScrutins, SamplePeriodDays
-from assemblee_mcp.tools.analyses.sampling import sample_notes, sample_period
+from assemblee_mcp.tools.analyses.sampling import (
+    sample_notes,
+    sample_period,
+    small_sample_warnings,
+)
 from assemblee_mcp.tools.common import ToolFunction, ToolSet, limited
 from assemblee_mcp.tools.periods import describe_period
 
@@ -86,7 +91,7 @@ class TexteTools(ToolSet):
     async def votes_serres(
         self,
         periode_jours: SamplePeriodDays = 30,
-        max_scrutins: MaxScrutins = 30,
+        max_scrutins: MaxScrutins = DEFAULT_ANALYSED_SCRUTINS,
         ecart_max: Annotated[
             int, Field(description="Écart maximal entre pour et contre, en voix.", ge=0, le=100)
         ] = 20,
@@ -110,8 +115,10 @@ class TexteTools(ToolSet):
             counted=f"écart = |pour − contre| ; scrutins d'écart au plus {ecart_max} voix.",
             limits=["les abstentions et non-votants ne sont pas dans l'écart."],
             notes=sample_notes(sample, max_scrutins, regular=True),
+            warnings=small_sample_warnings(len(details), "scrutin(s) analysé(s)"),
         )
-        return render.render_close_votes(stats.close_votes(details, ecart_max), ecart_max, method)
+        close = stats.close_votes(details, ecart_max)
+        return render.render_close_votes(close, ecart_max, method, stats.closest_margin(details))
 
 
 def register(mcp: FastMCP, client: CivixClient) -> None:

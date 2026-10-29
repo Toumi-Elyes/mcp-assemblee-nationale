@@ -99,6 +99,16 @@ def cohesion(scrutins: Sequence[Scrutin], abbreviations: Mapping[str, str]) -> l
     ]
 
 
+def closest_margin(scrutins: Sequence[Scrutin]) -> int | None:
+    """Plus petit écart pour/contre observé, ou `None` sans décompte."""
+    margins = [
+        abs(scrutin.results_global.pour - scrutin.results_global.contre)
+        for scrutin in scrutins
+        if scrutin.results_global is not None
+    ]
+    return min(margins) if margins else None
+
+
 def close_votes(scrutins: Sequence[Scrutin], max_margin: int) -> list[CloseVote]:
     """Scrutins dont l'écart entre pour et contre est au plus `max_margin`, du plus serré."""
     rows = [

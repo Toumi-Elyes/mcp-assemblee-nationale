@@ -5,6 +5,7 @@ from datetime import datetime
 from pydantic import Field
 
 from assemblee_mcp.civix.models.base import CivixModel, Position
+from assemblee_mcp.civix.models.kinds import classify_scrutin
 
 
 class Sort(CivixModel):
@@ -57,6 +58,11 @@ class ScrutinSummary(CivixModel):
     type: str | None = None
     sort_code: str | None = None
     tags: list[str] = Field(default_factory=list)
+
+    @property
+    def kind(self) -> str:
+        """Nature du scrutin (amendement, article, texte ou autre), motions exclues du texte."""
+        return classify_scrutin(self.type, self.titre)
 
     @property
     def dossier_ref(self) -> str | None:

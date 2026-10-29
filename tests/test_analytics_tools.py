@@ -1,11 +1,13 @@
 import csv
 import io
 import json
+import re
 from datetime import UTC, date, datetime
 
 import pytest
 from fastmcp.exceptions import ToolError
 
+from assemblee_mcp import limits
 from assemblee_mcp.analytics import gather
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.config import Settings
@@ -25,13 +27,24 @@ from tests.conftest import (
 )
 
 TODAY = date(2026, 10, 29)
-LIST_BUDGET = 30
-ANALYTICS_BUDGET = 45
+LIST_BUDGET = limits.LISTING_MAX_CALLS
+ANALYTICS_BUDGET = limits.ANALYTICS_MAX_CALLS
 
 
 @pytest.fixture(autouse=True)
 def fixed_today(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(gather, "current_day", lambda: TODAY)
+
+
+def scanned_count(pattern: str, text: str) -> int:
+    """Nombre lu dans `text` ; il doit rester entre la cible et la cible plus un lot de lecture."""
+    found = re.search(pattern, text)
+    assert found is not None
+    count = int(found.group(1))
+    assert (
+        limits.TARGET_USABLE_SCRUTINS <= count <= limits.TARGET_USABLE_SCRUTINS + limits.VOTES_BATCH
+    )
+    return count
 
 
 def assert_analysis_shape(text: str) -> None:
@@ -197,7 +210,7 @@ async def test_cohesion_groupes(mcp_client: McpClient) -> None:
 async def test_votes_serres(mcp_client: McpClient, civix_mock: CivixStub) -> None:
     civix_mock.listings[None] = make_listing(30, 3)
     none = await call(mcp_client, "votes_serres", periode_jours=30)
-    assert "Aucun scrutin de l'échantillon" in none
+    assert "parcourus n'a un écart" in none
     wide = await call(mcp_client, "votes_serres", periode_jours=30, ecart_max=100)
     assert "| Écart |" in wide
     assert "| 81 |" in wide
@@ -210,9 +223,9 @@ async def test_bilan_depute(mcp_client: McpClient, civix_mock: CivixStub) -> Non
     text = await call(mcp_client, "bilan_depute", depute="Astrid Panosyan-Bouvet", periode_jours=30)
     assert_analysis_shape(text)
     assert "(EPR)" in text
-    assert "| 0 | 0 | 30 | 0 | 0 |" in text
-    assert "Votes exprimés par délégation : 30" in text
-    assert "0 sur 30 votes comparables" in text
+    scanned = scanned_count(r"\| 0 \| 0 \| (\d+) \| 0 \| 0 \|", text)
+    assert f"Votes exprimés par délégation : {scanned}" in text
+    assert f"0 sur {scanned} votes comparables" in text
     assert "ne dit rien de l'intérêt" in text
     assert len(civix_mock.requests) <= ANALYTICS_BUDGET
 
@@ -257,8 +270,8 @@ async def test_comparer_deputes_fits_budget(mcp_client: McpClient, civix_mock: C
         periode_jours=30,
     )
     assert_analysis_shape(text)
-    assert "Scrutins où les deux ont exprimé un vote : 30" in text
-    assert "Même position sur : 30 (100 %)" in text
+    shared = scanned_count(r"Scrutins où les deux ont exprimé un vote : (\d+)", text)
+    assert f"Même position sur : {shared} (100 %)" in text
     assert len(civix_mock.requests) <= ANALYTICS_BUDGET
 
 
@@ -300,7 +313,15 @@ async def test_exporter_votes(mcp_client: McpClient) -> None:
     text = await call(mcp_client, "exporter_votes", scrutin_uid=SCRUTIN_UID)
     block = text.split("```csv\n")[1].split("\n```")[0]
     rows = list(csv.reader(io.StringIO(block)))
-    assert rows[0] == ["scrutin_uid", "depute_uid", "prenom", "nom", "position", "par_delegation"]
+    assert rows[0] == [
+        "scrutin_uid",
+        "depute_uid",
+        "prenom",
+        "nom",
+        "groupe",
+        "position",
+        "par_delegation",
+    ]
     assert len(rows) == 18
     assert "Export CSV : 17 ligne(s)." in text
     as_json = await call(mcp_client, "exporter_votes", scrutin_uid=SCRUTIN_UID, format="json")
@@ -325,3 +346,25 @@ async def test_old_scrutins_are_cached_for_a_day_and_recent_ones_for_ten_minutes
     await client.get_votes("VTANR5L17V1")
     assert civix_mock.paths().count(f"/scrutins/{SCRUTIN_UID}/votes") == 1
     assert civix_mock.paths().count("/scrutins/VTANR5L17V1/votes") == 2
+
+
+async def test_exporter_votes_adds_the_group_and_limits_lines(
+    mcp_client: McpClient, civix_mock: CivixStub
+) -> None:
+    directory = load_fixture("deputes_groupe_hor")
+    directory["meta"]["pagination"]["next_page"] = None
+    civix_mock.add("/deputes", directory, page="1")
+
+    text = await call(mcp_client, "exporter_votes", scrutin_uid=SCRUTIN_UID, max_lignes=3)
+
+    block = text.split("```csv\n")[1].split("\n```")[0]
+    rows = list(csv.DictReader(io.StringIO(block)))
+    assert len(rows) == 3
+    assert "Export limité à 3 lignes (`max_lignes`) sur 17 votes." in text
+    full = await call(mcp_client, "exporter_votes", scrutin_uid=SCRUTIN_UID)
+    by_name = {
+        row["nom"]: row
+        for row in csv.DictReader(io.StringIO(full.split("```csv\n")[1].split("\n```")[0]))
+    }
+    assert by_name["Valletoux"]["groupe"] == "HOR"
+    assert by_name["Braun-Pivet"]["groupe"] == ""

@@ -225,3 +225,20 @@ def test_compare_deputes() -> None:
     assert (result.shared, result.agreed, result.only_a, result.only_b) == (2, 1, 1, 1)
     assert result.rate == 0.5
     assert Position.POUR.value == "pour"
+
+
+def test_spread_order_keeps_every_prefix_spread_over_the_whole_list() -> None:
+    items = list(range(16))
+
+    ordered = stats.spread_order(items)
+
+    assert sorted(ordered) == items
+    assert sorted(ordered[:4]) == [0, 4, 8, 12]
+    assert sorted(ordered[:8]) == [0, 2, 4, 6, 8, 10, 12, 14]
+
+
+@pytest.mark.parametrize("size", [0, 1, 2, 7, 100])
+def test_spread_order_is_a_permutation(size: int) -> None:
+    items = list(range(size))
+
+    assert sorted(stats.spread_order(items)) == items

@@ -4,7 +4,9 @@ from assemblee_mcp.civix.models import (
     CivixModel,
     CivixResponse,
     Pagination,
+    ScrutinDetail,
 )
+from assemblee_mcp.links import assemblee_scrutin_url, civix_scrutin_url
 from assemblee_mcp.urls import safe_url
 
 FOOTER = (
@@ -27,6 +29,13 @@ def response_source_line[AttributesT: CivixModel](response: CivixResponse[Attrib
     """Ligne « Source : » d'une réponse CIVIX."""
     civix = response.source.civix_page or safe_url(response.canonical_url)
     return source_line(civix, response.source.assemblee_url)
+
+
+def scrutin_source_line(scrutin: ScrutinDetail) -> str:
+    """Ligne « Source : » d'un scrutin : sa page CIVIX et sa page à l'Assemblée nationale."""
+    return source_line(
+        civix_scrutin_url(scrutin.uid), assemblee_scrutin_url(scrutin.legislature, scrutin.numero)
+    )
 
 
 def finish(body: str, source: str) -> str:

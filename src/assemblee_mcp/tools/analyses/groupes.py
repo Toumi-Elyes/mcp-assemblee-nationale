@@ -7,12 +7,18 @@ from fastmcp import FastMCP
 from pydantic import Field
 
 from assemblee_mcp.analytics import gather, render, stats
-from assemblee_mcp.analytics.models import GroupStances, Method
+from assemblee_mcp.analytics.models import GroupStances, Method, PairAgreement
 from assemblee_mcp.civix import lookup
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.civix.models import Scrutin, ScrutinSummary
 from assemblee_mcp.formatting import format_no_scrutin
-from assemblee_mcp.limits import ANALYTICS_DEADLINE_SECONDS, ANALYTICS_MAX_CALLS
+from assemblee_mcp.limits import (
+    ANALYTICS_DEADLINE_SECONDS,
+    ANALYTICS_MAX_CALLS,
+    DEFAULT_ANALYSED_SCRUTINS,
+    MAX_ANALYSED_SCRUTINS,
+    SMALL_SAMPLE_THRESHOLD,
+)
 from assemblee_mcp.tools.analyses.parameters import (
     KIND_VALUES,
     DossierReference,
@@ -22,16 +28,32 @@ from assemblee_mcp.tools.analyses.parameters import (
     OptionalSubject,
     require_subject_or_dossier,
 )
-from assemblee_mcp.tools.analyses.sampling import SelectedSample, sample_notes, select_sample
+from assemblee_mcp.tools.analyses.sampling import (
+    SelectedSample,
+    sample_notes,
+    select_sample,
+    small_sample_warnings,
+)
 from assemblee_mcp.tools.common import ToolFunction, ToolSet, limited
 
 analytics_tool = limited(ANALYTICS_MAX_CALLS, ANALYTICS_DEADLINE_SECONDS)
-DEFAULT_POSITIONS_SCRUTINS = 15
+DEFAULT_POSITIONS_SCRUTINS = 20
 
 
 def group_names(rows: list[GroupStances]) -> list[str]:
     """Sigles de groupes présents, par ordre alphabétique."""
     return sorted({name for row in rows for name in row.stances})
+
+
+def thin_pairs_warnings(pairs: list[PairAgreement]) -> list[str]:
+    """Avertit quand des paires de groupes ont trop peu de scrutins en commun pour conclure."""
+    thin = sum(1 for pair in pairs if pair.shared < SMALL_SAMPLE_THRESHOLD)
+    if thin == 0:
+        return []
+    return [
+        f"{thin} paire(s) de groupes ont moins de {SMALL_SAMPLE_THRESHOLD} scrutins en commun : "
+        "leur taux d'accord est trop fragile pour conclure."
+    ]
 
 
 def selection_method(
@@ -47,6 +69,7 @@ def selection_method(
         counted=counted,
         limits=limits,
         notes=selection.notes,
+        warnings=small_sample_warnings(analysed, "scrutin(s) analysé(s)"),
     )
 
 
@@ -65,6 +88,7 @@ def positions_method(sample: gather.Sample, analysed: int, max_scrutins: int) ->
             "les décomptes par groupe sont ceux publiés par CIVIX pour chaque scrutin.",
         ],
         notes=sample_notes(sample, max_scrutins, regular=False),
+        warnings=small_sample_warnings(analysed, "scrutin(s) analysé(s)"),
     )
 
 
@@ -84,7 +108,7 @@ class GroupeAnalyses(ToolSet):
             Field(description="Référence d'un dossier législatif (DLR…), à la place de `sujet`."),
         ] = None,
         max_scrutins: Annotated[
-            int, Field(ge=3, le=30, description="Scrutins analysés.")
+            int, Field(ge=3, le=MAX_ANALYSED_SCRUTINS, description="Scrutins analysés.")
         ] = DEFAULT_POSITIONS_SCRUTINS,
         type_scrutin: KindParameter = "tous",
     ) -> str:
@@ -110,7 +134,7 @@ class GroupeAnalyses(ToolSet):
         self,
         sujet: OptionalSubject = None,
         periode_jours: OptionalSamplePeriodDays = None,
-        max_scrutins: MaxScrutins = 30,
+        max_scrutins: MaxScrutins = DEFAULT_ANALYSED_SCRUTINS,
         type_scrutin: KindParameter = "tous",
     ) -> str:
         """Taux d'accord entre groupes parlementaires, deux à deux, sur un échantillon de scrutins.
@@ -136,14 +160,18 @@ class GroupeAnalyses(ToolSet):
                 "l'échantillon peut comporter beaucoup d'amendements.",
             ],
         )
-        return render.render_agreements(stats.agreements(rows), group_names(rows), method)
+        pairs = stats.agreements(rows)
+        method = method.model_copy(
+            update={"warnings": [*method.warnings, *thin_pairs_warnings(pairs)]}
+        )
+        return render.render_agreements(pairs, group_names(rows), method)
 
     @analytics_tool
     async def cohesion_groupes(
         self,
         sujet: OptionalSubject = None,
         periode_jours: OptionalSamplePeriodDays = None,
-        max_scrutins: MaxScrutins = 30,
+        max_scrutins: MaxScrutins = DEFAULT_ANALYSED_SCRUTINS,
         type_scrutin: KindParameter = "tous",
     ) -> str:
         """Part des votes de chaque groupe qui suivent sa position majoritaire.

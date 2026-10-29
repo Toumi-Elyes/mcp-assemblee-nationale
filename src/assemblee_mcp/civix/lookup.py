@@ -8,14 +8,19 @@ from assemblee_mcp.civix.budget import CivixBudgetError, can_afford
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.civix.errors import CivixNotFoundError
 from assemblee_mcp.civix.models import Depute, Groupe
-from assemblee_mcp.textutils import fold, tokens
+from assemblee_mcp.limits import (
+    CIVIX_PAGE_SIZE,
+    MAX_DIRECTORY_PAGES,
+    MAX_NAME_SEARCHES,
+    SEARCH_CATEGORY_CAP,
+)
+from assemblee_mcp.textutils import fold, strip_accents, tokens
 
 DEPUTE_UID_PATTERN = re.compile(r"^PA\d+$", re.IGNORECASE)
-DIRECTORY_PAGE_SIZE = 50
-MAX_DIRECTORY_PAGES = 15
 CURRENT_LEGISLATURE = 17
-MAX_TOKEN_SEARCHES = 2
-MIN_NAME_WORDS = 2
+ASCII_LIMIT = 127
+MIN_STEM_LENGTH = 3
+MAX_WORD_SEARCHES = 2
 
 
 async def list_groupes(client: CivixClient) -> list[Groupe]:
@@ -42,14 +47,14 @@ async def all_deputes(
 ) -> list[Depute]:
     """Parcourt toutes les pages de `/deputes` (50 par page, pages suivantes en parallèle)."""
     first = await client.list_deputes(
-        groupe=groupe, legislature=legislature, page=1, page_size=DIRECTORY_PAGE_SIZE
+        groupe=groupe, legislature=legislature, page=1, page_size=CIVIX_PAGE_SIZE
     )
     deputes = list(first.attributes.results)
     total = first.pagination.total if first.pagination else None
     if first.pagination is None or first.pagination.next_page is None:
         return deputes
     page_count = (
-        min(math.ceil(total / DIRECTORY_PAGE_SIZE), MAX_DIRECTORY_PAGES)
+        min(math.ceil(total / CIVIX_PAGE_SIZE), MAX_DIRECTORY_PAGES)
         if total
         else MAX_DIRECTORY_PAGES
     )
@@ -58,7 +63,7 @@ async def all_deputes(
     pages = await asyncio.gather(
         *(
             client.list_deputes(
-                groupe=groupe, legislature=legislature, page=page, page_size=DIRECTORY_PAGE_SIZE
+                groupe=groupe, legislature=legislature, page=page, page_size=CIVIX_PAGE_SIZE
             )
             for page in range(2, page_count + 1)
         )
@@ -109,23 +114,44 @@ async def resolve_groupe(client: CivixClient, groupe: str) -> str:
     raise CivixNotFoundError(f"Groupe « {groupe} » inconnu. Groupes disponibles : {known}.")
 
 
-async def search_deputes(client: CivixClient, nom: str) -> list[Depute]:
-    """Députés trouvés par `/search`, filtrés localement sans tenir compte des accents.
+def stem_before_accent(word: str) -> str:
+    """Début d'un mot jusqu'à sa première lettre accentuée (la recherche CIVIX l'accepte)."""
+    for index, char in enumerate(word):
+        if ord(char) > ASCII_LIMIT:
+            return word[:index]
+    return word
 
-    Si l'expression complète ne donne rien, les mots les plus longs sont cherchés un à un :
-    CIVIX est sensible aux accents, mais le nom de famille en comporte rarement.
+
+def name_search_variants(name: str) -> list[str]:
+    """Formulations du nom à essayer dans `/search`, de la plus fidèle à la plus tolérante.
+
+    CIVIX est sensible aux accents et ne retrouve pas certains noms accentués : on essaie le nom
+    tel que saisi, sans accents, les mots les plus longs un à un, puis leur début avant l'accent.
     """
-    hits = (await client.search(nom)).attributes.results.deputes
-    matches = rank_by_name([hit.to_depute() for hit in hits], nom)
-    words = sorted(tokens(nom), key=len, reverse=True)
-    if matches or len(words) < MIN_NAME_WORDS:
-        return matches
-    for word in words[:MAX_TOKEN_SEARCHES]:
-        found = (await client.search(word)).attributes.results.deputes
-        matches = rank_by_name([hit.to_depute() for hit in found], nom)
+    typed = " ".join(name.split())
+    words = sorted(typed.split(), key=len, reverse=True)
+    stems = [
+        stem
+        for word in words
+        if (stem := stem_before_accent(word)) != word and len(stem) >= MIN_STEM_LENGTH
+    ]
+    candidates = [typed, strip_accents(typed), *stems]
+    if len(words) > 1:
+        candidates += words[:MAX_WORD_SEARCHES]
+    return list(dict.fromkeys(candidates))[:MAX_NAME_SEARCHES]
+
+
+async def search_deputes(client: CivixClient, nom: str) -> tuple[list[Depute], bool]:
+    """Députés trouvés par `/search`, filtrés localement ; indique si la liste est tronquée.
+
+    S'arrête à la première formulation qui donne un député correspondant au nom.
+    """
+    for variant in name_search_variants(nom):
+        hits = (await client.search(variant)).attributes.results.deputes
+        matches = rank_by_name([hit.to_depute() for hit in hits], nom)
         if matches:
-            return matches
-    return []
+            return matches, len(hits) >= SEARCH_CATEGORY_CAP
+    return [], False
 
 
 async def find_deputes(
@@ -135,23 +161,30 @@ async def find_deputes(
     groupe: str | None = None,
     legislature: int | None = None,
 ) -> list[Depute]:
-    """Cherche des députés par nom (législature en cours uniquement).
+    """Cherche des députés par nom (législature en cours uniquement) : le résolveur unique.
 
-    `/deputes` n'a pas de filtre par nom : on passe par `/search`, puis on filtre localement.
-    Sans résultat, l'annuaire est parcouru si le budget d'appels le permet.
+    Un identifiant (PA…) est exact. Sinon, si l'annuaire est déjà en mémoire il fait foi ;
+    sinon on essaie `/search` (plusieurs formulations), puis l'annuaire complet quand la
+    recherche ne trouve rien ou que sa liste est tronquée. La comparaison ignore accents et casse.
     """
     if legislature not in {None, CURRENT_LEGISLATURE}:
         raise CivixNotFoundError("Seule la 17e législature est couverte pour les députés.")
     abbr = await resolve_groupe(client, groupe) if groupe is not None else None
     if DEPUTE_UID_PATTERN.match(nom.strip()):
         return [(await client.get_depute(nom.strip().upper())).attributes.deputy]
-    matches = await search_deputes(client, nom)
-    if abbr is not None:
-        matches = _only_groupe(matches, abbr)
-    if matches or not can_afford(MAX_DIRECTORY_PAGES):
+    matches = await _match_by_name(client, nom)
+    return _only_groupe(matches, abbr) if abbr is not None else matches
+
+
+async def _match_by_name(client: CivixClient, nom: str) -> list[Depute]:
+    """Députés dont le nom correspond, via l'annuaire en mémoire, `/search` ou l'annuaire."""
+    cached = client.directory.cached()
+    if cached is not None:
+        return rank_by_name(cached, nom)
+    matches, truncated = await search_deputes(client, nom)
+    if matches and not truncated:
         return matches
-    directory = await all_deputes(client, groupe=abbr, legislature=legislature)
-    return rank_by_name(directory, nom)
+    return rank_by_name(await client.directory.load(), nom)
 
 
 def _only_groupe(deputes: list[Depute], groupe: str) -> list[Depute]:

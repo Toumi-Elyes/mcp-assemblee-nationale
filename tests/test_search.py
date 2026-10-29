@@ -1,17 +1,22 @@
 import pytest
 
+from assemblee_mcp import limits
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.civix.search import broaden, contains_all, search_everything, search_scrutins
 from tests.conftest import CivixStub, Payload, load_fixture
 
 
-def scrutins_payload(titles: list[str], *, next_page: int | None = None) -> Payload:
-    payload = load_fixture("search_scrutins")
-    template = payload["data"]["attributes"]["results"][0]
-    payload["data"]["attributes"]["results"] = [
+def scrutin_items(titles: list[str]) -> list[Payload]:
+    template = load_fixture("search_scrutins")["data"]["attributes"]["results"][0]
+    return [
         {**template, "uid": f"VTANR5L17V{n}", "titre": title, "objet": {"libelle": title}}
         for n, title in enumerate(titles)
     ]
+
+
+def scrutins_payload(titles: list[str], *, next_page: int | None = None) -> Payload:
+    payload = load_fixture("search_scrutins")
+    payload["data"]["attributes"]["results"] = scrutin_items(titles)
     payload["meta"]["pagination"].update(
         count_total=len(titles), count_returned=len(titles), next_page=next_page
     )
@@ -60,17 +65,12 @@ async def test_exact_query_hit_makes_one_call(client: CivixClient, civix_mock: C
 async def test_fallback_filters_pool_and_notes_it(
     client: CivixClient, civix_mock: CivixStub
 ) -> None:
-    civix_mock.add("/scrutins", empty_scrutins(), search="loi de finances 2027")
-    civix_mock.add(
-        "/scrutins",
-        scrutins_payload(
-            [
-                "le projet de loi de finances pour 2027",
-                "le projet de loi de finances pour 2026",
-                "l'article 2 du projet de loi de finances pour 2027",
-            ]
-        ),
-        search="finances",
+    civix_mock.listings["finances"] = scrutin_items(
+        [
+            "le projet de loi de finances pour 2027",
+            "le projet de loi de finances pour 2026",
+            "l'article 2 du projet de loi de finances pour 2027",
+        ]
     )
     found = await search_scrutins(client, "loi de finances 2027")
     assert [s.uid for s in found.results] == ["VTANR5L17V0", "VTANR5L17V2"]
@@ -81,25 +81,22 @@ async def test_fallback_filters_pool_and_notes_it(
     assert len(civix_mock.requests) == 2
 
 
-async def test_fallback_is_bounded_to_three_calls(
+async def test_fallback_reads_only_the_announced_pages_up_to_the_limit(
     client: CivixClient, civix_mock: CivixStub
 ) -> None:
-    civix_mock.add("/scrutins", empty_scrutins(), search="loi de finances 2027")
-    civix_mock.add(
-        "/scrutins",
-        scrutins_payload(["loi de finances pour 2027"], next_page=2),
-        search="finances",
-    )
+    civix_mock.listings["finances"] = scrutin_items(["loi de finances pour 2027"] * 700)
     found = await search_scrutins(client, "loi de finances 2027")
-    assert len(civix_mock.requests) == 3
+    assert len(civix_mock.requests) == 1 + limits.BROAD_POOL_PAGES
     assert found.note is not None
-    assert "limitée" in found.note
+    assert (
+        f"{limits.CIVIX_PAGE_SIZE * limits.BROAD_POOL_PAGES} scrutins les plus récents"
+        in found.note
+    )
 
 
 async def test_fallback_paginates_locally(client: CivixClient, civix_mock: CivixStub) -> None:
-    civix_mock.add("/scrutins", empty_scrutins(), search="loi de finances 2027")
     titles = [f"loi de finances pour 2027 n°{n}" for n in range(12)]
-    civix_mock.add("/scrutins", scrutins_payload(titles), search="finances")
+    civix_mock.listings["finances"] = scrutin_items(titles)
     first = await search_scrutins(client, "loi de finances 2027", page_size=10)
     assert len(first.results) == 10
     assert first.pagination is not None

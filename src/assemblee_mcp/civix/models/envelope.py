@@ -6,6 +6,9 @@ from assemblee_mcp.civix.models.base import CivixModel
 from assemblee_mcp.urls import safe_url
 
 ASSEMBLEE_HOMEPAGE = "https://www.assemblee-nationale.fr"
+# CIVIX publie des adresses de scrutins `.../scrutins/jo9152` qui renvoient une erreur 404 : elles
+# sont écartées, `links.assemblee_scrutin_url` construit l'adresse valable.
+SCRUTIN_LINK_MARKER = "/scrutins/"
 
 
 class Pagination(CivixModel):
@@ -40,7 +43,10 @@ class Source(CivixModel):
     def assemblee_url(self) -> str | None:
         """Lien précis vers l'Assemblée nationale, hors simple page d'accueil."""
         for url in self.source_urls:
-            if url.rstrip("/") != ASSEMBLEE_HOMEPAGE and (checked := safe_url(url)) is not None:
+            checked = safe_url(url)
+            if checked is None or checked.rstrip("/") == ASSEMBLEE_HOMEPAGE:
+                continue
+            if SCRUTIN_LINK_MARKER not in checked:
                 return checked
         return None
 

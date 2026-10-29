@@ -13,6 +13,7 @@ from pydantic import ValidationError
 
 from assemblee_mcp.civix.budget import CivixBudgetError, charge_call
 from assemblee_mcp.civix.cache import CacheKey, TtlCache
+from assemblee_mcp.civix.directory import DeputyDirectory
 from assemblee_mcp.civix.errors import (
     UNEXPECTED_MESSAGE,
     CivixError,
@@ -42,6 +43,7 @@ from assemblee_mcp.config import (
     POOL_TIMEOUT_SECONDS,
     Settings,
 )
+from assemblee_mcp.limits import CIVIX_PAGE_SIZE
 
 QueryParams = Mapping[str, str | int | bool | None]
 MAX_ATTEMPTS = 2
@@ -99,6 +101,11 @@ class CivixClient:
         )
         self._inflight: dict[CacheKey, asyncio.Future[CivixResponse[Any]]] = {}
         self._slots = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
+        self.directory = DeputyDirectory(
+            lambda page: self.list_deputes(page=page, page_size=CIVIX_PAGE_SIZE),
+            settings_.immutable_ttl,
+            clock,
+        )
 
     async def aclose(self) -> None:
         """Ferme la connexion HTTP sous-jacente."""

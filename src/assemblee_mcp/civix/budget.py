@@ -1,5 +1,7 @@
 """Budget d'appels réseau par appel d'outil, partagé entre les tâches lancées en parallèle."""
 
+from collections.abc import Iterator
+from contextlib import contextmanager
 from contextvars import ContextVar
 
 from assemblee_mcp.civix.errors import CivixError
@@ -50,3 +52,13 @@ def can_afford(calls: int) -> bool:
     """Vrai si le budget courant permet encore `calls` appels (toujours vrai sans budget)."""
     budget = current_budget.get()
     return budget is None or budget.remaining >= calls
+
+
+@contextmanager
+def unbudgeted() -> Iterator[None]:
+    """Suspend le budget pour un chargement mis en cache longtemps (annuaire des députés)."""
+    token = current_budget.set(None)
+    try:
+        yield
+    finally:
+        current_budget.reset(token)

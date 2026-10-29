@@ -5,6 +5,7 @@ from assemblee_mcp.urls import safe_url
 
 CIVIX_SITE = "https://www.civix.fr"
 ASSEMBLEE_DEPUTES = "https://www.assemblee-nationale.fr/dyn/deputes"
+ASSEMBLEE_SCRUTINS = "https://www.assemblee-nationale.fr/dyn"
 
 
 def civix_scrutin_url(uid: str) -> str:
@@ -20,6 +21,17 @@ def civix_depute_url(uid: str) -> str:
 def civix_groupe_url(abbr: str) -> str:
     """Page CIVIX d'un groupe."""
     return f"{CIVIX_SITE}/groupes/{abbr}"
+
+
+def assemblee_scrutin_url(legislature: int | None, numero: int | None) -> str | None:
+    """Page d'un scrutin sur le site de l'Assemblée nationale, construite ici.
+
+    L'adresse publiée par CIVIX (`.../scrutins/jo9231`) renvoie une erreur 404 ; la page existe
+    en `.../dyn/<législature>/scrutins/<numéro>`. Sans l'un des deux, on n'en donne pas.
+    """
+    if legislature is None or numero is None:
+        return None
+    return f"{ASSEMBLEE_SCRUTINS}/{legislature}/scrutins/{numero}"
 
 
 def assemblee_depute_url(uid: str) -> str:

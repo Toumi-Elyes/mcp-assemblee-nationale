@@ -18,17 +18,19 @@ from assemblee_mcp.analytics.stats.deputes import compare_deputes, depute_bilan
 from assemblee_mcp.analytics.stats.groups import (
     agreements,
     close_votes,
+    closest_margin,
     cohesion,
     group_stances,
     stance,
 )
-from assemblee_mcp.analytics.stats.shared import day_of, evenly_spaced
+from assemblee_mcp.analytics.stats.shared import day_of, evenly_spaced, spread_order
 
 __all__ = [
     "NO_DOSSIER_LABEL",
     "agreements",
     "busiest_days",
     "close_votes",
+    "closest_margin",
     "cohesion",
     "compare_deputes",
     "day_of",
@@ -40,6 +42,7 @@ __all__ = [
     "make_rate",
     "rank_texts",
     "rate_table",
+    "spread_order",
     "stance",
     "trends",
     "weekly_volumes",

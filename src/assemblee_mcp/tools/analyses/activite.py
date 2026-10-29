@@ -1,7 +1,7 @@
 """Outils d'analyse de l'activité générale de l'Assemblée (tendances, textes, périodes)."""
 
 import asyncio
-from datetime import date, timedelta
+from datetime import date
 from typing import Annotated, Literal
 
 from fastmcp import FastMCP
@@ -30,12 +30,6 @@ from assemblee_mcp.tools.common import LegislatureNumber, ToolFunction, ToolSet,
 from assemblee_mcp.tools.periods import DateText, describe_period, parse_range
 
 listing_tool = limited(LISTING_MAX_CALLS, ANALYTICS_DEADLINE_SECONDS)
-
-
-def period_ending_today(days: int) -> tuple[date, date]:
-    """Bornes d'une période de `days` jours se terminant aujourd'hui."""
-    end = gather.current_day()
-    return end - timedelta(days=days), end
 
 
 def listing_method(found: gather.Listing, start: date, end: date, *, counted: str) -> Method:
@@ -113,7 +107,7 @@ def assembly_stats(
         total_scrutins=total,
         sample_size=len(items),
         overall=stats.make_rate("Tous les scrutins", items),
-        by_type=stats.rate_table(items, lambda item: item.type),
+        by_type=stats.rate_table(items, lambda item: item.kind),
         groups=[
             GroupSeats(abbr=groupe.abbr, libelle=groupe.libelle, effectif=groupe.effectif)
             for groupe in groups
@@ -148,7 +142,7 @@ class ActiviteTools(ToolSet):
         (amendements, articles, ensembles de textes) et par contexte (PLF, PLFSS, propositions
         de loi), et les jours les plus chargés.
         """
-        start, end = period_ending_today(periode_jours)
+        start, end = gather.last_days(periode_jours)
         found = await gather.fetch_period(self.client, start, end, legislature=legislature)
         result = stats.trends(found.items, start, end)
         return render.render_trends(result, trends_method(found, start, end))
@@ -165,7 +159,7 @@ class ActiviteTools(ToolSet):
         nombre de scrutins (dont amendements, articles et votes sur l'ensemble), adoptés/rejetés,
         date du dernier vote. Un grand nombre de scrutins reflète surtout le nombre d'amendements.
         """
-        start, end = period_ending_today(periode_jours)
+        start, end = gather.last_days(periode_jours)
         found = await gather.fetch_period(self.client, start, end)
         ranked = stats.rank_texts(found.items)
         method = texts_method(found, start, end, ranked, limite)
@@ -198,7 +192,12 @@ class ActiviteTools(ToolSet):
             start,
             end,
             counted="scrutins publics dont la date est dans la période, après filtres.",
-        ).model_copy(update={"matching": len(kept)})
+        ).model_copy(
+            update={
+                "matching": None,
+                "notes": [f"{len(kept)} scrutin(s) correspondent aux filtres (type, résultat)."],
+            }
+        )
         lines = "\n".join(scrutin_line(item) for item in shown) or "Aucun scrutin."
         hint = pagination_hint(pagination, len(shown), "scrutin(s)")
         body = f"## Scrutins {describe_period(start, end)}\n\n{lines}\n\n{hint}"

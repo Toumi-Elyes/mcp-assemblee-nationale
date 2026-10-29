@@ -3,8 +3,8 @@
 Où chercher, du réseau vers l'utilisateur :
 
 - `civix/` : accès à CIVIX. `client` (appels, cache, nouvelles tentatives), `models/` (réponses
-  en modèles Pydantic), `lookup` et `search` (recherches composées), `budget` (plafond d'appels
-  par outil) et `errors` (messages d'erreur en français).
+  en modèles Pydantic), `directory` (annuaire des députés), `lookup` et `search/` (recherches
+  composées), `budget` (plafond d'appels par outil) et `errors` (messages d'erreur en français).
 - `analytics/` : calculs purs sur les scrutins. `gather` collecte les données avec des volumes
   d'appels bornés, `stats/` calcule, `render/` met les résultats en markdown avec leur méthode,
   `exporting` produit le CSV et le JSON.

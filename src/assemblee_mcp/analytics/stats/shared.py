@@ -34,6 +34,19 @@ def evenly_spaced[Item](items: Sequence[Item], count: int) -> list[Item]:
     return [items[int(index * step)] for index in range(count)]
 
 
+def spread_order[Item](items: Sequence[Item]) -> list[Item]:
+    """Réordonne la liste pour que n'importe quel début soit réparti sur l'ensemble.
+
+    Lire les premiers éléments d'une liste triée par date ne donnerait que les plus récents :
+    avec cet ordre (inversion des bits de l'indice), une lecture interrompue reste régulière.
+    """
+    bits = max(len(items) - 1, 0).bit_length()
+    indices = (
+        int(format(index, f"0{bits}b")[::-1], 2) if bits else 0 for index in range(1 << bits)
+    )
+    return [items[index] for index in indices if index < len(items)]
+
+
 def scrutin_ref(scrutin: ScrutinDetail) -> ScrutinRef:
     """Référence courte d'un scrutin détaillé."""
     return ScrutinRef(

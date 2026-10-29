@@ -25,6 +25,22 @@ def vote_of(votes: ScrutinVotes, deputy_uid: str) -> tuple[Position, bool] | Non
     return None
 
 
+def deputy_present(votes: ScrutinVotes, deputy_uid: str) -> bool:
+    """Vrai si le député figure dans la liste des votes du scrutin."""
+    return vote_of(votes, deputy_uid) is not None
+
+
+def expressed_by(votes: ScrutinVotes, deputy_uid: str) -> bool:
+    """Vrai si le député a exprimé un vote (pour, contre ou abstention) sur le scrutin."""
+    found = vote_of(votes, deputy_uid)
+    return found is not None and found[0] in EXPRESSED
+
+
+def both_expressed(votes: ScrutinVotes, uid_a: str, uid_b: str) -> bool:
+    """Vrai si les deux députés ont exprimé un vote sur le scrutin : il est comparable."""
+    return expressed_by(votes, uid_a) and expressed_by(votes, uid_b)
+
+
 def group_stance_of(votes: ScrutinVotes, group_uid: str | None) -> Stance | None:
     """Position majoritaire d'un groupe, d'après la ventilation d'un scrutin."""
     if group_uid is None:

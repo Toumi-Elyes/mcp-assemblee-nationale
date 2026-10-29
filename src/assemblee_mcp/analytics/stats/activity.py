@@ -17,17 +17,9 @@ from assemblee_mcp.analytics.stats.shared import UNKNOWN_LABEL, day_of, result_t
 from assemblee_mcp.civix.models import (
     ScrutinSummary,
 )
+from assemblee_mcp.civix.models.kinds import KIND_AMENDEMENT, KIND_ARTICLE, KIND_ENSEMBLE
 
 NO_DOSSIER_LABEL = "Scrutins sans dossier législatif"
-
-
-TYPE_AMENDEMENT = "amendement"
-
-
-TYPE_ARTICLE = "article"
-
-
-TYPE_ENSEMBLE = "texte"
 
 
 BUSIEST_DAYS = 5
@@ -96,7 +88,7 @@ def trends(items: Sequence[ScrutinSummary], start: date, end: date) -> Trends:
         total=len(items),
         overall=make_rate("Tous les scrutins", items),
         weeks=weekly_volumes(items),
-        by_type=rate_table(items, lambda item: item.type),
+        by_type=rate_table(items, lambda item: item.kind),
         by_context=rate_table(items, lambda item: item.context),
         busiest_days=busiest_days(items),
     )
@@ -111,7 +103,7 @@ def text_activity(items: Sequence[ScrutinSummary]) -> TextActivity:
     """Activité de vote d'un ensemble de scrutins d'un même dossier."""
     first = items[0]
     days = [day for item in items if (day := day_of(item)) is not None]
-    kinds = Counter(item.type for item in items)
+    kinds = Counter(item.kind for item in items)
     rate = make_rate("", items)
     return TextActivity(
         dossier_ref=first.dossier_ref,
@@ -120,9 +112,9 @@ def text_activity(items: Sequence[ScrutinSummary]) -> TextActivity:
         scrutins=len(items),
         adopted=rate.adopted,
         rejected=rate.rejected,
-        amendements=kinds[TYPE_AMENDEMENT],
-        articles=kinds[TYPE_ARTICLE],
-        ensemble=kinds[TYPE_ENSEMBLE],
+        amendements=kinds[KIND_AMENDEMENT],
+        articles=kinds[KIND_ARTICLE],
+        ensemble=kinds[KIND_ENSEMBLE],
         last_date=max(days) if days else None,
     )
 
@@ -144,7 +136,7 @@ def timeline_entry(item: ScrutinSummary) -> TimelineEntry:
         uid=item.uid,
         numero=item.numero,
         day=day_of(item),
-        kind=item.type or UNKNOWN_LABEL,
+        kind=item.kind,
         result=result_text(item),
         title=item.titre,
     )
@@ -160,8 +152,8 @@ def dossier_timeline(
 ) -> DossierTimeline:
     """Chronologie des scrutins d'un dossier ; amendements comptés, autres scrutins listés."""
     ordered = chronological(items)
-    amendments = [item for item in ordered if item.type == TYPE_AMENDEMENT]
-    listed = [item for item in ordered if item.type != TYPE_AMENDEMENT]
+    amendments = [item for item in ordered if item.kind == KIND_AMENDEMENT]
+    listed = [item for item in ordered if item.kind != KIND_AMENDEMENT]
     entries = [timeline_entry(item) for item in listed]
     first = ordered[0]
     return DossierTimeline(
@@ -171,6 +163,6 @@ def dossier_timeline(
         total=len(ordered),
         amendements=make_rate("amendements", amendments),
         entries=entries,
-        final_votes=[entry for entry in entries if entry.kind == TYPE_ENSEMBLE],
+        final_votes=[entry for entry in entries if entry.kind == KIND_ENSEMBLE],
         other_dossiers=list(others)[:MAX_OTHER_DOSSIERS],
     )

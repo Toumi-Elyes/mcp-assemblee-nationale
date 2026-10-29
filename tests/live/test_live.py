@@ -1,6 +1,7 @@
 import os
 from typing import Any
 
+import httpx
 import pytest
 from fastmcp import Client
 
@@ -89,3 +90,77 @@ async def test_live_accords_entre_groupes(live_mcp_client: Client[Any]) -> None:
     text = str(result.content[0].text)
     assert "## Accords entre groupes" in text
     assert "| RN |" in text
+
+
+@pytest.mark.parametrize("name", ["Thiébaut", "Thiebaut", "Trouvé", "Trouve", "Aurélie Trouvé"])
+async def test_live_comment_a_vote_resolves_accented_names(
+    live_mcp_client: Client[Any], name: str
+) -> None:
+    async with live_mcp_client as connected:
+        result = await connected.call_tool("comment_a_vote", {"depute": name, "sujet": "retraites"})
+    assert str(result.content[0].text).startswith("## Votes de ")
+
+
+async def test_live_global_search_of_a_topic_lists_dossiers_with_their_reference(
+    live_mcp_client: Client[Any],
+) -> None:
+    async with live_mcp_client as connected:
+        result = await connected.call_tool(
+            "rechercher", {"requete": "projet de loi de finances 2027"}
+        )
+    text = str(result.content[0].text)
+    assert "### Dossiers législatifs" in text
+    assert "dossier `DLR" in text
+    assert "### Scrutins (du plus récent au plus ancien)" in text
+
+
+async def test_live_motions_are_not_votes_on_the_whole_text(live_mcp_client: Client[Any]) -> None:
+    async with live_mcp_client as connected:
+        result = await connected.call_tool(
+            "scrutins_par_periode",
+            {"date_debut": "2026-06-01", "date_fin": "2026-07-31", "type": "texte"},
+        )
+    text = str(result.content[0].text)
+    assert "motion de rejet" not in text
+    assert "l'ensemble" in text
+
+
+async def test_live_period_covers_exactly_the_requested_days(live_mcp_client: Client[Any]) -> None:
+    async with live_mcp_client as connected:
+        result = await connected.call_tool("tendances_scrutins", {"periode_jours": 14})
+    assert "(14 jours)" in str(result.content[0].text)
+
+
+async def test_live_exporter_votes_has_a_group_column(live_mcp_client: Client[Any]) -> None:
+    async with live_mcp_client as connected:
+        result = await connected.call_tool(
+            "exporter_votes", {"scrutin_uid": "VTANR5L17V7324", "max_lignes": 5}
+        )
+    text = str(result.content[0].text)
+    assert "nom,groupe,position" in text
+    assert "Export limité à 5 lignes" in text
+
+
+async def test_live_comparison_of_deputes_who_rarely_vote_together_is_explained(
+    live_mcp_client: Client[Any],
+) -> None:
+    async with live_mcp_client as connected:
+        result = await connected.call_tool(
+            "comparer_deputes",
+            {"depute_a": "Mathilde Panot", "depute_b": "Marine Le Pen", "periode_jours": 30},
+        )
+    text = str(result.content[0].text)
+    assert "Échantillon trop faible pour conclure" in text
+    assert "n/d" not in text
+
+
+async def test_live_assemblee_scrutin_links_work(live_mcp_client: Client[Any]) -> None:
+    async with live_mcp_client as connected:
+        result = await connected.call_tool("obtenir_scrutin", {"uid": "VTANR5L17V7324"})
+    text = str(result.content[0].text)
+    link = "https://www.assemblee-nationale.fr/dyn/17/scrutins/7324"
+    assert link in text
+    assert "/scrutins/jo" not in text
+    async with httpx.AsyncClient(follow_redirects=True, timeout=20) as http:
+        response = await http.get(link, headers={"User-Agent": "Mozilla/5.0"})
+    assert response.status_code == 200

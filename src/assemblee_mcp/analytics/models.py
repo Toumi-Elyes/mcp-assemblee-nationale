@@ -31,6 +31,7 @@ class Method(ResultModel):
     limits: list[str] = Field(default_factory=list)
     truncated: bool = False
     notes: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
 
 
 class Rate(ResultModel):

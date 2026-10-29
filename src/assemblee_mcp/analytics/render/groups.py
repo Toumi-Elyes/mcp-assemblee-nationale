@@ -89,13 +89,23 @@ def render_cohesion(rows: Sequence[GroupCohesion], method: Method) -> str:
     return finish_analysis(body, method)
 
 
-def render_close_votes(rows: Sequence[CloseVote], max_margin: int, method: Method) -> str:
-    """Scrutins au résultat serré."""
+def no_close_vote_text(max_margin: int, scanned: int, closest: int | None) -> str:
+    """Réponse sans résultat serré : ce qui a été parcouru et comment élargir."""
+    closest_text = f" Le plus serré était de {closest} voix." if closest is not None else ""
+    return (
+        "## Résultats serrés\n\n"
+        f"Aucun des {scanned} scrutin(s) parcourus n'a un écart de {max_margin} voix ou moins."
+        f"{closest_text} Pour élargir : augmentez `ecart_max`, `periode_jours` (30 au plus) ou "
+        "`max_scrutins`, ou choisissez `type_scrutin` « tous »."
+    )
+
+
+def render_close_votes(
+    rows: Sequence[CloseVote], max_margin: int, method: Method, closest: int | None = None
+) -> str:
+    """Scrutins au résultat serré, ou ce qui a été parcouru s'il n'y en a aucun."""
     if not rows:
-        body = (
-            "## Résultats serrés\n\n"
-            f"Aucun scrutin de l'échantillon n'a un écart de {max_margin} voix ou moins."
-        )
+        body = no_close_vote_text(max_margin, method.analysed, closest)
         return finish_analysis(body, method)
     body = f"## Résultats serrés (écart de {max_margin} voix ou moins)\n\n" + table(
         ["Écart", "Pour", "Contre", "Abst.", "Date", "Scrutin", "Résultat"],

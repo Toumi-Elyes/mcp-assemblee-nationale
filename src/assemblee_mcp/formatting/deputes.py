@@ -16,6 +16,7 @@ from assemblee_mcp.formatting.scrutins import result_label
 from assemblee_mcp.formatting.sources import finish, source_line
 from assemblee_mcp.formatting.text import field_text, format_date, truncate
 from assemblee_mcp.links import (
+    assemblee_scrutin_url,
     civix_depute_url,
     civix_scrutin_url,
     depute_assemblee_url,
@@ -98,7 +99,7 @@ def position_from_votes(response: CivixResponse[ScrutinVotes], depute_uid: str) 
         date_scrutin=scrutin.date_scrutin,
         result=result_label(scrutin),
         vote=vote,
-        assemblee_url=response.source.assemblee_url,
+        assemblee_url=assemblee_scrutin_url(scrutin.legislature, scrutin.numero),
     )
 
 
