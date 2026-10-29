@@ -3,7 +3,7 @@
 **Demandez à Claude, ChatGPT ou Gemini comment ont voté les députés, en français, avec les sources.**
 
 [![CI](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/actions/workflows/ci.yml/badge.svg)](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/actions/workflows/ci.yml)
-![Python 3.15](https://img.shields.io/badge/python-3.15-blue)
+![Python 3.14+](https://img.shields.io/badge/python-3.14%2B-blue)
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-green)](LICENSE)
 [![MCP](https://img.shields.io/badge/MCP-serveur-informational)](https://modelcontextprotocol.io)
 
@@ -346,7 +346,7 @@ Le serveur expose aussi une route `GET /health` qui répond `{"status": "ok"}` (
 
 ### Lancer en local
 
-Il faut Python 3.15 et [Poetry](https://python-poetry.org) 2.
+Il faut Python 3.14 ou plus récent (le projet est développé en 3.15) et [Poetry](https://python-poetry.org) 2.
 
 ```bash
 poetry install
@@ -421,7 +421,7 @@ An [MCP](https://modelcontextprotocol.io) server that lets Claude, ChatGPT or Ge
 
 - **Remote URL** (Claude custom connectors, ChatGPT developer mode, Gemini CLI `httpUrl`): `https://mcp-assemblee-nationale.fastmcp.app/mcp`
 - **Local**: `uvx --from git+https://github.com/Toumi-Elyes/mcp-assemblee-nationale mcp-assemblee-nationale` (stdio), or `--http` for streamable HTTP.
-- **Stack**: Python 3.15, FastMCP 4, Pydantic v2 models, httpx, Poetry.
+- **Stack**: Python 3.14+ (developed on 3.15), FastMCP 4, Pydantic v2 models, httpx, Poetry.
 - **Scope**: National Assembly only (no Senate). Tool outputs are in French, since the underlying data is French.
 - **Privacy**: the server only receives the tool query, keeps no conversation history, sets no cookies; CIVIX responses are cached for 10 minutes.
 - **Not official**: independent project, not affiliated with the Assemblée nationale or CIVIX.

@@ -5,7 +5,7 @@ description = "Serveur MCP pour interroger les votes de l'Assemblée nationale (
 authors = [{ name = "Elyes Toumi" }]
 license = "MIT"
 readme = "README.md"
-requires-python = ">=3.15,<4.0"
+requires-python = ">=3.14,<4.0"
 keywords = ["mcp", "assemblee-nationale", "deputes", "scrutins", "civix", "open-data", "claude", "chatgpt"]
 dependencies = [
   "fastmcp (>=4.1,<5.0)",
@@ -34,7 +34,7 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
-target-version = "py315"
+target-version = "py314"
 line-length = 100
 src = ["src", "tests"]
 
@@ -47,7 +47,7 @@ ignore = ["PLR0913", "RUF001", "RUF002", "RUF003", "TC001", "TC002", "TC003"]
 "tests/**" = ["PLR2004", "S101"]
 
 [tool.mypy]
-python_version = "3.15"
+python_version = "3.14"
 strict = true
 plugins = ["pydantic.mypy"]
 files = ["src", "tests"]

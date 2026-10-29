@@ -4,7 +4,7 @@ Merci de votre aide ! Ce projet est un serveur MCP en Python qui rend les votes 
 
 ## Installation
 
-Prérequis : Python 3.15 et [Poetry](https://python-poetry.org/).
+Prérequis : Python 3.14 ou plus récent (développement en 3.15) et [Poetry](https://python-poetry.org/).
 
 ```bash
 poetry install
