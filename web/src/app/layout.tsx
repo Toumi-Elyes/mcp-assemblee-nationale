@@ -29,11 +29,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  colorScheme: "light dark",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#161616" },
-  ],
+  colorScheme: "light",
+  themeColor: "#ffffff",
 };
 
 const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -45,7 +42,7 @@ const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <body id="haut" className="min-h-screen font-sans text-base">
         <a
           href="#contenu"
-          className="sr-only rounded bg-accent px-3 py-2 text-base font-bold text-on-accent focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50"
+          className="sr-only rounded-sm bg-accent px-3 py-2 text-base font-bold text-on-accent focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50"
         >
           Aller au contenu
         </a>

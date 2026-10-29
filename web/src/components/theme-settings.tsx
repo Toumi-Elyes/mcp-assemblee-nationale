@@ -67,7 +67,7 @@ export const ThemeSettings: React.FC<ThemeSettingsProps> = ({ variant }) => {
         onClick={onOpen}
         aria-haspopup="dialog"
         className={cn(
-          "inline-flex items-center gap-2 px-3 py-2 text-sm transition hover:bg-hover",
+          "inline-flex items-center gap-2 px-3 py-2 text-sm transition-colors hover:text-accent-hover",
           variant === "header" ? "font-medium text-accent" : "font-bold text-accent underline underline-offset-4",
         )}
       >
@@ -79,11 +79,11 @@ export const ThemeSettings: React.FC<ThemeSettingsProps> = ({ variant }) => {
         aria-labelledby={titleId}
         onClick={onBackdropClick}
         onClose={onDialogClose}
-        className="m-auto w-full max-w-md rounded-lg border border-line bg-raised p-6 text-ink backdrop:bg-black/50"
+        className="m-auto w-full max-w-md border border-rule bg-raised p-6 text-ink shadow-2xl shadow-black/30 backdrop:bg-black/50"
       >
         <div className="flex flex-col gap-6">
           <div className="flex items-start justify-between gap-4">
-            <h2 id={titleId} className="font-serif text-2xl font-bold">
+            <h2 id={titleId} className="font-display text-2xl font-semibold tracking-tight">
               Paramètres d'affichage
             </h2>
             <button
@@ -104,8 +104,8 @@ export const ThemeSettings: React.FC<ThemeSettingsProps> = ({ variant }) => {
                 key={option.value}
                 htmlFor={`${id}-${option.value}`}
                 className={cn(
-                  "flex cursor-pointer items-start gap-3 rounded border p-3 transition hover:bg-hover",
-                  choice === option.value ? "border-accent" : "border-line",
+                  "flex cursor-pointer items-start gap-3 rounded-sm border p-3 transition-colors hover:bg-hover",
+                  choice === option.value ? "border-rule" : "border-line",
                 )}
               >
                 <input

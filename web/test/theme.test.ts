@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   THEME_INIT_SCRIPT,
   THEME_KEY,
+  DEFAULT_THEME,
   applyTheme,
   parseTheme,
   readStoredTheme,
@@ -11,26 +12,27 @@ import {
 } from "@/lib/theme";
 
 describe("theme helpers", () => {
-  it("falls back to system for anything unknown", () => {
+  it("falls back to light for anything unknown", () => {
     expect(parseTheme("light")).toBe("light");
     expect(parseTheme("dark")).toBe("dark");
     expect(parseTheme("system")).toBe("system");
-    expect(parseTheme("blue")).toBe("system");
-    expect(parseTheme(null)).toBe("system");
-    expect(parseTheme(undefined)).toBe("system");
+    expect(parseTheme("blue")).toBe("light");
+    expect(parseTheme(null)).toBe("light");
+    expect(parseTheme(undefined)).toBe("light");
   });
 
   it("reads the stored choice and survives a throwing storage", () => {
     expect(readStoredTheme({ getItem: () => "dark" })).toBe("dark");
-    expect(readStoredTheme({ getItem: () => null })).toBe("system");
+    expect(readStoredTheme({ getItem: () => null })).toBe("light");
+    expect(readStoredTheme({ getItem: () => "system" })).toBe("system");
     expect(
       readStoredTheme({
         getItem: () => {
           throw new Error("blocked");
         },
       }),
-    ).toBe("system");
-    expect(readStoredTheme(null)).toBe("system");
+    ).toBe("light");
+    expect(readStoredTheme(null)).toBe("light");
   });
 
   it("writes under the theme key and reports failures", () => {
@@ -50,13 +52,18 @@ describe("theme helpers", () => {
     expect(writeStoredTheme(null, "dark")).toBe(false);
   });
 
-  it("sets data-theme for light and dark and removes it for system", () => {
+  it("sets data-theme for every choice, system included", () => {
     const setAttribute = vi.fn();
-    const removeAttribute = vi.fn();
-    applyTheme({ setAttribute, removeAttribute }, "dark");
+    applyTheme({ setAttribute }, "dark");
     expect(setAttribute).toHaveBeenCalledWith("data-theme", "dark");
-    applyTheme({ setAttribute, removeAttribute }, "system");
-    expect(removeAttribute).toHaveBeenCalledWith("data-theme");
+    applyTheme({ setAttribute }, "light");
+    expect(setAttribute).toHaveBeenCalledWith("data-theme", "light");
+    applyTheme({ setAttribute }, "system");
+    expect(setAttribute).toHaveBeenCalledWith("data-theme", "system");
+  });
+
+  it("defaults to the light theme", () => {
+    expect(DEFAULT_THEME).toBe("light");
   });
 
   it("resolves system from the device preference", () => {
@@ -84,13 +91,13 @@ describe("THEME_INIT_SCRIPT", () => {
     return setAttribute;
   }
 
-  it("applies a stored light or dark choice before paint", () => {
+  it("applies a stored choice before paint", () => {
     expect(run("light")).toHaveBeenCalledWith("data-theme", "light");
     expect(run("dark")).toHaveBeenCalledWith("data-theme", "dark");
+    expect(run("system")).toHaveBeenCalledWith("data-theme", "system");
   });
 
-  it("leaves the attribute alone for system, junk or blocked storage", () => {
-    expect(run("system")).not.toHaveBeenCalled();
+  it("leaves the attribute alone (light by default) for junk, empty or blocked storage", () => {
     expect(run("junk")).not.toHaveBeenCalled();
     expect(run(null)).not.toHaveBeenCalled();
     expect(run(null, true)).not.toHaveBeenCalled();

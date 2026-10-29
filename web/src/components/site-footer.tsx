@@ -35,7 +35,7 @@ const LEGAL: readonly FooterLink[] = [
 const LinkList: React.FC<{ title: string; links: readonly FooterLink[] }> = ({ title, links }) => {
   return (
     <div className="flex flex-col gap-3">
-      <h2 className="text-base font-bold">{title}</h2>
+      <h2 className="font-display text-lg font-semibold">{title}</h2>
       <ul className="flex flex-col gap-2 text-sm">
         {links.map((link) => (
           <li key={link.href}>
@@ -51,11 +51,11 @@ const LinkList: React.FC<{ title: string; links: readonly FooterLink[] }> = ({ t
 
 export const SiteFooter: React.FC = () => {
   return (
-    <footer className="border-t border-line bg-bg py-12">
+    <footer className="border-t-2 border-rule bg-bg py-12">
       <div className="mx-auto flex w-full max-w-page flex-col gap-10 px-4 sm:px-6">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="flex flex-col gap-3">
-            <p className="text-lg font-bold">{SITE_NAME}</p>
+            <p className="font-display text-2xl font-bold leading-none tracking-tight">{SITE_NAME}</p>
             <p className="text-sm text-ink-soft">
               Projet personnel, indépendant et non officiel. Il n'est affilié ni à l'Assemblée nationale ni à CIVIX.
             </p>
@@ -73,7 +73,7 @@ export const SiteFooter: React.FC = () => {
           <p className="text-sm text-ink-soft">
             Sauf mention contraire, les données sont publiées sous Licence Ouverte 2.0 (Etalab). Code sous licence MIT.
           </p>
-          <a href="#haut" className="inline-flex items-center gap-2 px-3 py-2 text-sm font-bold text-accent transition hover:bg-hover">
+          <a href="#haut" className="inline-flex items-center gap-2 px-3 py-2 text-sm font-bold text-accent transition-colors hover:text-accent-hover">
             <ArrowUpIcon aria-hidden="true" size={20} weight="bold" />
             Haut de page
           </a>

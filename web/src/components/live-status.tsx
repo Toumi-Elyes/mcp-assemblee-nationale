@@ -31,13 +31,14 @@ export const LiveStatus: React.FC = () => {
   }, []);
 
   return (
-    <p className="text-sm text-muted">
+    <span className="inline-flex items-center gap-2 text-sm text-muted">
+      <span aria-hidden="true" className="size-2 rounded-full bg-ink" />
       {now === null
-        ? `Dernière lecture : ${formatTimestamp(new Date(updatedAt))}.`
-        : `Mis à jour ${relativeLabel(Math.max(0, now - updatedAt))}.`}
+        ? `Dernière lecture : ${formatTimestamp(new Date(updatedAt))}`
+        : `Mis à jour ${relativeLabel(Math.max(0, now - updatedAt))}`}
       <span aria-live="polite" className="sr-only">
         {changeCount > 0 ? "De nouvelles données ont été chargées." : ""}
       </span>
-    </p>
+    </span>
   );
 };

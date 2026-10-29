@@ -1,368 +1,314 @@
-# Page d'accueil, décisions de conception
-
-> Dernière révision : style data.gouv.fr (section « Révision v3 »). Les sections plus bas qui parlent de Geist, de l'accent sarcelle, de la barre flottante ou des animations de révélation décrivent l'état précédent.
-
-Suit la skill `landing-page-design` (partie A puis partie B). Les règles données par le propriétaire du projet l'emportent en cas de conflit : aucune preuve inventée, mots composés réécrits dans les textes, neutralité stricte.
-
-## Révision v3 : style graphique de data.gouv.fr (remplace les décisions visuelles précédentes)
-
-Consigne du propriétaire : reprendre la colorimétrie d'origine de data.gouv.fr et son style graphique, parce que la version précédente faisait « trop IA ». Cette section l'emporte sur la skill pour tout ce qui est visuel, et sur les sections « Direction artistique », « Système visuel », « Audit d'accessibilité » et les maquettes plus bas, qui décrivent l'état précédent (barre flottante, accent sarcelle, Geist, révélations animées). Structure, données, textes, routes et tests restent inchangés.
-
-### Palette (jetons dans `globals.css`)
-
-| Jeton | Clair | Sombre | Usage |
-|---|---|---|---|
-| fond | `#FFFFFF` | `#161616` | page |
-| surface | `#F6F6F6` | `#1E1E1E` | sections en alternance |
-| bordure | `#E5E5E5` | `#353535` | filets complets de 1 px |
-| texte | `#161616` | `#FFFFFF` | corps et titres |
-| texte secondaire | `#3A3A3A` | `#CECECE` | textes d'appoint |
-| atténué | `#666666` | `#A6A6A6` | légendes |
-| accent | `#000091` | `#8585F6` | boutons, liens, états actifs |
-| survol / actif | `#1212FF` / `#2323FF` | `#A5A5FA` / `#C1C1FB` | boutons |
-
-Le mode sombre reprend les équivalents de l'échelle du système de design de l'État (fond `#161616`, accent `#8585F6`) pour garder le respect de `prefers-color-scheme`. Les couleurs d'information (`#0063CB`, `#18753C`, `#CE0500`, `#B34000`) ne sont pas utilisées : aucun message ne dépend d'elles, et jamais de vert ou de rouge pour pour et contre.
-
-Encodage des positions, sans jugement : pour = bleu accent plein, contre = **hachures** diagonales gris foncé (motif SVG `pattern-contre` défini une fois dans le document), abstention = gris `#929292`, non votant = gris pâle. La forme (plein, hachuré, gris) porte l'information en plus de la teinte ; la légende donne toujours libellés et effectifs. Hémicycle : points alternés bleu et gris.
-
-### Sélecteur de thème (« Paramètres d'affichage »)
-
-Le thème est choisissable, avec **Système** par défaut. Un bouton « Paramètres d'affichage » (icône et libellé sur ordinateur, icône seule avec nom accessible sur téléphone) dans le bandeau du haut, et un lien dans le pied de page, ouvrent une boîte de dialogue native `<dialog>` avec trois boutons radio : Thème clair, Thème sombre, Système (« Utilise le réglage de votre appareil », avec le thème actuel). Échap ou « Fermer » la ferme et le focus revient au bouton. Le choix est gardé dans `localStorage` (clé `theme`, lecture et écriture protégées), appliqué par l'attribut `data-theme` sur `<html>` : jetons clairs dans `:root`, jetons sombres sous `:root[data-theme="dark"]` et sous `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) }`, de sorte que « Système » fonctionne sans JavaScript. Un script en ligne minimal dans `<head>` applique le choix avant le premier affichage (pas de flash) ; `suppressHydrationWarning` est posé sur `<html>` pour cette seule raison.
-
-Jetons sombres (valeurs du système de design de l'État) : fond `#161616`, surfaces `#1E1E1E`, cartes `#242424`, survol `#2A2A2A`, bordure `#353535`, titres `#FFFFFF`, texte `#CECECE`, atténué `#A6A6A6`, accent `#8585F6`. Contrastes : texte `#CECECE` 11,5 sur fond et 9,9 sur carte ; atténué 7,4 sur fond, 6,4 sur carte, 5,9 sur survol ; accent 5,8 sur fond, 5,3 sur surface, 4,9 sur carte, 4,6 sur survol ; texte foncé sur bouton accent 5,8. Marques de données : hachures de « contre » dessinées avec `--mark-contre` sur `--bg`, abstention `#7B7B7B` (3,7 sur carte), piste `#353535`. L'image de partage reste claire.
-
-### Formes
-
-Plat : aucune ombre, aucun flou, aucun dégradé (le texte à dégradé du hero a disparu). Rayon `rounded` (4 px) pour boutons, champs, étiquettes et lignes imbriquées, `rounded-lg` (8 px) pour les cartes. Bouton principal plein bleu, bouton secondaire blanc avec filet bleu de 1 px et texte bleu, jamais en pilule. Cartes : filet complet de 1 px, titre, texte court, lien « Voir le scrutin » avec flèche.
-
-### Mise en page
-
-En tête : bandeau gris « Projet indépendant et non officiel · données de l'Assemblée nationale via CIVIX », puis un en tête blanc classique à filet inférieur (titre à gauche, navigation, lien « Code source » à droite), non fixe. Sections en alternance blanc et `#F6F6F6`. Grands chiffres en bleu (un chiffre, une courte légende) pour le hero et la bande de chiffres en direct. Pied de page en quatre colonnes (projet, données, informations légales, présentation) avec la ligne de licence : données sous Licence Ouverte 2.0, code sous licence MIT. Les filets d'un seul côté ne servent qu'à l'en tête et au pied de page, jamais aux cartes.
-
-### Typographie
-
-- **Public Sans** (OFL, USWDS) pour tout le texte et l'interface, poids 400, 500 et 700, auto hébergée via `@fontsource/public-sans`. Choisie pour sa sobriété institutionnelle proche de celle de Marianne, sans en être une copie, et parce qu'elle gère bien les chiffres tabulaires et les accents français.
-- **Spectral** (OFL) pour les grands titres éditoriaux (hero, titres de section, slogan), poids 500 et 700, via `@fontsource/spectral`, comme les titres éditoriaux de data.gouv.fr.
-- **Marianne n'est pas utilisée** : elle est réservée aux sites de l'État. Pas d'italique. Chiffres en Public Sans à chasse tabulaire, plus de police mono sauf pour le code et l'adresse du connecteur (système).
-- Auto hébergement par `@fontsource` : aucun appel à un service de polices au chargement, ce qui sert aussi la page de confidentialité.
-
-### Retiré
-
-Barre de navigation flottante translucide et son menu animé, texte du titre en dégradé, révélation du slogan mot par mot (le slogan est un grand énoncé éditorial statique en Spectral), apparitions par glissement au défilement (`Reveal` supprimé), survols qui translatent ou réduisent les boutons, rotations et durées de 500 ms, mode de nombres en police mono, accent sarcelle. Restent seulement les transitions fonctionnelles (couleur en 200 ms, anneau de focus de 2 px) ; le défilement doux vers les ancres est désactivé sous `prefers-reduced-motion`.
-
-### Limite : pas d'imitation de l'État
-
-Aucun bloc « République Française », aucun logo Marianne, aucune bande tricolore, aucun mot « gouv » dans l'interface, aucune marque du système de design de l'État. Le bandeau « non officiel » est visible sur toutes les pages, et le pied de page répète que le projet n'est affilié ni à l'Assemblée nationale ni à CIVIX. Les seuls liens vers data.gouv.fr sont des liens vers la source des données. Le bleu `#000091` demandé est une couleur de l'identité visuelle de l'État : combiné à la mise en page, il rapproche l'aspect de celui des sites publics. Le bandeau et les mentions sont là pour que cela ne puisse pas être pris pour un site officiel ; à reconsidérer si le propriétaire préfère une teinte plus éloignée.
-
-### Contrastes mesurés (v3)
-
-Clair : texte 18,1 sur fond ; secondaire 11,4 ; atténué 5,74 sur fond, 5,31 sur surface, 4,86 sur survol ; accent 14,9 sur fond et 13,8 sur surface ; blanc sur bouton survolé 8,2 ; gris d'abstention 3,11 (graphique, seuil de 3 respecté) ; filet décoratif 1,26, sans rôle d'information. Sombre : texte 18,1 ; atténué 7,4 sur fond, 6,9 sur surface, 5,7 sur survol ; accent 5,8 sur fond et 5,3 sur surface ; texte foncé sur bouton 5,8 ; gris d'abstention 4,3.
-
-## Hypothèses d'entrée (A1)
-
-- Action principale unique : ajouter le connecteur à son assistant (bouton « Ajouter à mon assistant », cible `#installer`). Conversion : adresse copiée ou étapes d'installation ouvertes.
-- Offre : gratuit, sans compte, sans clé, lecture seule, chaque réponse sourcée.
-- Public : citoyens sans bagage technique, puis journalistes, enseignants, étudiants, associations civiques.
-- Objections : trop technique, fiable et neutre, payant, données personnelles, compatibilité avec mon assistant.
-- Preuves : uniquement des données réelles, lues en direct sur CIVIX au build puis toutes les 30 minutes. Aucun témoignage, logo, chiffre d'usage ni personne inventés.
-- Trafic : réseaux sociaux, GitHub, bouche à oreille, data.gouv.fr. Les visiteurs connaissent les assistants IA, pas le mot MCP : on dit « connecteur ».
-- Direction : éditorial minimal, thèmes clair et sombre selon `prefers-color-scheme`, mobile d'abord.
-
-## Direction artistique (avant la construction)
-
-Pas de « moderne et épuré » : ce vocabulaire produit l'allure moyenne des pages générées. Direction retenue : **journalisme de données éditorial**, en Geist.
-
-- **Chiffres en grand.** Les nombres en direct sont le visuel : Geist Mono en `text-6xl` pour le chiffre principal, `text-4xl` pour les secondaires, légende en `text-sm` à côté.
-- **Grille asymétrique.** Hero en 7 + 5 colonnes avec la conversation décalée vers le bas. Sections en 4 + 8 : le titre reste à gauche (collant sur grand écran) et le contenu occupe la colonne de droite. Rien n'est centré, sauf la barre de navigation.
-- **Blanc généreux.** `py-16` à `py-24` entre sections, texte limité à 680 px, très peu de cadres.
-- **Une seule couleur d'accent : un vert sarcelle profond** (`#0B6B65` en clair, `#5CC9BD` en sombre) sur base neutre plate. Justification : le sarcelle n'est lié à aucun parti, évite le bleu blanc rouge et les roses ou rouges partisans, et se distingue du bleu par défaut des pages générées. Contrastes mesurés : texte blanc sur accent 6,35 en clair, noir sur accent 10,54 en sombre.
-- **Marques de données sans connotation.** Pour : accent. Contre : couleur du texte (noir ou blanc cassé). Abstention : gris moyen. Non votant : gris pâle. Pas de vert ni de rouge. Adopté et rejeté se distinguent par icône et mot.
-- **Objets faits main.** Hémicycle SVG de 577 points calculé depuis les effectifs réels, courbe SVG du nombre de scrutins par jour, barres SVG, conversation construite avec un vrai scrutin. Aucune illustration de banque d'images, ni 3D, ni vidéo.
-
-### Références et ce qu'on en retient
-
-1. **Our World in Data** : le chiffre en tête, le graphique sobre, la source toujours sous la donnée. On reprend la source sous chaque chiffre et la sobriété des courbes.
-2. **Les Décodeurs du Monde** : un fait, un graphique, une phrase claire. On reprend le ton factuel et les titres qui annoncent la conclusion.
-3. **The Pudding** : une mise en page de récit avec de grandes respirations et des graphiques propres à chaque sujet. On reprend le rythme long et les objets faits main (l'hémicycle).
-4. **Datawrapper Blog** : annotations discrètes et typographie qui porte le propos. On reprend les légendes en petit texte au plus près des marques.
-5. **Les parlements en hémicycle (diagrammes de Wikipédia et d'Europe Elects)** : un point par siège. On reprend le principe, sans couleurs partisanes.
-6. **Stripe Press et pages d'essai éditoriales** : colonne de titre à gauche, texte à droite, beaucoup de blanc. On reprend la grille 4 + 8.
-7. **Linear (pages produit)** : navigation flottante, chiffres en police mono. On reprend la barre flottante floutée et l'usage de la mono pour les chiffres.
-8. **Observable et Observable Plot** : série temporelle minimale, un seul trait. On reprend la courbe sans axes superflus.
-9. **data.gouv.fr** : lisibilité institutionnelle, liens de source explicites. On reprend les liens vers les sources officielles, en évitant son bleu et rouge d'État.
-10. **Garden de The Browser Company et pages éditoriales d'Are.na** : usage mesuré d'un seul accent. On reprend l'idée d'une seule couleur vive sur un fond plat.
-
-## Wireframes
-
-Les maquettes ci dessous décrivent la mise en page cible. Elles ont été écrites après une première version complète de la page et ont guidé la refonte (voir la critique plus bas).
-
-### Hero
-
-```
-DESKTOP (12 colonnes)
-+-----------------------------------------------------------------------+
-|   [ MCP Assemblée nationale   liens...   GitHub  (Ajouter) ]  flottant |
-|                                                                       |
-|  col 1-7                                         col 8-12 (décalée)   |
-|  Sachez comment ont voté vos députés,                                 |
-|  source à l'appui                                 +-----------------+ |
-|  sous titre (680 px max)                          | conversation    | |
-|  [ Ajouter à mon assistant v ]  <- CTA unique     |  question réelle| |
-|  gratuit, sans compte, sans clé                   |  réponse + barre| |
-|  8 741   <- Geist Mono, text-6xl                  |  sources        | |
-|  scrutins sous la 17e législature...              +-----------------+ |
-|                                                   légende "illustration"|
-+-----------------------------------------------------------------------+
-
-MOBILE (une colonne)
-+-------------------------+
-| [MCP Assemblée   (=)]   |  pas de CTA dans la barre
-| Titre (3 lignes)        |
-| sous titre              |
-| [ Ajouter ... v ]       |
-| 8 741  (text-6xl)       |
-| légende                 |
-| conversation (pleine)   |
-+-------------------------+
-```
-
-### Preuve en direct
-
-```
-DESKTOP
-+-----------------------------------------------------------------------+
-| En direct (titre pleine largeur, intro)                               |
-| 412            |  64 scrutins cette semaine | 577 députés             |
-| scrutins/30 j  |  X adoptés, Y rejetés      | 12 groupes              |
-| ~~~ courbe SVG |                            |                         |
-|-----------------------------------------------------------------------|
-| Cette semaine : cartes par dossier (2 colonnes), lignes de scrutin    |
-| Tendances : [barres par jour] [dossiers 7/30 j] [adoption] [finals]   |
-| Composition : hémicycle (col 1-7)        | liste des groupes (col 8-12)|
-+-----------------------------------------------------------------------+
-MOBILE : chiffres empilés, cartes en une colonne, hémicycle pleine largeur
-         puis liste des groupes dessous.
-```
-
-### Démo
-
-```
-DESKTOP (2 + 3)                      MOBILE
-+-----------+--------------------+   +----------------+
-| Député    | résultats          |   | Député (champ) |
-| [champ v] | (squelette puis    |   | suggestions    |
-| suggestions| liste de scrutins)|   | Sujet (champ)  |
-| Sujet     |                    |   | [Voir les votes]|
-| [Voir...] |                    |   | résultats      |
-+-----------+--------------------+   +----------------+
-```
-
-### Installation
-
-```
-DESKTOP (4 + 8)                         MOBILE
-+-----------+-------------------------+ +----------------------+
-| titre     | Étape 1 [adresse][Copier]| | titre                |
-| (collant) | Étape 2 [Claude|ChatGPT|| | Étape 1 adresse+Copier|
-|           |  Gemini|En local]        | | Étape 2 onglets      |
-|           |  étapes numérotées       | | étapes, note         |
-|           | Étape 3 demander         | | Étape 3              |
-+-----------+-------------------------+ +----------------------+
-```
-
-### Révélation du slogan
-
-```
-+-----------------------------------------------------------------------+
-|  Les chiffres viennent de l'Assemblée. Les liens mènent à la source.  |
-|  Le jugement vous appartient.      (text-4xl à text-5xl, 680 px max)  |
-|  chaque mot passe de 30 % à 100 % en croisant la ligne à 60 % de l'écran |
-+-----------------------------------------------------------------------+
-```
-
-### FAQ
-
-```
-DESKTOP (4 + 8)                        MOBILE
-+-----------+------------------------+ +---------------------+
-| titre     | > question 1           | | titre               |
-| (collant) | > question 2 ...       | | > question 1 ...    |
-+-----------+------------------------+ +---------------------+
-```
-
-## 1. Plan de la page
-
-Layout **B, récit long**. Le produit ne se comprend pas depuis une capture : il faut expliquer ce qu'est un connecteur, rassurer sur la neutralité et la fiabilité, puis prouver avec des données réelles. Le public est sceptique et peu technique, ce qui justifie un récit qui éduque avant de demander l'action.
-
-1. Barre de navigation flottante (translucide, flou), lien GitHub en icône
-2. **Hero** : titre, sous titre, CTA unique, preuve en direct, échange de chat réel
-3. **Problème et solution** : un assistant seul répond de mémoire, avec le connecteur il va chercher
-4. **Bénéfices** (4)
-5. **Comment ça marche** (3 étapes)
-6. **Révélation du slogan** (mot par mot au défilement)
-7. **Preuve en direct** : « Cette semaine à l'Assemblée », tendances (votes par jour sur 30 jours, textes les plus votés 7 et 30 jours, taux d'adoption par type de vote, derniers votes sur l'ensemble d'un texte), composition des groupes
-8. **Démo en direct** : « Comment a voté [député] sur [sujet] ? »
-9. **Ce que le connecteur sait faire** : 25 outils (23 par intention, plus `search` et `fetch` pour la recherche approfondie de ChatGPT) et 6 modèles de demande, formulés comme des questions, avec une mention du bloc « Méthode » et de l'absence de classement
-10. **Installer** (cible du CTA) : Claude, ChatGPT, Gemini, en local, avec copie de l'adresse
-11. **Garanties** (réduction du risque) : gratuit, sans compte, code ouvert, lecture seule
-12. **FAQ** (10 questions, JSON-LD FAQPage)
-13. **CTA final** identique au premier
-14. Pied de page : GitHub, source des données, licence, confidentialité, mentions
-
-Pages annexes : `/scrutins/[uid]` (détail d'un vote), `/confidentialite`, `/mentions`, 404 de marque, `opengraph-image`, `sitemap.xml`, `robots.txt`, icône.
-
-## 2. Copie du hero
-
-- **Titre** : « Sachez comment ont voté vos députés, source à l'appui » (coupures : après « voté »).
-- **Sous titre** : « Ajoutez un connecteur gratuit à votre assistant IA. Il va chercher les vrais scrutins de l'Assemblée nationale au lieu de répondre de mémoire, et il cite le lien de chacun. »
-- **CTA** : « Ajouter à mon assistant »
-- **Réassurance sous le CTA** : « Gratuit, sans compte, sans clé. Pour Claude et ChatGPT. »
-- **Preuve en direct** : « {N} scrutins sous la 17e législature, dernier vote le {date} » (chiffres lus sur CIVIX).
-- **Visuel** : un échange de chat construit avec un vrai scrutin récent (dernier vote sur l'ensemble d'un texte) et la vraie position d'un vrai député. Légende : « Exemple construit avec les données du {date} ». Si CIVIX est injoignable, le visuel passe en état d'erreur composé et ne montre aucune donnée.
-
-## 3. Bénéfices
-
-1. **Des réponses avec leur source.** Chaque scrutin cité renvoie vers la page de l'Assemblée et celle de CIVIX.
-2. **Les vrais chiffres, pas un souvenir.** Pour, contre, abstentions et détail par groupe viennent des données ouvertes, lues au moment de la question.
-3. **Gratuit et sans compte.** Une adresse à coller. Pas de clé, pas d'inscription, aucune donnée personnelle demandée.
-4. **Des faits, sans classement.** Aucun député ni groupe n'est noté. Le connecteur transmet les positions telles qu'elles sont enregistrées.
-
-## 4. Comment ça marche
-
-1. **Copiez l'adresse** du connecteur (un bouton le fait pour vous).
-2. **Collez l'adresse dans votre assistant**, dans les réglages des connecteurs (Claude ou ChatGPT).
-3. **Posez votre question** en français : « Comment a voté ma députée sur le budget ? »
-
-Définition de « connecteur » (une phrase) : « Un connecteur est une adresse que votre assistant sait interroger pour obtenir des données fiables ; son nom technique est MCP. »
-
-## 5. Slogan (révélation mot par mot)
-
-« Les chiffres viennent de l'Assemblée. Les liens mènent à la source. Le jugement vous appartient. »
-
-## 6. FAQ
-
-1. **Que fait ce connecteur, concrètement ?** Il permet à votre assistant de consulter les scrutins, les députés et les groupes de l'Assemblée nationale pendant la conversation, puis de citer ses sources.
-2. **Combien ça coûte ?** Rien. Le connecteur, l'API et l'hébergement sont gratuits. Seul l'abonnement à votre assistant peut être payant : ChatGPT demande un plan payant pour les connecteurs personnalisés.
-3. **C'est trop technique pour moi ?** Non. Il suffit de copier une adresse et de la coller dans les réglages de votre assistant. Les étapes sont détaillées plus haut.
-4. **Les réponses sont fiables et neutres ?** Les chiffres viennent des données ouvertes de l'Assemblée nationale et sont transmis tels quels, sans note ni classement. L'assistant rédige la phrase : ouvrez le lien source pour vérifier.
-5. **Que deviennent mes données ?** Le serveur reçoit seulement la recherche envoyée par l'assistant, jamais votre conversation. Pas de compte, pas de cookie, pas d'historique conservé.
-6. **Ça marche avec mon assistant ?** Claude (y compris le plan gratuit, avec un connecteur personnalisé) et ChatGPT (plans payants, depuis le navigateur). L'application Gemini ne prend pas en charge les connecteurs personnalisés à notre connaissance ; Gemini CLI fonctionne.
-7. **L'assistant peut quand même se tromper ?** Oui, il peut mal résumer. C'est pourquoi chaque réponse cite la page du scrutin, à vérifier.
-8. **D'où viennent les chiffres ?** De l'Assemblée nationale, reprise par l'API publique CIVIX référencée sur data.gouv.fr, sous Licence Ouverte Etalab 2.0.
-9. **Ce projet est officiel ?** Non. Projet personnel et indépendant, sans lien avec l'Assemblée nationale ni avec CIVIX.
-10. **Et le Sénat ?** Pas pour l'instant : seule l'Assemblée nationale est couverte.
-
-## 7. SEO et AEO
-
-- **Indexer** : offre durable, intention de recherche alignée (« comment a voté un député », « votes Assemblée nationale IA »).
-- **Title** : « Comment ont voté vos députés ? Posez la question à votre assistant IA »
-- **Meta description** : « Connecteur gratuit pour Claude et ChatGPT : les votes des députés de l'Assemblée nationale, chiffres officiels et source de chaque scrutin. Sans compte. »
-- FAQ en questions et réponses visibles, balisage `FAQPage` JSON-LD, `WebSite` et `SoftwareApplication` minimal, OG image dynamique avec les chiffres du jour, `sitemap.xml`, `robots.txt`, liens internes vers `/scrutins/[uid]`.
-- Pages `/confidentialite` et `/mentions` indexables. `/api/*` exclu par `robots.txt`.
-
-## 8. Recommandation de layout
-
-**B, récit long.** Voir la section 1. Le hero reste de type A (message, preuve, visuel) mais la page enchaîne problème, bénéfices, explication, preuve en direct, démo, installation et FAQ pour lever le scepticisme avant la demande d'action.
-
-## 9. Système visuel (partie B), décisions
-
-- Police unique : Geist (paquet `geist`, `next/font/local`). Geist Mono uniquement pour les chiffres et données. Pas d'italique, poids maximum bold.
-- Échelle de texte : classes Tailwind `text-xs` à `text-6xl` uniquement. Titres `text-4xl` à `text-6xl`, corps `text-base` ou `text-lg`.
-- Espacements : uniquement les valeurs 0, 0.5, 1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24 de l'échelle Tailwind (2, 4, 8, 12, 16, 24, 32, 40, 48, 64, 80, 96 px). Boutons principaux : `px-3 py-2`, `text-base font-semibold`.
-- Rayons : échelle Tailwind. Règle d'imbrication appliquée quand l'écart est inférieur à 32 px : carte `rounded-2xl` (16) avec `p-2` (8) donne `rounded-lg` (8) à l'intérieur ; carte `rounded-3xl` (24) avec `p-4` (16) donne `rounded-lg` (8) ; `rounded-xl` (12) avec `p-2` donne `rounded-sm` (4). Quand le résultat est inférieur ou égal à 2, l'élément intérieur reste carré.
-- Fonds sombres : seulement `#000000`, `#181818`, `#1F1F1F`, `#272727`, `#313131`, `#131209`. Aucun dégradé de fond. Le seul dégradé est le texte du titre du hero (blanc vers `#9B9B9B` en sombre, noir vers `#666666` en clair).
-- Bordures : toujours sur les quatre côtés.
-- Marques de données (barres, points de légende) : dessinées en SVG avec `fill`, hors des fonds de surface. Couleurs de position non connotées (accent sarcelle, couleur du texte, gris), jamais vert ou rouge. Adopté et rejeté sont distingués par une icône et un mot, pas par une couleur.
-- Mouvement : courbe `cubic-bezier(0.22, 1, 0.36, 1)` exposée comme jeton `ease-weighted` et appliquée par défaut à toutes les transitions, `duration-500` pour les positions, `duration-300` pour les couleurs. Seulement `transform` et `opacity`. `prefers-reduced-motion` remplace les déplacements par un simple fondu. Révélations avec `IntersectionObserver`, une seule fois.
-- Navigation : barre flottante centrée, translucide avec flou, icône de menu animée, panneau mobile pleine hauteur, liens qui entrent à 60 ms d'intervalle (plafond 400 ms), page courante indiquée.
-
-## 10. Données en direct et appels CIVIX
-
-Voir `README.md` pour la liste des appels par rendu et les durées de cache.
-
-## Résultat de la checklist
-
-Vérifié par grep sur `src/` et par lecture. Pass sauf mention.
-
-Stratégie
-- Une offre, un public, une action : pass (CTA « Ajouter à mon assistant », cible `#installer`)
-- Pas de CTA concurrent au dessus de la ligne de flottaison : pass (le CTA de la barre est masqué sous `lg` via `max-lg:hidden`, GitHub en icône discrète)
-- Chiffres précis plutôt que verbes vagues : pass (compteurs lus en direct, 25 outils, 6 modèles)
-- Au moins une réduction de risque : pass (section garanties)
-- Preuve à côté de l'affirmation : pass (chiffres en direct dans les bénéfices et le hero)
-- Layout choisi : pass (B)
-
-Visuel
-- Police unique, pas d'italique, pas d'ultra gras : pass (Geist, `font-medium/semibold/normal` seulement ; Geist Mono pour les chiffres ; `em, i, cite` forcés en normal)
-- Pas de trait d'union dans les textes, pas de mot orphelin : pass (grep des motifs courants, `text-wrap: balance/pretty`). Restent les noms propres et titres venant de l'API
-- Tailles sur l'échelle Tailwind : pass (`text-xs` à `text-6xl`, aucun `-[`)
-- Espacements de la table : pass (grep des valeurs hors table : `pt-32` et `pt-40` ramenés à `pt-24`, `max-h-64` remplacé par la classe `listbox-height`)
-- Rayons imbriqués : pass avec réserve (cartes `rounded-2xl` + `p-2` + intérieur `rounded-lg`, onglets `rounded-xl` + `p-1` + `rounded-lg`) ; les étiquettes en `rounded-sm` à l'intérieur de cartes à marge 16 px ou plus restent hors formule
-- Pas de bordure sur un seul côté, pas de dégradé de fond : pass (seul dégradé : texte du titre, classe `.hero-title`)
-- Titre et sous titre du hero plafonnés à 680 px : pass (`max-w-hero`, jeton de thème)
-- Icônes Phosphor : pass
-- Transitions sur la courbe B7, révélations par IntersectionObserver : pass (courbe posée comme défaut du thème ; aucun écouteur `scroll`)
-- Révélation du slogan mot par mot : pass (3 phrases, un IntersectionObserver par mot, repli sans mouvement pour `prefers-reduced-motion`)
-- Fonds sombres limités à la liste : pass pour les surfaces (`#131209`, `#181818`, `#1F1F1F`, `#272727`, `#313131`) ; les marques de données SVG (sarcelle, texte, gris) sont des remplissages hors surface
-
-Contenu et finitions
-- Vraie copie, aucun mot interdit : pass (aucune personne, citation, logo ni statistique inventés)
-- États survol, actif, focus, chargement, vide, erreur : pass (squelettes de la démo, états vides et erreurs composés, repli « Données momentanément indisponibles »)
-- Pas de lien mort, page courante indiquée : pass (suivi de section dans la barre, `aria-current`)
-- 404, mentions légales, confidentialité, validation de formulaire, favicon, balises meta, textes alternatifs : pass (`not-found.tsx`, `/mentions`, `/confidentialite`, validation du formulaire de démo, `icon.svg`, OG dynamique)
-
-Non vérifié : rendu visuel clair et sombre sur tous les écrans, lecteur d'écran, Lighthouse. Un contrôle visuel mobile du hero a été fait dans Chrome.
-
-
-## Critique de la première version
-
-Question posée : qu'est ce qui rend cette page générique, et qu'est ce qui la rendrait distinctive ?
-
-Constats sur la première version complète :
-1. Tout était centré ou empilé en grilles de cartes identiques, avec des titres de section au dessus. C'est la mise en page par défaut des pages générées.
-2. L'accent était un bleu franc, couleur par défaut des pages générées et proche des codes d'un drapeau.
-3. Les chiffres en direct étaient de petites étiquettes ; la composition des groupes était une liste de barres grises ; les tendances n'avaient pas de forme propre.
-
-Corrections appliquées (les trois premières) :
-1. **Grille asymétrique** : hero 7 + 5 avec conversation décalée, sections en 4 + 8 avec titre collant, étapes d'installation et « comment ça marche » en liste verticale à gros chiffres.
-2. **Accent unique sarcelle**, marques de données ramenées à l'accent, au texte et au gris.
-3. **Objets de données** : chiffres en Geist Mono `text-6xl`, bande de chiffres en tête de la preuve en direct avec courbe SVG, hémicycle SVG de 577 points avec liste interactive.
-
-Reste à faire (non traité) : une version annotée des barres par jour (pic nommé), un état « chargement » pour les chiffres du hero, et un contrôle sur de vrais téléphones.
-
-## Audit d'accessibilité
-
-Contrastes mesurés avec la formule WCAG sur les jetons réels :
-- Clair : texte `#111111` sur fond 18,9 ; gris secondaire `#5C5C57` sur fond 6,7, sur surface 6,2, sur survol 5,7 ; blanc sur accent 6,35.
-- Sombre : texte `#F4F4F1` sur fond 17,0 ; gris secondaire `#A6A6A0` sur fond 7,7, sur surface 7,3, sur survol 6,1 ; noir sur accent 10,5.
-- Marques graphiques : gris d'abstention 3,5 sur fond clair et 5,4 sur fond sombre (seuil de 3 pour les graphiques) ; l'information n'est jamais portée par la couleur seule (légende avec libellés et effectifs).
-- Focus : contour de 2 px couleur accent, décalé de 2 px, sur tous les éléments focalisables. Ordre de tabulation : lien d'évitement, barre, contenu dans l'ordre du document, pied de page.
-- Étiquettes : champs de la démo et des filtres associés à un `label`, erreurs reliées par `aria-describedby`, `aria-invalid`, combobox avec `aria-expanded` et navigation au clavier.
-- Graphiques : chaque SVG porte `role="img"` et un `aria-label` chiffré ; l'hémicycle est doublé par une liste textuelle de boutons avec effectifs ; la courbe a des `title` par jour.
-- Mouvement : `prefers-reduced-motion` retire les déplacements, le slogan s'affiche sans transition d'attente.
-- Limites : pas de test avec lecteur d'écran réel ; l'hémicycle en survol n'a pas d'équivalent tactile autre que le bouton de la liste.
-
-## Passage mobile
-
-Contrôle dans Chrome à la plus petite largeur permise par l'outil (500 px) : aucun débordement horizontal (`scrollWidth` égal à `innerWidth`), titre en trois lignes, CTA et chiffre visibles sans défiler, conversation en pleine largeur. Un défaut trouvé et corrigé : le CTA de la barre se superposait au bouton de menu (la classe `hidden` perdait contre `inline-flex`), remplacé par `max-lg:hidden`. Le rendu à 375 px n'a pas pu être testé directement : à vérifier sur un vrai téléphone.
-
-## Pourquoi ces choix de mise en page
-
-- Hero 7 + 5 : le texte garde sa mesure de lecture, la conversation réelle sert de preuve juste à côté du CTA, et son décalage vers le bas casse l'alignement en deux blocs égaux.
-- Titres en colonne gauche collante : sur un récit long, le titre reste visible pendant la lecture du contenu, ce qui remplace les en têtes centrés répétés.
-- Le chiffre avant l'explication : le public sceptique croit d'abord ce qu'il peut vérifier.
-- Hémicycle plutôt que barres : c'est la forme que le public reconnaît pour une assemblée, et un point par siège rend le total (577) tangible.
-
-
-## Checklist après la révision v3
-
-Les règles visuelles de la skill (police unique Geist, fonds sombres, dégradé du titre, mouvement, navigation flottante, révélation du slogan) sont volontairement écartées par la consigne du propriétaire. Contrôles qui restent valables :
-- Une action principale, pas de CTA concurrent : pass (aucun bouton dans l'en tête, un seul CTA par zone, bouton secondaire seulement ailleurs)
-- Échelle de texte Tailwind, espacements de la table, aucune valeur arbitraire `-[` : pass (greps ci dessous)
-- Aucun dégradé, flou, ombre, `bg-clip-text` : pass (grep)
-- Pas d'italique, poids 400, 500 et 700 seulement : pass
-- Pas de trait d'union dans les textes, pas de mot orphelin : pass avec les réserves précédentes
-- Écarts de bordure : filets d'un seul côté seulement dans l'en tête et le pied de page
-- États survol, actif (couleur), focus, chargement, vide, erreur : pass
-- Non imitation de l'État : pass (voir la limite ci dessus)
-Non vérifié : lecteur d'écran, Lighthouse, rendu sur un vrai téléphone.
+---
+name: MCP Assemblée nationale
+description: Les votes des députés, affichés comme un tableau des départs, dans la colorimétrie de data.gouv.fr.
+colors:
+  bg: "#ffffff"
+  surface: "#f6f6f6"
+  raised: "#ffffff"
+  hover: "#eeeeee"
+  line: "#e5e5e5"
+  rule: "#161616"
+  ink: "#161616"
+  ink-soft: "#3a3a3a"
+  muted: "#666666"
+  accent: "#000091"
+  accent-hover: "#1212ff"
+  accent-active: "#2323ff"
+  on-accent: "#ffffff"
+  flap: "#161616"
+  flap-ink: "#ffffff"
+  flap-split: "#3a3a3a"
+  mark-pour: "#000091"
+  mark-contre: "#3a3a3a"
+  mark-abstention: "#868686"
+  mark-absent: "#e5e5e5"
+  bg-dark: "#161616"
+  surface-dark: "#1e1e1e"
+  raised-dark: "#242424"
+  hover-dark: "#2a2a2a"
+  line-dark: "#353535"
+  rule-dark: "#cecece"
+  ink-dark: "#ffffff"
+  ink-soft-dark: "#cecece"
+  muted-dark: "#a6a6a6"
+  accent-dark: "#8585f6"
+  accent-hover-dark: "#a5a5fa"
+  accent-active-dark: "#c1c1fb"
+  on-accent-dark: "#161616"
+  flap-dark: "#2e2e2e"
+  flap-split-dark: "#161616"
+  mark-pour-dark: "#8585f6"
+  mark-contre-dark: "#cecece"
+  mark-abstention-dark: "#7b7b7b"
+  mark-absent-dark: "#353535"
+typography:
+  display:
+    fontFamily: "Barlow Semi Condensed, Public Sans, ui-sans-serif, sans-serif"
+    fontSize: "4.5rem"
+    fontWeight: 600
+    lineHeight: 1
+    letterSpacing: "-0.025em"
+  headline:
+    fontFamily: "Barlow Semi Condensed, Public Sans, ui-sans-serif, sans-serif"
+    fontSize: "3rem"
+    fontWeight: 600
+    lineHeight: 1
+    letterSpacing: "-0.025em"
+  title:
+    fontFamily: "Barlow Semi Condensed, Public Sans, ui-sans-serif, sans-serif"
+    fontSize: "1.5rem"
+    fontWeight: 600
+    lineHeight: 1.25
+    letterSpacing: "-0.025em"
+  board:
+    fontFamily: "Barlow Semi Condensed, Public Sans, ui-sans-serif, sans-serif"
+    fontSize: "1.125rem"
+    fontWeight: 600
+    lineHeight: 1.5
+    fontFeature: "\"tnum\""
+  body:
+    fontFamily: "Public Sans, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1rem"
+    fontWeight: 400
+    lineHeight: 1.5
+  lead:
+    fontFamily: "Public Sans, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.125rem"
+    fontWeight: 400
+    lineHeight: 1.55
+  small:
+    fontFamily: "Public Sans, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "0.875rem"
+    fontWeight: 400
+    lineHeight: 1.43
+  label:
+    fontFamily: "Barlow Semi Condensed, Public Sans, ui-sans-serif, sans-serif"
+    fontSize: "0.875rem"
+    fontWeight: 600
+    lineHeight: 1.43
+    letterSpacing: "0.025em"
+  mono:
+    fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace"
+    fontSize: "0.875rem"
+    fontWeight: 400
+rounded:
+  flap: "0.06em"
+  sm: "4px"
+  full: "9999px"
+spacing:
+  flap-gutter: "0.06em"
+  row: "14px"
+  gutter-mobile: "16px"
+  gutter: "24px"
+  section-mobile: "64px"
+  section: "80px"
+  measure: "40rem"
+  page: "80rem"
+components:
+  button-primary:
+    backgroundColor: "{colors.accent}"
+    textColor: "{colors.on-accent}"
+    rounded: "{rounded.sm}"
+    padding: "10px 16px"
+  button-primary-hover:
+    backgroundColor: "{colors.accent-hover}"
+  button-primary-active:
+    backgroundColor: "{colors.accent-active}"
+  button-secondary:
+    backgroundColor: "{colors.bg}"
+    textColor: "{colors.accent}"
+    rounded: "{rounded.sm}"
+    padding: "10px 16px"
+  button-secondary-hover:
+    backgroundColor: "{colors.hover}"
+  flap-cell:
+    backgroundColor: "{colors.flap}"
+    textColor: "{colors.flap-ink}"
+    typography: "{typography.display}"
+    rounded: "{rounded.flap}"
+  result-tile:
+    backgroundColor: "{colors.flap}"
+    textColor: "{colors.flap-ink}"
+    typography: "{typography.label}"
+    rounded: "{rounded.sm}"
+    padding: "2px 6px"
+  copy-field:
+    backgroundColor: "{colors.bg}"
+    textColor: "{colors.ink}"
+    typography: "{typography.mono}"
+    rounded: "{rounded.sm}"
+    padding: "10px 12px"
+  install-stop:
+    backgroundColor: "{colors.bg}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.full}"
+    size: "28px"
+  install-stop-current:
+    backgroundColor: "{colors.rule}"
+    textColor: "{colors.bg}"
+    rounded: "{rounded.full}"
+    size: "28px"
+---
+
+# Design System: MCP Assemblée nationale
+
+## Overview
+
+**Creative North Star: "Le tableau des départs de l'Assemblée"**
+
+Le registre de l'Assemblée affiché comme un tableau des départs de gare, posé sur une page éditoriale blanche. Les scrutins arrivent en lignes classées par l'heure, les plus récents en tête, chacun avec son volet d'état. Les chiffres se retournent dans des tuiles à palettes quand la donnée en direct change. L'installation est une ligne à trois arrêts. Le monde est celui de l'affichage public d'information : lisible de loin, factuel, sans commentaire.
+
+La densité est celle d'un horaire : des filets pleine largeur, des colonnes, aucune boîte. La couleur est presque absente. L'encre et le papier portent tout, et le Bleu France n'apparaît que là où l'on peut agir. La colorimétrie reprend celle de data.gouv.fr (valeurs du système de design de l'État pour le thème sombre). Le projet s'en sert comme d'une palette, jamais comme d'une identité : rien ne doit faire croire à un site officiel.
+
+Refus confirmés : le hero partagé avec une capture de produit dans une boîte, puis des bandes alternées de cartes à icônes sous des surtitres ; le vert et le rouge pour les positions de vote ; tout signe de l'État (Marianne, bande tricolore, bloc « République Française », « .gouv »).
+
+**Key Characteristics:**
+- Page blanche, lignes réglées pleine largeur, aucune carte.
+- Tuiles à palettes encre et blanc pour les comptes, les dates et les états seulement.
+- Bleu France réservé aux actions, aux liens et à la marque « pour ».
+- Barlow Semi Condensed pour la signalétique, Public Sans pour la lecture.
+- Encodage des votes neutre : la forme porte l'information, jamais une couleur partisane.
+- Clair par défaut, quel que soit le réglage de l'appareil.
+
+## Colors
+
+Une palette d'encre sur papier, d'un seul bleu, empruntée à data.gouv.fr ; le thème sombre reprend les valeurs sombres du système de design de l'État (jetons `-dark`).
+
+### Primary
+- **Bleu France** (accent ; accent-dark en sombre) : boutons, liens, anneau de focus, sélection de texte, curseur, puces radio, et la marque « pour ». Survol et appui passent aux deux bleus plus vifs (accent-hover, accent-active). Le texte posé sur le bleu est blanc en clair, encre en sombre (on-accent).
+
+### Neutral
+- **Papier** (bg) : le fond de la page et des lignes du tableau.
+- **Gris de passage** (surface) : le fond de la seule section dense de données en direct (tendances, composition des groupes).
+- **Papier relevé** (raised) : la boîte de dialogue et la liste de suggestions, seuls calques flottants.
+- **Gris de survol** (hover) : survol des boutons secondaires, des options et du bouton fermer ; fond des squelettes de chargement.
+- **Filet** (line) : les filets fins de 1 px entre les lignes, les pistes vides des barres.
+- **Trait d'encre** (rule) : les filets épais de 2 px qui ouvrent une section, un tableau ou la ligne d'installation ; la ligne et les arrêts du schéma ; le soulignement de l'onglet ou de la page courante.
+- **Encre** (ink), **encre douce** (ink-soft), **gris de légende** (muted) : titres et chiffres ; textes d'appoint ; légendes, têtes de colonnes et métadonnées.
+- **Tuile** (flap, flap-ink, flap-split) : tuiles encre à chiffres blancs, coupées par un trait au milieu. En sombre, la tuile s'éclaircit (flap-dark) et le trait de coupe prend la couleur du fond.
+
+### Marques de vote
+- **Pour** (mark-pour) : aplat Bleu France.
+- **Contre** (mark-contre) : hachures diagonales à 45° de 2 px sur 4 px, dessinées par le motif SVG `pattern-contre` défini une seule fois dans le document, sur le fond de page.
+- **Abstention** (mark-abstention) : aplat gris moyen.
+- **Non votant** (mark-absent) : aplat pâle, couleur du filet. C'est une piste, pas une marque lue seule : l'effectif est toujours écrit dans la légende.
+
+### Named Rules
+**The Bleu d'action Rule.** Le Bleu France ne colore que ce qu'on peut presser ou suivre, plus la marque « pour ». Les barres de tendance, d'adoption et de dossiers sont en encre sur piste pâle, jamais en bleu.
+
+**The Gris de passage Rule.** Le gris de passage est réservé au fond de la section de données en direct. Aucune autre section ne prend de fond gris ; le rythme vient des filets, pas de bandes alternées.
+
+**The Ni vert ni rouge Rule.** Pour, contre, abstention et non votant s'encodent par la forme (aplat, hachures, gris, pâle), avec libellés et effectifs dans la légende. Les couleurs d'information (vert, rouge, orange) ne sont jamais utilisées pour un vote ou un résultat.
+
+**The Pas d'État Rule.** La colorimétrie de data.gouv.fr est une palette, pas un costume : pas de Marianne, pas de bande tricolore, pas de « République Française », pas de « .gouv ». La ligne « Projet indépendant et non officiel · données de l'Assemblée nationale via CIVIX » reste visible en tête de chaque page.
+
+**The Clair d'abord Rule.** Le thème clair s'affiche à la première visite, quel que soit le réglage de l'appareil. Le choix (clair, sombre, système) se fait dans « Paramètres d'affichage », est gardé dans `localStorage` sous la clé `theme`, et un script en ligne dans `<head>` pose `data-theme` sur `<html>` avant le premier affichage dès qu'un choix existe. Les jetons sombres s'appliquent sous `[data-theme="dark"]`, et sous `[data-theme="system"]` quand l'appareil préfère le sombre.
+
+## Typography
+
+**Display Font:** Barlow Semi Condensed (repli Public Sans, sans serif), poids 500, 600 et 700
+**Body Font:** Public Sans (repli ui-sans-serif, system-ui), poids 400, 500 et 700
+**Label/Mono Font:** mono système (ui-monospace, SFMono-Regular, Menlo)
+
+**Character:** Une grotesque de signalétique, étroite et ferme, pour tout ce qui s'affiche (titres, texte du tableau, chiffres), et une sans serif civique, sobre, pour tout ce qui se lit. Les deux polices sont auto hébergées via `@fontsource`, sous une CSP stricte (`font-src 'self'`) : aucun service de polices externe.
+
+### Hierarchy
+- **Display** (Barlow 600, 4.5rem sur grand écran, 3.75rem puis 2.25rem en dessous, interligne 1, approche serrée) : le titre principal de l'accueil, en deux lignes.
+- **Headline** (Barlow 600, 2.25rem à 3rem, approche serrée) : titres de section ; 1.875rem à 2.25rem pour le titre du tableau « Cette semaine à l'Assemblée » et les sections de la page d'un scrutin.
+- **Title** (Barlow 600, 1.25rem à 1.5rem) : titres de tableaux numérotés, arrêts de la ligne, questions de la FAQ, nom du site.
+- **Board** (Barlow 600, 1.125rem, chiffres tabulaires) : dates des lignes du tableau, sigles et effectifs des groupes, libellés à côté d'une tuile.
+- **Body** (Public Sans 400, 1rem, interligne 1.5) : texte courant et titres des scrutins (500), mesure de 40rem.
+- **Lead** (Public Sans 400, 1.125rem) : introductions de section, en encre douce.
+- **Small** (Public Sans 400, 0.875rem) : légendes, effectifs, métadonnées ; 0.75rem pour la ligne non officielle.
+- **Label** (Barlow 600, 0.875rem, capitales, interlettrage 0.025em) : têtes de colonnes du tableau, interlocuteurs de l'exemple de conversation (« Vous », « Votre assistant ») et libellés des tuiles de résultat. Rien d'autre.
+- **Mono** (0.875rem) : l'adresse du connecteur, les noms d'outils et de modèles, les blocs de code. Jamais pour les chiffres.
+
+### Named Rules
+**The Signalétique Rule.** Un chiffre qui s'affiche seul (tuile, date du tableau, effectif d'un groupe, libellé à côté d'une tuile) est en Barlow Semi Condensed à chasse tabulaire. Un chiffre pris dans une phrase de lecture (décomptes d'une ligne, légende, part d'un groupe, compte d'un dossier) reste en Public Sans à chasse tabulaire. Le mono ne sert qu'aux adresses, aux noms d'outils et au code.
+
+**The Pas d'italique Rule.** `em`, `i`, `cite` et `address` sont forcés en romain. Les titres sont équilibrés (`text-wrap: balance`), les paragraphes soignés (`text-wrap: pretty`).
+
+## Layout
+
+Une page de 80rem au plus, avec 16 px de marge sur téléphone et 24 px au delà. La grille est à 12 colonnes sur grand écran : le premier écran met le titre sur 8 colonnes et le compteur à palettes sur 4, puis la ligne d'installation en pleine largeur. Le tableau de la semaine occupe 8 colonnes, et l'exemple de conversation, collant, les 4 autres. Les sections respirent de 64 px (80 px dès 640 px). Elles s'ouvrent par un en tête posé sur un trait d'encre de 2 px : titre à gauche, métadonnées alignées à droite sur grand écran. Le texte de lecture ne dépasse pas 40rem.
+
+Le tableau des scrutins a trois colonnes dès 640 px : date (4.5rem), scrutin (le reste), résultat (6.5rem, aligné à droite), avec 20 px entre colonnes et 14 px de hauteur de ligne de part et d'autre. Sur téléphone, la date et le résultat partagent une ligne au dessus du titre. Les lignes sont regroupées par dossier : les dossiers sont classés par leur vote le plus récent, et dans chaque dossier le vote sur l'ensemble du texte vient en tête, puis les autres scrutins du plus récent au plus ancien.
+
+La ligne d'installation est verticale sur téléphone (arrêts à gauche, trait vertical) et horizontale sur grand écran (colonnes proportionnelles, trait horizontal). Le dernier tronçon s'efface en filet fin.
+
+### Named Rules
+**The Lignes réglées Rule.** On sépare par des filets pleine largeur, jamais par des boîtes : 2 px d'encre pour ouvrir, 1 px de filet entre les lignes. Pas de grille de cartes.
+
+**The Chronologie Rule.** La profondeur est le temps : dossiers et scrutins se suivent du plus récent au plus ancien, avec pour seule exception le vote sur l'ensemble d'un texte, placé en tête de son dossier. Aucune autre mise en avant éditoriale.
+
+## Elevation & Depth
+
+Le système est plat : aucune ombre, aucun flou, aucun dégradé sur la page. La hiérarchie passe par l'épaisseur des filets (2 px contre 1 px), par le contraste encre et papier, et par l'unique fond gris de la section de données. Seuls les deux calques qui flottent réellement au dessus de la page portent une ombre : la boîte de dialogue « Paramètres d'affichage », sur un voile noir à 50 %, et la liste de suggestions du champ député de la démonstration (valeurs dans le fichier annexe).
+
+### Named Rules
+**The Calque seulement Rule.** Une ombre signale un calque qui recouvre la page (dialogue, liste déroulante), jamais une surface posée dessus. Aucune carte, aucun bouton, aucune tuile n'a d'ombre.
+
+## Shapes
+
+Des formes d'affichage public : rectangles nets, angles à peine adoucis. Boutons, champs, options du dialogue et tuiles de résultat ont 4 px de rayon. Les cellules à palettes ont un rayon proportionnel au corps (0.06em) et sont séparées par un intervalle proportionnel (0.06em), pour garder la même forme à toutes les tailles. La boîte de dialogue et la liste de suggestions restent carrées, bordées d'un trait d'encre. Seuls les arrêts de la ligne d'installation et le point d'état du direct sont ronds. Les marques de données sont des rectangles : segments de barre, et un carré de 6 px par siège dans la grille des groupes.
+
+## Components
+
+### Buttons
+Fermes et pleins, jamais en pilule.
+- **Shape:** angles légèrement adoucis (4 px).
+- **Primary:** aplat Bleu France, texte blanc en gras, 10 px sur 16 px, corps 1rem (0.875rem en petite taille). C'est l'action « Copier l'adresse » et les relances des pages d'erreur.
+- **Hover / Focus:** le bleu s'avive au survol puis à l'appui, transition de couleur de 150 ms. Le focus est un contour de 2 px Bleu France décalé de 2 px, partout.
+- **Secondary:** fond papier, filet Bleu France de 1 px, texte bleu ; fond gris de survol. La petite variante a un filet pâle qui passe au bleu au survol.
+- **Copier attaché:** collé au champ d'adresse, il partage son bord et perd son arrondi de jonction.
+
+### Links
+- Texte Bleu France souligné (1 px, décalé de 0.2em, 2 px au survol). Les titres des scrutins sont en encre avec un soulignement pâle, et passent au bleu au survol. Les liens externes portent une icône Phosphor de sortie.
+
+### Inputs / Fields
+- **Style:** fond papier, trait d'encre de 1 px, 4 px de rayon. L'adresse du connecteur est en mono, en lecture seule. Le champ « député » de la démonstration est une ligne de saisie en Barlow 1.5rem posée sur un trait d'encre de 2 px.
+- **Focus:** contour Bleu France de 2 px. Les filtres passent leur bordure au bleu au survol.
+- **Erreur:** message relié au champ ; aucune couleur rouge.
+
+### Navigation
+- Ligne non officielle en tête (corps 0.75rem ; le build la pose aujourd'hui sur le gris de passage, écart à la règle du même nom, non canonisé), avec « Paramètres d'affichage » et « Code source » en bleu à droite (icône seule sur téléphone, nom accessible gardé). En dessous, un en tête blanc à filet inférieur : le nom du site en Barlow 700, et des liens en Barlow 600 qui défilent horizontalement sur téléphone. La page courante est soulignée d'un trait d'encre de 2 px. Les onglets (assistants, périodes) suivent la même règle : trait d'encre sous l'onglet choisi, gris de légende sinon.
+
+### Tuile à palettes (signature)
+Un caractère par cellule : aplat encre, chiffre blanc en Barlow tabulaire, trait de coupe horizontal au milieu (1 px au moins). Les espaces deviennent des intervalles vides. Réservée aux comptes, aux dates et aux numéros (compteur de la législature, total de la semaine, numéro d'un scrutin, 404). À l'affichage, chaque caractère se retourne ; quand l'actualisation apporte une valeur changée, seuls les caractères modifiés se retournent : rotation de -50° à 0° avec un léger rebond, 520 ms, courbe ease-out-quint, 40 ms de décalage par caractère. Le chiffre reste lisible pendant tout le mouvement (aucune opacité nulle). Sous `prefers-reduced-motion`, aucun mouvement. Le groupe porte un nom accessible avec la valeur complète.
+
+### Tuile de résultat
+« Adopté » et « Rejeté » partagent la même tuile encre : Barlow 600 en capitales, 4 px de rayon, et ne diffèrent que par l'icône (coche ou croix, Phosphor en gras) et le mot. « Inconnu » prend un point d'interrogation.
+
+### Barre de positions
+Une barre pleine largeur (8 px dans les lignes, 24 px en grand) qui juxtapose pour, contre, abstention et non votant dans cet ordre, avec les marques décrites dans Colors. Elle porte un nom accessible chiffré. Sa légende est en pastilles de 12 px cerclées d'encre douce, suivies du libellé et de l'effectif.
+
+### Grille des sièges
+Pour chaque groupe, une ligne réglée : sigle et nom, un carré d'encre par siège (50 par ligne), effectif et part. Les groupes sont classés par effectif, avec une légende qui dit que cet ordre ne reflète pas la place dans l'hémicycle. Elle remplace l'hémicycle, parce que CIVIX ne fournit aucun ordre de placement.
+
+### Ligne d'installation
+Trois arrêts ronds de 28 px numérotés en Barlow gras, reliés par un trait d'encre de 2 px. L'arrêt de départ est plein (encre, chiffre papier), les suivants sont évidés. Le premier arrêt porte le champ d'adresse et « Copier l'adresse », le deuxième le lien vers les étapes par assistant.
+
+### Tableaux numérotés
+Les figures de données ouvrent par un trait d'encre de 2 px, un titre en Barlow 1.5rem, puis une légende « Tableau N. » en gras suivie d'une note. Le numéro vient sous le titre, jamais au dessus.
+
+## Do's and Don'ts
+
+### Do:
+- **Do** séparer par des filets pleine largeur : 2 px d'encre pour ouvrir une section ou un tableau, 1 px de filet entre les lignes.
+- **Do** réserver le Bleu France aux boutons, aux liens, au focus et à la marque « pour ».
+- **Do** encoder pour en aplat bleu, contre en hachures diagonales, abstention en gris (#868686 en clair, #7b7b7b en sombre) et non votant en pâle, avec libellés et effectifs dans la légende.
+- **Do** distinguer adopté et rejeté par l'icône et le mot, dans des tuiles d'encre identiques.
+- **Do** mettre les comptes, les dates et les numéros dans des tuiles à palettes, et couper le retournement sous `prefers-reduced-motion`.
+- **Do** afficher le thème clair à la première visite et garder le choix sous la clé `theme`, appliqué avant le premier affichage.
+- **Do** n'afficher que des données réelles de CIVIX, avec un état « Données momentanément indisponibles » quand elles manquent.
+- **Do** garder la ligne « Projet indépendant et non officiel » visible en tête de chaque page.
+
+### Don't:
+- **Don't** utiliser le vert ou le rouge (ni aucune couleur d'information) pour une position ou un résultat.
+- **Don't** utiliser Marianne, une bande tricolore, un bloc « République Française » ou « .gouv » dans l'interface.
+- **Don't** poser un surtitre en capitales au dessus d'un titre : les capitales Barlow sont réservées aux têtes de colonnes, aux interlocuteurs et aux tuiles de résultat.
+- **Don't** construire des grilles de cartes ni des bandes alternées de fonds gris ; le gris de passage n'appartient qu'à la section de données en direct.
+- **Don't** dessiner un hémicycle ni rien qui suggère une place politique : CIVIX ne donne aucun ordre de placement.
+- **Don't** mettre d'ombre, de flou ou de dégradé sur une surface de la page ; l'ombre est réservée aux calques (dialogue, liste de suggestions).
+- **Don't** utiliser le mono pour les chiffres, ni charger une police depuis un service externe.
+- **Don't** inventer de preuve : ni témoignage, ni logo, ni chiffre d'usage.

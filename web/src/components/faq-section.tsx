@@ -1,6 +1,5 @@
 import { PlusIcon } from "@phosphor-icons/react/dist/ssr";
 import { FAQ } from "@/content/faq";
-import { Section } from "./section";
 
 function faqJsonLd(): string {
   const data = {
@@ -17,27 +16,31 @@ function faqJsonLd(): string {
 
 export const FaqSection: React.FC = () => {
   return (
-    <Section split
- id="faq" eyebrow="Questions fréquentes" title="Les réponses aux questions qu'on nous pose le plus">
+    <section id="faq" aria-labelledby="faq-titre" className="py-16 sm:py-20">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd() }} />
-      <ul className="flex flex-col gap-3">
-        {FAQ.map((item) => (
-          <li key={item.question}>
-            <details className="group rounded-lg border border-line bg-raised transition hover:bg-hover">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-lg p-4 text-lg font-bold">
-                {item.question}
-                <PlusIcon
-                  aria-hidden="true"
-                  size={20}
-                  weight="bold"
-                  className="shrink-0 transition group-open:rotate-45"
-                />
-              </summary>
-              <p className="px-4 pb-4 text-base text-muted">{item.answer}</p>
-            </details>
-          </li>
-        ))}
-      </ul>
-    </Section>
+      <div className="mx-auto grid w-full max-w-page gap-8 px-4 sm:px-6 lg:grid-cols-12 lg:gap-12">
+        <h2 id="faq-titre" className="font-display text-4xl font-semibold tracking-tight sm:text-5xl lg:col-span-4">
+          Les réponses aux questions qu'on nous pose le plus
+        </h2>
+        <ul className="border-t-2 border-rule lg:col-span-8">
+          {FAQ.map((item) => (
+            <li key={item.question} className="border-b border-line">
+              <details className="group">
+                <summary className="flex cursor-pointer list-none items-start justify-between gap-6 py-4 font-display text-xl font-semibold leading-snug transition-colors hover:text-accent">
+                  {item.question}
+                  <PlusIcon
+                    aria-hidden="true"
+                    size={20}
+                    weight="bold"
+                    className="mt-1 shrink-0 transition-transform duration-200 group-open:rotate-45"
+                  />
+                </summary>
+                <p className="max-w-measure pb-5 text-base text-ink-soft">{item.answer}</p>
+              </details>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
   );
 };
