@@ -13,8 +13,8 @@ export function rejectCrossSite(request: NextRequest): NextResponse | null {
   );
 }
 
-export function okResponse(body: unknown): NextResponse {
-  return NextResponse.json(body, { headers: { "Cache-Control": SUCCESS_CACHE } });
+export function okResponse(body: unknown, cacheControl: string = SUCCESS_CACHE): NextResponse {
+  return NextResponse.json(body, { headers: { "Cache-Control": cacheControl } });
 }
 
 export function errorResponse(message: string, status: number): NextResponse {

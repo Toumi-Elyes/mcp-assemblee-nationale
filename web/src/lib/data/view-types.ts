@@ -72,3 +72,34 @@ export type HomeView = {
   suggestions: { topics: string[]; deputes: DemoDepute[] };
   heroChat: HeroChat | null;
 };
+
+export type WeekScrutinView = {
+  uid: string;
+  date: string | null;
+  title: string;
+  result: VoteResult;
+  counts: Counts | null;
+};
+
+export type WeekGroupView = {
+  key: string;
+  label: string | null;
+  count: number;
+  adopted: number;
+  rejected: number;
+  scrutins: WeekScrutinView[];
+};
+
+export type WeekView = {
+  from: string;
+  to: string;
+  total: number;
+  hiddenGroups: number;
+  groups: WeekGroupView[];
+};
+
+export type LiveSnapshot = {
+  generatedAt: string;
+  counters: HeroCounters;
+  week: WeekView | null;
+};

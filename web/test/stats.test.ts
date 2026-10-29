@@ -143,3 +143,26 @@ describe("hemicycleSeats", () => {
     expect(hemicycleSeats([])).toEqual([]);
   });
 });
+
+describe("buildLiveSnapshot", () => {
+  it("serialises the week with counts and keeps the payload JSON safe", async () => {
+    const { buildLiveSnapshot } = await import("@/lib/data/live");
+    const { liveSnapshotSchema } = await import("@/lib/data/live-schema");
+    const week = lastDays(scrutins, 7);
+    const groups = groupByDossier(week);
+    const counts = new Map([[week[0]!.uid, { pour: 1, contre: 2, abstention: 3, non_votant: 0, total: 6 }]]);
+    const snapshot = buildLiveSnapshot({
+      generatedAt: NOW,
+      counters: { legislature: 17, scrutins: 10, latestDate: "2026-10-28", deputes: 577, groupes: 12 },
+      week: { from: "2026-10-22", to: "2026-10-28", total: week.length, groups, counts },
+      trends: null,
+      groupes: null,
+      suggestions: { topics: [], deputes: [] },
+      heroChat: null,
+    });
+    const parsed = liveSnapshotSchema.parse(JSON.parse(JSON.stringify(snapshot)));
+    expect(parsed.week?.total).toBe(week.length);
+    expect(parsed.week?.groups.length).toBeLessThanOrEqual(6);
+    expect(parsed.week?.groups.every((group) => group.scrutins.length <= 3)).toBe(true);
+  });
+});

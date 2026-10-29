@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { GithubLogoIcon, ListChecksIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/cn";
 import { GITHUB_URL, SITE_NAME } from "@/lib/config";
+import { ThemeSettings } from "./theme-settings";
 
 type NavItem = { href: string; label: string };
 
@@ -36,9 +37,23 @@ export const SiteNav: React.FC = () => {
 
   return (
     <header className="bg-bg">
-      <p className="bg-surface px-4 py-2 text-center text-xs text-ink-soft sm:px-6">
-        Projet indépendant et non officiel · données de l'Assemblée nationale via CIVIX
-      </p>
+      <div className="bg-surface">
+        <div className="mx-auto flex w-full max-w-page flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-1 sm:px-6">
+          <p className="py-1 text-xs text-ink-soft">
+            Projet indépendant et non officiel · données de l'Assemblée nationale via CIVIX
+          </p>
+          <div className="flex items-center gap-1">
+            <ThemeSettings variant="header" />
+            <a
+              href={GITHUB_URL}
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-accent transition hover:bg-hover"
+            >
+              <GithubLogoIcon aria-hidden="true" size={20} weight="bold" />
+              <span className="max-sm:sr-only">Code source</span>
+            </a>
+          </div>
+        </div>
+      </div>
       <div className="border-b border-line">
         <div className="mx-auto flex w-full max-w-page flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-3 sm:px-6">
           <Link href="/" className="flex items-center gap-3 py-1">
@@ -48,13 +63,6 @@ export const SiteNav: React.FC = () => {
               <span className="text-xs text-muted">Les votes des députés, dans votre assistant IA</span>
             </span>
           </Link>
-          <a
-            href={GITHUB_URL}
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-accent transition hover:bg-hover lg:order-last"
-          >
-            <GithubLogoIcon aria-hidden="true" size={20} weight="bold" />
-            Code source
-          </a>
           <nav aria-label="Navigation principale" className="w-full lg:w-auto">
             <ul className="flex flex-wrap items-center gap-x-1">
               <li>

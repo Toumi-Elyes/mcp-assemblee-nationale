@@ -25,6 +25,12 @@ Le mode sombre reprend les équivalents de l'échelle du système de design de l
 
 Encodage des positions, sans jugement : pour = bleu accent plein, contre = **hachures** diagonales gris foncé (motif SVG `pattern-contre` défini une fois dans le document), abstention = gris `#929292`, non votant = gris pâle. La forme (plein, hachuré, gris) porte l'information en plus de la teinte ; la légende donne toujours libellés et effectifs. Hémicycle : points alternés bleu et gris.
 
+### Sélecteur de thème (« Paramètres d'affichage »)
+
+Le thème est choisissable, avec **Système** par défaut. Un bouton « Paramètres d'affichage » (icône et libellé sur ordinateur, icône seule avec nom accessible sur téléphone) dans le bandeau du haut, et un lien dans le pied de page, ouvrent une boîte de dialogue native `<dialog>` avec trois boutons radio : Thème clair, Thème sombre, Système (« Utilise le réglage de votre appareil », avec le thème actuel). Échap ou « Fermer » la ferme et le focus revient au bouton. Le choix est gardé dans `localStorage` (clé `theme`, lecture et écriture protégées), appliqué par l'attribut `data-theme` sur `<html>` : jetons clairs dans `:root`, jetons sombres sous `:root[data-theme="dark"]` et sous `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) }`, de sorte que « Système » fonctionne sans JavaScript. Un script en ligne minimal dans `<head>` applique le choix avant le premier affichage (pas de flash) ; `suppressHydrationWarning` est posé sur `<html>` pour cette seule raison.
+
+Jetons sombres (valeurs du système de design de l'État) : fond `#161616`, surfaces `#1E1E1E`, cartes `#242424`, survol `#2A2A2A`, bordure `#353535`, titres `#FFFFFF`, texte `#CECECE`, atténué `#A6A6A6`, accent `#8585F6`. Contrastes : texte `#CECECE` 11,5 sur fond et 9,9 sur carte ; atténué 7,4 sur fond, 6,4 sur carte, 5,9 sur survol ; accent 5,8 sur fond, 5,3 sur surface, 4,9 sur carte, 4,6 sur survol ; texte foncé sur bouton accent 5,8. Marques de données : hachures de « contre » dessinées avec `--mark-contre` sur `--bg`, abstention `#7B7B7B` (3,7 sur carte), piste `#353535`. L'image de partage reste claire.
+
 ### Formes
 
 Plat : aucune ombre, aucun flou, aucun dégradé (le texte à dégradé du hero a disparu). Rayon `rounded` (4 px) pour boutons, champs, étiquettes et lignes imbriquées, `rounded-lg` (8 px) pour les cartes. Bouton principal plein bleu, bouton secondaire blanc avec filet bleu de 1 px et texte bleu, jamais en pilule. Cartes : filet complet de 1 px, titre, texte court, lien « Voir le scrutin » avec flèche.

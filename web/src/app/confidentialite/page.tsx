@@ -20,6 +20,7 @@ const ConfidentialitePage: React.FC = () => {
           paragraphs: [
             "Il n'utilise aucun cookie, aucun traceur, aucun outil de mesure d'audience et aucune publicité. Comme il ne dépose rien sur votre appareil, aucune bannière de consentement n'est nécessaire.",
             "Les polices de caractères sont servies par ce site, sans appel à un service tiers.",
+            "Si vous choisissez un thème dans « Paramètres d'affichage », ce choix est gardé dans le stockage local de votre navigateur (clé « theme »). Il ne quitte jamais votre appareil et n'est pas un cookie.",
           ],
         },
         {

@@ -25,13 +25,37 @@
   --mark-absent: #e5e5e5;
 }
 
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #161616;
+  --surface: #1e1e1e;
+  --raised: #242424;
+  --hover: #2a2a2a;
+  --line: #353535;
+  --ink: #ffffff;
+  --ink-soft: #cecece;
+  --muted: #a6a6a6;
+  --accent: #8585f6;
+  --accent-hover: #a5a5fa;
+  --accent-active: #c1c1fb;
+  --on-accent: #161616;
+  --mark-pour: #8585f6;
+  --mark-contre: #cecece;
+  --mark-abstention: #7b7b7b;
+  --mark-absent: #353535;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     color-scheme: dark;
     --bg: #161616;
     --surface: #1e1e1e;
-    --raised: #161616;
-    --hover: #2d2d2d;
+    --raised: #242424;
+    --hover: #2a2a2a;
     --line: #353535;
     --ink: #ffffff;
     --ink-soft: #cecece;
