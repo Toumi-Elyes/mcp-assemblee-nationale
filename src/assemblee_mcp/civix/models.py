@@ -173,7 +173,31 @@ class ScrutinSummary(CivixModel):
     sort: Sort | None = None
     type_vote: TypeVote | None = None
     context: str | None = None
+    type: str | None = None
+    sort_code: str | None = None
     tags: list[str] = Field(default_factory=list)
+
+    @property
+    def dossier_ref(self) -> str | None:
+        """Référence du dossier législatif, si elle existe."""
+        dossier = self.objet.dossier_legislatif if self.objet else None
+        return dossier.dossier_ref if dossier else None
+
+    @property
+    def dossier_libelle(self) -> str | None:
+        """Titre du dossier législatif, s'il existe."""
+        dossier = self.objet.dossier_legislatif if self.objet else None
+        return dossier.libelle if dossier else None
+
+    @property
+    def adopted(self) -> bool | None:
+        """Vrai si adopté, faux si rejeté, `None` si inconnu."""
+        code = (self.sort_code or (self.sort.code if self.sort else None) or "").casefold()
+        if code.startswith("adopt"):
+            return True
+        if code.startswith(("rejet", "non adopt")):
+            return False
+        return None
 
 
 class ScrutinList(CivixModel):

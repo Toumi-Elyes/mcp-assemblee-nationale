@@ -20,6 +20,9 @@ READ_ONLY_ANNOTATIONS = {
 DEFAULT_PAGE_SIZE = 10
 TOOL_DEADLINE_SECONDS = 25
 DIRECTORY_MAX_CALLS = 20
+ANALYTICS_MAX_CALLS = 45
+ANALYTICS_DEADLINE_SECONDS = 45.0
+LISTING_MAX_CALLS = 30
 
 Page = Annotated[int, Field(description="Numéro de page, à partir de 1.", ge=1, le=500)]
 LegislatureNumber = Annotated[
@@ -51,6 +54,7 @@ PositionName = Literal["pour", "contre", "abstention", "non_votant"]
 
 def limited[**P](
     max_calls: int,
+    deadline: float | None = None,
 ) -> Callable[[Callable[P, Awaitable[str]]], Callable[P, Awaitable[str]]]:
     """Plafonne les appels CIVIX et la durée d'un outil, et convertit `CivixError` en `ToolError`.
 
@@ -62,7 +66,9 @@ def limited[**P](
         async def wrapper(*args: P.args, **kwargs: P.kwargs) -> str:
             token = current_budget.set(CallBudget(max_calls))
             try:
-                async with asyncio.timeout(TOOL_DEADLINE_SECONDS):
+                async with asyncio.timeout(
+                    deadline if deadline is not None else TOOL_DEADLINE_SECONDS
+                ):
                     return await function(*args, **kwargs)
             except CivixError as error:
                 raise ToolError(error.message) from error

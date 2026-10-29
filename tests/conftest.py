@@ -1,6 +1,7 @@
 import json
 from collections.abc import AsyncIterator, Iterator
 from dataclasses import dataclass, field
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -44,6 +45,7 @@ class CivixStub:
 
     requests: list[httpx.Request] = field(default_factory=list)
     overrides: list[tuple[str, dict[str, str], httpx.Response]] = field(default_factory=list)
+    listings: dict[str | None, list[Payload]] = field(default_factory=dict)
 
     def add(self, path: str, payload: Payload, status: int = 200, **params: str) -> None:
         self.overrides.append((path, params, httpx.Response(status, json=payload)))
@@ -60,11 +62,11 @@ class CivixStub:
                 return response
         return self.default(path, params)
 
-    def default(self, path: str, params: dict[str, str]) -> httpx.Response:
+    def default(self, path: str, params: dict[str, str]) -> httpx.Response:  # noqa: PLR0911
         if path == "/search":
             return httpx.Response(200, json=self.search(params.get("search", "")))
         if path == "/scrutins":
-            return httpx.Response(200, json=self.scrutins(params.get("search")))
+            return httpx.Response(200, json=self.scrutins(params))
         if path == "/deputes":
             return httpx.Response(200, json=self.deputes(params.get("groupe")))
         fixed = {
@@ -77,6 +79,10 @@ class CivixStub:
         }
         if path in fixed:
             return httpx.Response(200, json=load_fixture(fixed[path]))
+        if path.startswith("/scrutins/") and path.count("/") == 2 and path != "/scrutins/NOPE":
+            detail = load_fixture("scrutin_detail")
+            detail["data"]["attributes"]["scrutin"]["uid"] = path.rsplit("/", 1)[1]
+            return httpx.Response(200, json=detail)
         if path.startswith("/scrutins/") and path.endswith("/votes"):
             return httpx.Response(200, json=load_fixture("scrutin_votes"))
         return httpx.Response(404, json={"error": "not found"})
@@ -85,7 +91,25 @@ class CivixStub:
         named = {"retraites": "search_global", "Abadie": "search_depute"}
         return load_fixture(named[query]) if query in named else empty_search(query)
 
-    def scrutins(self, query: str | None) -> Payload:
+    def paged(self, items: list[Payload], params: dict[str, str]) -> Payload:
+        page = int(params.get("page", "1"))
+        size = int(params.get("page_size", "10"))
+        payload = load_fixture("search_scrutins")
+        window = items[(page - 1) * size : page * size]
+        payload["data"]["attributes"]["results"] = window
+        payload["meta"]["pagination"] = {
+            "page": page,
+            "page_size": size,
+            "next_page": page + 1 if page * size < len(items) else None,
+            "count_total": len(items),
+            "count_returned": len(window),
+        }
+        return payload
+
+    def scrutins(self, params: dict[str, str]) -> Payload:
+        query = params.get("search")
+        if query in self.listings:
+            return self.paged(self.listings[query], params)
         if query == "retraites":
             return load_fixture("search_scrutins")
         payload = load_fixture("search_scrutins")
@@ -136,3 +160,46 @@ def server(client: CivixClient) -> FastMCP:
 async def mcp_client(server: FastMCP) -> AsyncIterator[Client[Any]]:
     async with Client(server) as connected:
         yield connected
+
+
+def make_item(
+    number: int,
+    day: str,
+    *,
+    kind: str = "amendement",
+    context: str | None = "Proposition de loi",
+    sort: str = "adopté",
+    dossier_ref: str | None = "DLR5L17N1",
+    dossier: str = "Un texte",
+) -> Payload:
+    item: Payload = load_fixture("search_scrutins")["data"]["attributes"]["results"][0]
+    item.update(
+        uid=f"VTANR5L17V{number}",
+        numero=number,
+        date_scrutin=f"{day}T00:00:00+00:00",
+        type=kind,
+        context=context,
+        sort_code=sort,
+        titre=f"le scrutin {number} du {dossier}",
+    )
+    item["objet"] = {
+        "libelle": item["titre"],
+        "dossierLegislatif": {"libelle": dossier, "dossierRef": dossier_ref}
+        if dossier_ref
+        else None,
+    }
+    return item
+
+
+def make_listing(days: int, per_day: int, end: str = "2026-10-29") -> list[Payload]:
+    """`per_day` scrutins par jour sur `days` jours, du plus récent au plus ancien."""
+    last = date.fromisoformat(end)
+    items: list[Payload] = []
+    for offset in range(days):
+        day = (last - timedelta(days=offset)).isoformat()
+        for index in range(per_day):
+            number = 9000 - len(items)
+            kind = "texte" if index == 0 else "amendement"
+            sort = "adopté" if (offset + index) % 3 == 0 else "rejeté"
+            items.append(make_item(number, day, kind=kind, sort=sort))
+    return items

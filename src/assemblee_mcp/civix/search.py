@@ -214,3 +214,40 @@ async def search_everything(client: CivixClient, query: str, *, page: int = 1) -
         len(results.deputes) + len(results.scrutins) + len(results.groupes) + len(results.dossiers)
     )
     return GlobalSearch(exact, results, total, broad_note(query, broad, truncated=False))
+
+
+@dataclass(frozen=True)
+class ScrutinPool:
+    """Scrutins correspondant à une recherche, jusqu'à 100, du plus récent au plus ancien."""
+
+    items: list[ScrutinSummary]
+    matching: int
+    truncated: bool
+    note: str | None = None
+
+
+async def search_scrutin_pool(
+    client: CivixClient, query: str, *, legislature: int | None = None
+) -> ScrutinPool:
+    """Rassemble les scrutins d'une recherche (au plus 3 appels CIVIX), sans pagination."""
+    first = await client.list_scrutins(
+        query, legislature=legislature, page=1, page_size=BROAD_PAGE_SIZE
+    )
+    if not scrutins_empty(first):
+        items = list(first.attributes.results)
+        total = first.pagination.total if first.pagination else None
+        has_more = first.pagination is not None and first.pagination.next_page is not None
+        if has_more:
+            second = await client.list_scrutins(
+                query, legislature=legislature, page=2, page_size=BROAD_PAGE_SIZE
+            )
+            items.extend(second.attributes.results)
+            has_more = second.pagination is not None and second.pagination.next_page is not None
+        return ScrutinPool(items, total if total is not None else len(items), has_more)
+    broad = broaden(query)
+    if broad is None:
+        return ScrutinPool([], 0, False)
+    pool, truncated = await broad_pool(client, broad, legislature)
+    matches = [item for item in pool if contains_all(summary_text(item), broad.required)]
+    note = broad_note(query, broad, truncated=truncated)
+    return ScrutinPool(matches, len(matches), truncated, note)

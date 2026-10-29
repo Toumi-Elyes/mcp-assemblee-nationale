@@ -32,7 +32,14 @@ async def test_health_route() -> None:
 
 async def test_prompts(mcp_client: Client[Any]) -> None:
     prompts = {prompt.name for prompt in await mcp_client.list_prompts()}
-    assert prompts == {"resumer_scrutin", "mon_depute", "comparer_groupes"}
+    assert prompts == {
+        "resumer_scrutin",
+        "mon_depute",
+        "comparer_groupes",
+        "tendances_du_mois",
+        "bilan_groupe",
+        "comparer_deux_deputes",
+    }
     result = await mcp_client.get_prompt("resumer_scrutin", {"sujet": "retraites"})
     message = result.messages[0].content
     assert isinstance(message, TextContent)

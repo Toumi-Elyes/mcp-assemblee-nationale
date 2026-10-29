@@ -4,6 +4,7 @@ import asyncio
 import time
 from collections import OrderedDict
 from collections.abc import Callable, Mapping
+from datetime import datetime, timedelta
 from http import HTTPStatus
 from typing import Any
 from urllib.parse import quote
@@ -25,6 +26,7 @@ from assemblee_mcp.civix.models import (
     DeputeListResponse,
     GroupeDetailResponse,
     GroupeListResponse,
+    Scrutin,
     ScrutinListResponse,
     ScrutinResponse,
     ScrutinVotesResponse,
@@ -33,6 +35,7 @@ from assemblee_mcp.civix.models import (
 )
 from assemblee_mcp.config import (
     CONNECT_TIMEOUT_SECONDS,
+    IMMUTABLE_AFTER_DAYS,
     MAX_CONCURRENT_REQUESTS,
     MAX_CONNECTIONS,
     MAX_KEEPALIVE_CONNECTIONS,
@@ -46,6 +49,7 @@ MAX_ATTEMPTS = 2
 FORBIDDEN_SEGMENTS = frozenset({"", ".", ".."})
 RETRYABLE_STATUSES = frozenset({HTTPStatus.BAD_GATEWAY, HTTPStatus.GATEWAY_TIMEOUT})
 VOTES_SUFFIX = "/votes"
+DETAIL_PATH_SLASHES = 2
 
 
 def segment(value: str) -> str:
@@ -76,9 +80,9 @@ class TtlCache:
         self._entries.move_to_end(key)
         return value
 
-    def set(self, key: CacheKey, value: CivixResponse[Any]) -> None:
+    def set(self, key: CacheKey, value: CivixResponse[Any], ttl: float | None = None) -> None:
         """Mémorise une valeur en évinçant les plus anciennes au-delà du plafond."""
-        self._entries[key] = (self._clock() + self._ttl, value)
+        self._entries[key] = (self._clock() + (self._ttl if ttl is None else ttl), value)
         self._entries.move_to_end(key)
         while len(self._entries) > self._max_entries:
             self._entries.popitem(last=False)
@@ -101,6 +105,9 @@ class CivixClient:
         self._http: httpx.AsyncClient | None = None
         self._cache = TtlCache(settings_.cache_max_entries, settings_.cache_ttl, clock)
         self._votes_cache = TtlCache(settings_.votes_cache_max_entries, settings_.cache_ttl, clock)
+        self._detail_cache = TtlCache(
+            settings_.detail_cache_max_entries, settings_.cache_ttl, clock
+        )
         self._inflight: dict[CacheKey, asyncio.Future[CivixResponse[Any]]] = {}
         self._slots = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
 
@@ -203,7 +210,7 @@ class CivixClient:
             if value is not None
         }
         key: CacheKey = (path, tuple(sorted(clean.items())))
-        cache = self._votes_cache if path.endswith(VOTES_SUFFIX) else self._cache
+        cache = self._cache_for(path)
         cached = cache.get(key)
         if cached is not None and isinstance(cached, response_model):
             return cached
@@ -223,11 +230,29 @@ class CivixClient:
             )
             raise
         else:
-            cache.set(key, parsed)
+            cache.set(key, parsed, self._ttl_for(parsed))
             future.set_result(parsed)
             return parsed
         finally:
             del self._inflight[key]
+
+    def _cache_for(self, path: str) -> TtlCache:
+        if path.endswith(VOTES_SUFFIX):
+            return self._votes_cache
+        if path.startswith("/scrutins/") and path.count("/") == DETAIL_PATH_SLASHES:
+            return self._detail_cache
+        return self._cache
+
+    def _ttl_for(self, response: CivixResponse[Any]) -> float | None:
+        """Durée de cache longue pour un scrutin vieux de plus de 2 jours (données figées)."""
+        attributes = response.attributes
+        if not isinstance(attributes, Scrutin) or attributes.scrutin.date_scrutin is None:
+            return None
+        voted = attributes.scrutin.date_scrutin
+        now = datetime.now(voted.tzinfo)
+        if now - voted > timedelta(days=IMMUTABLE_AFTER_DAYS):
+            return self.settings.immutable_ttl
+        return None
 
     async def _load[AttributesT: CivixModel](
         self,

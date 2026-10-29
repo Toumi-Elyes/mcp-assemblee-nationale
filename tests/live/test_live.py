@@ -1,11 +1,14 @@
 import os
+from typing import Any
 
 import pytest
+from fastmcp import Client
 
 from assemblee_mcp.civix import lookup
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.civix.search import search_scrutins
 from assemblee_mcp.config import Settings
+from assemblee_mcp.server import create_server
 
 pytestmark = pytest.mark.skipif(
     os.environ.get("CIVIX_LIVE") != "1", reason="Tests réseau : définir CIVIX_LIVE=1"
@@ -56,3 +59,33 @@ async def test_live_natural_phrase_falls_back(live_client: CivixClient) -> None:
     assert len(found.results) >= 1
     assert found.note is not None
     assert found.note.startswith("Recherche élargie")
+
+
+@pytest.fixture
+def live_mcp_client() -> Client[Any]:
+    return Client(create_server(CivixClient(Settings.from_env())))
+
+
+async def test_live_tendances_scrutins(live_mcp_client: Client[Any]) -> None:
+    async with live_mcp_client as connected:
+        result = await connected.call_tool("tendances_scrutins", {"periode_jours": 30})
+    text = str(result.content[0].text)
+    assert "## Tendances des scrutins" in text
+    assert "### Méthode" in text
+
+
+async def test_live_textes_les_plus_votes(live_mcp_client: Client[Any]) -> None:
+    async with live_mcp_client as connected:
+        result = await connected.call_tool("textes_les_plus_votes", {"periode_jours": 30})
+    text = str(result.content[0].text)
+    assert "Textes comptant le plus de scrutins" in text
+
+
+async def test_live_accords_entre_groupes(live_mcp_client: Client[Any]) -> None:
+    async with live_mcp_client as connected:
+        result = await connected.call_tool(
+            "accords_entre_groupes", {"periode_jours": 30, "max_scrutins": 10}
+        )
+    text = str(result.content[0].text)
+    assert "## Accords entre groupes" in text
+    assert "| RN |" in text
