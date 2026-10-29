@@ -1,11 +1,13 @@
 import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
-import type { Counts, Scrutin } from "@/lib/civix/types";
+import type { Counts, VoteResult } from "@/lib/civix/types";
 import { formatShortDay, formatNumber, pluralize } from "@/lib/format";
 import { LINK_TEXT } from "./button-styles";
 import { PositionBar } from "./position-bar";
 import { ResultBadge } from "./result-badge";
 
-export const ScrutinRow: React.FC<{ scrutin: Scrutin; counts: Counts | undefined }> = ({ scrutin, counts }) => {
+type ScrutinRowData = { uid: string; date: string | null; title: string; result: VoteResult };
+
+export const ScrutinRow: React.FC<{ scrutin: ScrutinRowData; counts: Counts | undefined }> = ({ scrutin, counts }) => {
   return (
     <li className="flex flex-col gap-2 rounded border border-line bg-bg p-3">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">

@@ -5,26 +5,43 @@ import { ArrowLeftIcon, ArrowSquareOutIcon } from "@phosphor-icons/react/dist/ss
 import { LINK_TEXT } from "@/components/button-styles";
 import { PositionBar, PositionLegend } from "@/components/position-bar";
 import { ResultBadge } from "@/components/result-badge";
+import { Unavailable } from "@/components/unavailable";
 import { VotesExplorer } from "@/components/votes-explorer";
-import { CivixError } from "@/lib/civix";
+import { PHASE_PRODUCTION_BUILD } from "next/constants";
+import { CivixError, listScrutins } from "@/lib/civix";
 import { getScrutinPage, type ScrutinPageData } from "@/lib/data/scrutin";
 import { settle } from "@/lib/data/result";
 import { formatLongDay, formatNumber } from "@/lib/format";
 import { truncate } from "@/lib/text";
 
 export const revalidate = 21600;
+export const dynamicParams = true;
+
+const STATIC_PARAMS_COUNT = 50;
 
 const UID_PATTERN = /^VTANR5L\d{1,2}V\d{1,6}$/;
 const DESCRIPTION_LIMIT = 160;
 
 type PageProps = { params: Promise<{ uid: string }> };
 
-async function load(uid: string): Promise<{ data: ScrutinPageData } | { missing: true }> {
+export async function generateStaticParams(): Promise<Array<{ uid: string }>> {
+  try {
+    const page = await listScrutins({ pageSize: STATIC_PARAMS_COUNT });
+    return page.scrutins.filter((scrutin) => UID_PATTERN.test(scrutin.uid)).map((scrutin) => ({ uid: scrutin.uid }));
+  } catch {
+    return [];
+  }
+}
+
+async function load(uid: string): Promise<{ data: ScrutinPageData } | { missing: true } | { unavailable: true }> {
   try {
     return { data: await getScrutinPage(uid) };
   } catch (error) {
     if (error instanceof CivixError && error.status === 404) {
       return { missing: true };
+    }
+    if (process.env.NEXT_PHASE === PHASE_PRODUCTION_BUILD) {
+      return { unavailable: true };
     }
     throw error;
   }
@@ -79,6 +96,14 @@ const ScrutinPage = async ({ params }: PageProps) => {
   const loaded = await load(uid);
   if ("missing" in loaded) {
     notFound();
+  }
+  if ("unavailable" in loaded) {
+    return (
+      <main id="contenu" className="mx-auto flex w-full max-w-page flex-col gap-6 px-4 pb-24 pt-12 sm:px-6">
+        <BackLink />
+        <Unavailable />
+      </main>
+    );
   }
   const { data } = loaded;
   return (

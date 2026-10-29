@@ -3,6 +3,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { PatternDefs } from "@/components/pattern-defs";
 import { SiteNav } from "@/components/site-nav";
 import { SITE_NAME, SITE_URL } from "@/lib/config";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
 const TITLE = "Comment ont voté vos députés ? Posez la question à votre assistant IA";
@@ -37,7 +38,10 @@ export const viewport: Viewport = {
 
 const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body id="haut" className="min-h-screen font-sans text-base">
         <a
           href="#contenu"

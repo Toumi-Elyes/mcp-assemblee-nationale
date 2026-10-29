@@ -31,6 +31,19 @@ Toutes les données viennent de CIVIX, jamais de valeurs écrites à la main. L'
 
 Appels CIVIX par régénération de l'accueil, au pire : jusqu'à 10 pages de scrutins, 1 total de législature, 1 liste des groupes, 1 recherche des votes sur l'ensemble, jusqu'à 5 vérifications de sujets, 1 liste de votes (députés présents), 1 page de députés, jusqu'à 15 détails de scrutins. L'exemple du hero réutilise des appels déjà faits. La page d'un scrutin charge le vote, les groupes, les déclarations, puis l'annuaire complet des députés (environ 12 pages) pour afficher le groupe de chacun.
 
+## Stratégie de cache
+
+| Couche | Où | Durée | Détail |
+|---|---|---|---|
+| Cache de données Next, par appel CIVIX | `next: { revalidate }` dans `src/lib/civix/client.ts` | 10 min (recherche), 30 min (listes de scrutins), 6 h (détail, votes, déclarations), 24 h (groupes, députés) | Une même adresse CIVIX n'est appelée qu'une fois par durée, quel que soit le nombre de pages qui la demandent. |
+| Pages ISR | `/` | 1800 s | Régénérée en arrière plan. Si CIVIX ne répond pas pendant la régénération, la page lève une erreur et la dernière version valide reste servie. Le repli « Données momentanément indisponibles » n'existe qu'au build. |
+| | `/scrutins/[uid]` | 21600 s | `generateStaticParams` préconstruit les 50 derniers scrutins, `dynamicParams` accepte les autres à la demande. Un identifiant bien formé mais inconnu donne un 404 mis en cache par ISR. Un identifiant mal formé est rejeté sans appel. |
+| CDN, en têtes `s-maxage` | `/api/live` | 120 s + `stale-while-revalidate` 600 s | Chiffres du hero et liste de la semaine. |
+| | `/api/deputes`, `/api/demo` | 600 s + `stale-while-revalidate` 3600 s | Réponses 200. Les 400 et 404 sont mises en cache 300 s, les 403 et 502 jamais. |
+| Client | `LiveProvider` | toutes les 3 minutes | Seulement onglet visible, en ligne et sans demande de réduction de données. Pause quand l'onglet est caché, une relecture dès le retour si les données ont plus de 3 minutes. Reprise exponentielle après erreur, plafonnée à 15 minutes. Annulation de la requête en cours au démontage. |
+
+La limitation de débit est faite au pare feu de l'hébergeur (60 requêtes par minute et par IP sur `/api/*` et `/scrutins/*`), pas dans ce code.
+
 ## Déploiement sur Vercel
 
 1. Importer le dépôt dans un nouveau projet Vercel.

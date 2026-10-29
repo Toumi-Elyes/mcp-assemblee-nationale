@@ -9,6 +9,7 @@ import {
   SITE_NAME,
 } from "@/lib/config";
 import { LINK_TEXT } from "./button-styles";
+import { ThemeSettings } from "./theme-settings";
 
 type FooterLink = { href: string; label: string };
 
@@ -61,7 +62,12 @@ export const SiteFooter: React.FC = () => {
           </div>
           <LinkList title="Le projet" links={PROJECT} />
           <LinkList title="Les données" links={DATA} />
-          <LinkList title="Informations légales" links={LEGAL} />
+          <div className="flex flex-col gap-3">
+            <LinkList title="Informations légales" links={LEGAL} />
+            <div className="-ml-3">
+              <ThemeSettings variant="footer" />
+            </div>
+          </div>
         </div>
         <div className="flex flex-col gap-3 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-ink-soft">
