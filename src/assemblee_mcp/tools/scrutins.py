@@ -11,6 +11,7 @@ from assemblee_mcp.civix import lookup
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.civix.errors import CivixError
 from assemblee_mcp.civix.models import Position
+from assemblee_mcp.civix.search import search_scrutins
 from assemblee_mcp.formatting import (
     VoteFilters,
     format_scrutin,
@@ -64,10 +65,10 @@ def register(mcp: FastMCP, client: CivixClient) -> None:
         obtenir_scrutin ou votes_scrutin. Un même texte donne souvent plusieurs scrutins
         (amendements, articles, vote sur l'ensemble).
         """
-        response = await client.list_scrutins(
-            mots_cles, legislature=legislature, page=page, page_size=DEFAULT_PAGE_SIZE
+        found = await search_scrutins(
+            client, mots_cles, legislature=legislature, page=page, page_size=DEFAULT_PAGE_SIZE
         )
-        return format_scrutin_list(response, mots_cles)
+        return format_scrutin_list(found, mots_cles)
 
     @civix_tool
     async def obtenir_scrutin(uid: ScrutinUid) -> str:

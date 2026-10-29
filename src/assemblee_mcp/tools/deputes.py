@@ -11,6 +11,7 @@ from assemblee_mcp.civix import lookup
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.civix.errors import CivixError
 from assemblee_mcp.civix.models import Depute, Pagination, ScrutinSummary
+from assemblee_mcp.civix.search import search_scrutins
 from assemblee_mcp.formatting import (
     ScrutinPosition,
     format_comment_a_vote,
@@ -160,8 +161,8 @@ def register(mcp: FastMCP, client: CivixClient) -> None:
             pool = "Scrutin demandé."
         else:
             assert sujet is not None
-            listing = await client.list_scrutins(sujet, page_size=MAX_SCRUTINS)
-            summaries = listing.attributes.results[:MAX_SCRUTINS]
+            listing = await search_scrutins(client, sujet, page_size=MAX_SCRUTINS)
+            summaries = listing.results[:MAX_SCRUTINS]
             if not summaries:
                 return format_no_scrutin(sujet)
             entries = list(
@@ -171,8 +172,10 @@ def register(mcp: FastMCP, client: CivixClient) -> None:
             )
             total = listing.pagination.total if listing.pagination else None
             of_total = f" sur {total}" if total is not None else ""
+            broadened = f"_{listing.note}_\n\n" if listing.note else ""
             pool = (
-                f"{len(entries)} premier(s) scrutin(s){of_total} trouvé(s) pour « {sujet} » "
+                f"{broadened}{len(entries)} premier(s) scrutin(s){of_total} "
+                f"trouvé(s) pour « {sujet} » "
                 "(un texte donne souvent plusieurs scrutins : amendements, articles, ensemble). "
                 "Pour un scrutin précis, redemandez avec `scrutin_uid`."
             )

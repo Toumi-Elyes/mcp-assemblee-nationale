@@ -348,3 +348,31 @@ async def test_fetch_scrutin_metadata(mcp_client: McpClient) -> None:
 async def test_fetch_rejects_bad_ids(mcp_client: McpClient, identifier: str) -> None:
     with pytest.raises(ToolError, match=r"[Ii]dentifiant"):
         await call(mcp_client, "fetch", id=identifier)
+
+
+async def test_rechercher_scrutins_broadened_search_is_announced(
+    mcp_client: McpClient, civix_mock: CivixStub
+) -> None:
+    empty = load_fixture("search_scrutins")
+    empty["data"]["attributes"]["results"] = []
+    empty["meta"]["pagination"].update(count_total=0, next_page=None)
+    civix_mock.add("/scrutins", empty, search="pensions de retraites agricoles")
+    text = await call(
+        mcp_client, "rechercher_scrutins", mots_cles="pensions de retraites agricoles"
+    )
+    assert "Recherche élargie" in text
+    assert "VTANR5L17V7324" in text
+
+
+async def test_comment_a_vote_uses_broadened_subject(
+    mcp_client: McpClient, civix_mock: CivixStub
+) -> None:
+    empty = load_fixture("search_scrutins")
+    empty["data"]["attributes"]["results"] = []
+    empty["meta"]["pagination"].update(count_total=0, next_page=None)
+    civix_mock.add("/scrutins", empty, search="pensions de retraites agricoles")
+    text = await call(
+        mcp_client, "comment_a_vote", depute="Abadie", sujet="pensions de retraites agricoles"
+    )
+    assert "Recherche élargie" in text
+    assert "Aucun vote enregistré" in text

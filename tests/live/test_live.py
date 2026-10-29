@@ -4,6 +4,7 @@ import pytest
 
 from assemblee_mcp.civix import lookup
 from assemblee_mcp.civix.client import CivixClient
+from assemblee_mcp.civix.search import search_scrutins
 from assemblee_mcp.config import Settings
 
 pytestmark = pytest.mark.skipif(
@@ -48,3 +49,10 @@ async def test_live_group_members_cover_the_group(live_client: CivixClient) -> N
 async def test_live_search(live_client: CivixClient) -> None:
     response = await live_client.search("retraites")
     assert response.attributes.total > 0
+
+
+async def test_live_natural_phrase_falls_back(live_client: CivixClient) -> None:
+    found = await search_scrutins(live_client, "loi de finances 2027")
+    assert len(found.results) >= 1
+    assert found.note is not None
+    assert found.note.startswith("Recherche élargie")

@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 
 from assemblee_mcp.civix import lookup
 from assemblee_mcp.civix.client import CivixClient
+from assemblee_mcp.civix.search import search_everything
 from assemblee_mcp.formatting import (
     format_date,
     format_depute,
@@ -87,7 +88,7 @@ def register(mcp: FastMCP, client: CivixClient) -> None:
         Renvoie un JSON `{"results": [{"id", "title", "url"}]}` ; les identifiants
         (`scrutin:<uid>`, `depute:<uid>`, `groupe:<sigle>`) se passent à `fetch`.
         """
-        results = (await client.search(query)).attributes.results
+        results = (await search_everything(client, query)).results
         items = [
             SearchItem(
                 id=make_id(SCRUTIN_PREFIX, hit.uid),

@@ -18,14 +18,13 @@ from assemblee_mcp.civix.models import (
     Position,
     Scrutin,
     ScrutinDetail,
-    ScrutinList,
     ScrutinSummary,
     ScrutinVotes,
-    SearchResults,
     StatementList,
     Vote,
     VoteCounts,
 )
+from assemblee_mcp.civix.search import GlobalSearch, ScrutinSearch
 from assemblee_mcp.links import (
     civix_depute_url,
     civix_scrutin_url,
@@ -144,21 +143,23 @@ def scrutin_line(scrutin: ScrutinSummary) -> str:
     return f"- {head}\n  {truncate(scrutin.titre)}\n  uid : `{scrutin.uid}`"
 
 
-def format_scrutin_list(response: CivixResponse[ScrutinList], query: str | None) -> str:
-    """Liste de scrutins."""
-    results = response.attributes.results
+def format_scrutin_list(search: ScrutinSearch, query: str | None) -> str:
+    """Liste de scrutins, avec la mention d'une éventuelle recherche élargie."""
+    results = search.results
     subject = f" pour « {query} »" if query else ""
+    source = response_source_line(search.response)
+    note = f"_{search.note}_\n\n" if search.note else ""
     if not results:
         body = (
-            f"Aucun scrutin trouvé{subject}. Essayez d'autres mots-clés, au singulier, "
+            f"{note}Aucun scrutin trouvé{subject}. Essayez d'autres mots-clés, au singulier, "
             "avec les accents français (« chômage », pas « chomage »)."
         )
-        return finish(body, response_source_line(response))
+        return finish(body, source)
     lines = "\n".join(scrutin_line(scrutin) for scrutin in results)
-    hint = pagination_hint(response.pagination, len(results), "scrutin(s)")
+    hint = pagination_hint(search.pagination, len(results), "scrutin(s)")
     follow = "Pour le détail ou les votes d'un scrutin, utilisez son `uid`."
-    body = f"## Scrutins{subject}\n\n{lines}\n\n{hint}\n{follow}"
-    return finish(body, response_source_line(response))
+    body = f"## Scrutins{subject}\n\n{note}{lines}\n\n{hint}\n{follow}"
+    return finish(body, source)
 
 
 def group_label(uid: str, abbreviations: Mapping[str, str]) -> str:
@@ -412,9 +413,11 @@ def format_groupe(response: CivixResponse[GroupeDetail]) -> str:
     return finish("\n".join(lines), source_line(groupe_civix_url(groupe), None))
 
 
-def format_search(response: CivixResponse[SearchResults], query: str) -> str:
+def format_search(search: GlobalSearch, query: str) -> str:
     """Résultats de la recherche globale, par catégorie."""
-    results = response.attributes.results
+    results = search.results
+    response = search.response
+    lead = f"_{search.note}_\n\n" if search.note else ""
     sections: list[str] = []
     if results.scrutins:
         lines = "\n".join(
@@ -442,15 +445,15 @@ def format_search(response: CivixResponse[SearchResults], query: str) -> str:
         sections.append(f"### Dossiers législatifs\n{lines}")
     if not sections:
         body = (
-            f"Aucun résultat pour « {query} ». Essayez des mots-clés plus courts, "
+            f"{lead}Aucun résultat pour « {query} ». Essayez des mots-clés plus courts, "
             "avec les accents français."
         )
         return finish(body, response_source_line(response))
     note = (
-        f"_{response.attributes.total} résultat(s) au total ; 8 au plus par catégorie. "
+        f"_{search.total} résultat(s) au total ; 8 au plus par catégorie. "
         "Pour en voir davantage, utilisez `rechercher_scrutins` ou `rechercher_deputes`._"
     )
-    body = f"## Résultats pour « {query} »\n\n" + "\n\n".join(sections) + f"\n\n{note}"
+    body = f"## Résultats pour « {query} »\n\n{lead}" + "\n\n".join(sections) + f"\n\n{note}"
     return finish(body, response_source_line(response))
 
 

@@ -13,6 +13,7 @@ from assemblee_mcp.civix.models import (
     SearchResponse,
     StatementsResponse,
 )
+from assemblee_mcp.civix.search import GlobalSearch, ScrutinSearch
 from tests.conftest import load_fixture
 
 
@@ -29,7 +30,8 @@ def test_truncate() -> None:
 
 def test_scrutin_list_has_source_footer_and_pagination() -> None:
     response = ScrutinListResponse.model_validate(load_fixture("search_scrutins"))
-    text = formatting.format_scrutin_list(response, "retraites")
+    search = ScrutinSearch(response, list(response.attributes.results), response.pagination)
+    text = formatting.format_scrutin_list(search, "retraites")
     assert "## Scrutins pour « retraites »" in text
     assert "uid : `VTANR5L17V7324`" in text
     assert "page 2" in text
@@ -41,7 +43,10 @@ def test_scrutin_list_empty_suggests_accents() -> None:
     payload = load_fixture("search_scrutins")
     payload["data"]["attributes"]["results"] = []
     response = ScrutinListResponse.model_validate(payload)
-    assert "accents" in formatting.format_scrutin_list(response, "chomage")
+    search = ScrutinSearch(response, [], response.pagination, "Recherche élargie : essai.")
+    text = formatting.format_scrutin_list(search, "chomage")
+    assert "accents" in text
+    assert "Recherche élargie" in text
 
 
 def test_format_scrutin_with_group_table() -> None:
@@ -123,7 +128,9 @@ def test_format_depute_and_groupes() -> None:
 
 def test_format_search_sections() -> None:
     response = SearchResponse.model_validate(load_fixture("search_global"))
-    text = formatting.format_search(response, "retraites")
+    attributes = response.attributes
+    search = GlobalSearch(response, attributes.results, attributes.total)
+    text = formatting.format_search(search, "retraites")
     assert "### Scrutins" in text
     assert "### Dossiers législatifs" in text
     assert "16 résultat(s) au total" in text
