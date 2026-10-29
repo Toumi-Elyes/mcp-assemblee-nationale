@@ -18,7 +18,7 @@ Gratuit, sans compte, sans clé, en lecture seule. Les données restent celles d
 L'adresse à coller dans votre assistant :
 
 ```
-https://mcp-assemblee-nationale.fastmcp.app/mcp
+https://mcp-assemblee-nationale.vercel.app/mcp
 ```
 
 <!-- URL à confirmer après déploiement -->
@@ -93,7 +93,7 @@ Source : *[lien vers la page du scrutin]*
 Vous n'avez besoin que de l'adresse en haut de cette page, à copier-coller dans votre assistant :
 
 ```
-https://mcp-assemblee-nationale.fastmcp.app/mcp
+https://mcp-assemblee-nationale.vercel.app/mcp
 ```
 
 ### Claude (claude.ai et application Claude)
@@ -130,7 +130,7 @@ Les connecteurs personnalisés demandent un abonnement payant (Plus, Pro, Busine
 {
   "mcpServers": {
     "assemblee-nationale": {
-      "httpUrl": "https://mcp-assemblee-nationale.fastmcp.app/mcp"
+      "httpUrl": "https://mcp-assemblee-nationale.vercel.app/mcp"
     }
   }
 }
@@ -384,13 +384,13 @@ En cas d'échec réseau ou d'erreur 5xx, le client refait un seul essai après 0
 
 ### Héberger votre propre copie
 
-Le plus simple est [FastMCP Cloud](https://fastmcp.cloud) (Prefect Horizon), gratuit pour un projet personnel :
+Le serveur public tourne sur [Vercel](https://vercel.com), gratuitement (plan Hobby) et sans compte à créer pour les utilisateurs. Le dépôt contient déjà tout le nécessaire : `api/index.py` expose l'application ASGI sur `/mcp` et `vercel.json` y redirige toutes les requêtes.
 
-1. Forkez ce dépôt, puis connectez-vous sur [fastmcp.cloud](https://fastmcp.cloud) avec GitHub.
-2. Créez un nouveau projet à partir de votre fork, avec le point d'entrée `src/assemblee_mcp/server.py:mcp`.
-3. Laissez l'authentification désactivée pour que Claude et ChatGPT puissent s'y connecter sans compte.
+1. Forkez ce dépôt et importez-le dans Vercel (**Add New → Project**). Gardez la racine du dépôt comme dossier racine et laissez le framework sur **Other**.
+2. Déployez. Vercel lit les dépendances et la version de Python dans `pyproject.toml`.
+3. Votre adresse à partager est `https://<votre-projet>.vercel.app/mcp`. Vérifiez avec `https://<votre-projet>.vercel.app/health`.
 
-Chaque push sur la branche principale redéploie le serveur. Pour piloter la plateforme en ligne de commande ou par API, la clé se passe dans la variable d'environnement `HORIZON_API_KEY` : gardez-la dans un fichier `.env`, qui est ignoré par git, et ne la committez jamais.
+Chaque push sur `main` redéploie le serveur. Pour déployer en ligne de commande, utilisez un token Vercel dans la variable `VERCEL_TOKEN`, rangée dans un fichier `.env` ignoré par git.
 
 Pour un autre hébergeur (Render, Fly.io, un VPS…), lancez :
 
@@ -419,7 +419,7 @@ Voir [CONTRIBUTING.md](CONTRIBUTING.md). Les issues et pull requests sont les bi
 
 An [MCP](https://modelcontextprotocol.io) server that lets Claude, ChatGPT or Gemini answer questions about **French National Assembly votes** (scrutins, individual votes by deputy, parliamentary groups), using the open [CIVIX API](https://www.data.gouv.fr/dataservices/api-publique-civix). Free, no account, no API key, read-only, every answer links to its source.
 
-- **Remote URL** (Claude custom connectors, ChatGPT developer mode, Gemini CLI `httpUrl`): `https://mcp-assemblee-nationale.fastmcp.app/mcp`
+- **Remote URL** (Claude custom connectors, ChatGPT developer mode, Gemini CLI `httpUrl`): `https://mcp-assemblee-nationale.vercel.app/mcp`
 - **Local**: `uvx --from git+https://github.com/Toumi-Elyes/mcp-assemblee-nationale mcp-assemblee-nationale` (stdio), or `--http` for streamable HTTP.
 - **Stack**: Python 3.14+ (developed on 3.15), FastMCP 4, Pydantic v2 models, httpx, Poetry.
 - **Scope**: National Assembly only (no Senate). Tool outputs are in French, since the underlying data is French.

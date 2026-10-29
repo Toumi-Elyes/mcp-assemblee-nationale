@@ -1,4 +1,4 @@
-"""Serveur MCP : point d'entrée `mcp` pour FastMCP Cloud et fabrique `create_server`."""
+"""Serveur MCP : objet `mcp` et fabrique `create_server`."""
 
 from importlib.metadata import PackageNotFoundError, version
 
