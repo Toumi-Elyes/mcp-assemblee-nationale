@@ -3,7 +3,7 @@
 import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 
 from assemblee_mcp.civix.models import (
     CivixModel,
@@ -74,7 +74,7 @@ POSITION_ORDER = (
 )
 
 
-def format_date(value: datetime | None) -> str:
+def format_date(value: date | None) -> str:
     """Date en français, par exemple « 4 juin 2026 »."""
     if value is None:
         return "date inconnue"

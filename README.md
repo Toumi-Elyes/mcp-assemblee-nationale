@@ -147,10 +147,20 @@ Posez vos questions normalement, en français.
 | Lire les explications de vote | « Qu'ont déclaré les groupes avant le vote sur [sujet] ? » |
 | Connaître les groupes | « Liste les groupes parlementaires et leur nombre de députés. » |
 | Identifier un élu | « Qui est le député de la 2e circonscription de l'Ariège ? » |
+| Suivre un texte de bout en bout | « Retrace tous les votes sur le budget 2027. » |
+| Repérer les votes serrés | « Quels votes se sont joués à quelques voix ce mois-ci ? » |
+| Comprendre une tendance | « Quelles ont été les tendances des votes ce mois-ci ? » |
+| Savoir ce qui occupe l'Assemblée | « Quels textes ont été le plus votés cette semaine ? » |
+| Voir qui vote ensemble | « Sur les 30 derniers jours, quels groupes votent le plus souvent ensemble ? » |
+| Résumer les votes d'un député | « Donne-moi le bilan des votes de [député] ce mois-ci. » |
+| Comparer deux députés | « [Député A] et [député B] votent-ils souvent pareil ? » |
+| Récupérer les données | « Exporte en CSV les scrutins du 1er au 15 octobre. » |
 
 Astuce : si l'IA ne trouve rien, reformulez avec un mot-clé du titre officiel (« retraites » plutôt que « la réforme de Borne »).
 
-Trois questions prêtes à l'emploi sont aussi proposées dans le menu des prompts de Claude : **Résumer un scrutin**, **Mon député**, **Comparer les groupes**.
+Chaque analyse (tendances, accords entre groupes, bilan d'un député…) se termine par un bloc **Méthode** : période, taille de l'échantillon et limites. Le serveur ne classe jamais les députés : il décrit, il ne note pas.
+
+Six questions prêtes à l'emploi sont aussi proposées dans le menu des prompts de Claude : **Résumer un scrutin**, **Mon député**, **Comparer les groupes**, **Tendances du mois**, **Bilan d'un groupe**, **Comparer deux députés**.
 
 ### Exemple de réponse
 
@@ -184,45 +194,58 @@ flowchart LR
 
 ## Ce que l'IA peut faire
 
-Les outils sont rangés par intention. Tous sont en lecture seule.
+25 outils, rangés par intention. Tous sont en lecture seule et sourcés. Les analyses portent sur un échantillon borné, annoncé dans leur bloc **Méthode**.
 
 ### Suivre un vote
 
 | Outil | À quoi il sert |
 |---|---|
+| `rechercher` | Chercher sans savoir si c'est un vote, un député ou un groupe |
 | `rechercher_scrutins` | Trouver les votes sur un thème : date, résultat, titre, identifiant |
 | `obtenir_scrutin` | Résultat d'un vote : adopté ou rejeté, pour, contre, abstentions, détail par groupe |
 | `votes_scrutin` | Vote de chaque député, filtrable par groupe, position ou nom |
 | `declarations_groupes` | Explications de vote publiées par les groupes (souvent aucune) |
-
-<!-- NOUVEAUX OUTILS « Suivre un vote » : votes serrés, chronologie d'un dossier législatif, textes les plus votés (à remplir) -->
+| `comment_a_vote` | Comment UN député a voté sur un sujet, en une question, avec les sources |
+| `dossier_legislatif` | Chronologie de tous les scrutins d'un texte de loi |
+| `scrutins_par_periode` | Scrutins entre deux dates (90 jours au plus), filtrables par type et par résultat |
+| `votes_serres` | Votes récents au résultat serré (par défaut, les votes sur l'ensemble d'un texte) |
 
 ### Comprendre une tendance
 
-<!-- NOUVEAUX OUTILS « Comprendre une tendance » : tendances, positions / accord / cohésion des groupes, statistiques de la législature, avec une question d'exemple chacun (à remplir) -->
+| Outil | À quoi il sert |
+|---|---|
+| `tendances_scrutins` | Volume de scrutins par semaine, taux d'adoption par type et par contexte, jours les plus chargés (7 à 90 jours) |
+| `textes_les_plus_votes` | Les textes qui ont donné lieu au plus de scrutins sur une période |
+| `statistiques_assemblee` | Totaux de la législature, sièges par groupe, taux d'adoption estimé sur un échantillon de 500 scrutins |
+| `positions_groupes` | Position majoritaire de chaque groupe sur les scrutins d'un sujet |
+| `accords_entre_groupes` | Part des scrutins où deux groupes ont la même position, pour chaque paire |
+| `cohesion_groupes` | Part des votes de chaque groupe qui suivent sa position majoritaire |
 
 ### Un député, un groupe
 
 | Outil | À quoi il sert |
 |---|---|
-| `comment_a_vote` | Comment UN député a voté sur un sujet, en une question, avec les sources |
 | `rechercher_deputes` | Trouver un député par nom, groupe ou législature |
 | `obtenir_depute` | Fiche d'un député : groupe, circonscription, liens officiels |
 | `lister_groupes` | Les groupes parlementaires : sigles, effectifs |
 | `obtenir_groupe` | Fiche d'un groupe |
-| `rechercher` | Chercher sans savoir si c'est un vote, un député ou un groupe |
-
-<!-- NOUVEAUX OUTILS « Un député, un groupe » : synthèse par député, comparaison de députés (à remplir) -->
+| `bilan_depute` | Répartition des positions d'UN député et alignement avec son groupe, avec les limites de l'échantillon |
+| `comparer_deputes` | Part de scrutins votés de la même façon par deux députés |
 
 ### Exporter des données
 
-<!-- NOUVEAUX OUTILS « Exporter des données » : exports CSV / JSON (à remplir) -->
+| Outil | À quoi il sert |
+|---|---|
+| `exporter_scrutins` | Liste de scrutins en CSV ou JSON, avec protection contre les formules de tableur |
+| `exporter_votes` | Votes nominatifs d'un scrutin en CSV ou JSON |
 
 ### Pour la recherche approfondie de ChatGPT
 
 | Outil | À quoi il sert |
 |---|---|
 | `search`, `fetch` | Les mêmes données, au format attendu par ChatGPT (deep research) |
+
+**Neutralité** : aucun outil ne classe les députés ni les groupes. Les chiffres décrivent un échantillon, jamais une qualité.
 
 ## D'où viennent les données
 
@@ -255,7 +278,7 @@ Ce projet n'est affilié ni à l'Assemblée nationale, ni à CIVIX.
 
 Le serveur est en lecture seule et sans compte. Il est protégé ainsi :
 
-- **Budget d'appels** : chaque appel d'outil est limité à 10 appels vers CIVIX (les réponses déjà en cache ne comptent pas). Au-delà, il répond « Demande trop large : précisez le nom, le groupe ou le sujet ».
+- **Budget d'appels et délai** : chaque appel d'outil est plafonné en nombre d'appels vers CIVIX (de 10 pour une recherche simple à 45 pour une analyse, les réponses en cache ne comptent pas) et en durée. Au-delà, il répond par exemple « Demande trop large : précisez le nom, le groupe ou le sujet ».
 - **Limitation de débit** : des règles de limitation de débit sont appliquées sur le pare-feu de Vercel.
 - **Texte tiers cité et signalé** : les déclarations des groupes sont citées telles quelles et marquées comme contenu tiers, pas comme instructions.
 - **Liens autorisés** : seuls les liens https vers `civix.fr`, `assemblee-nationale.fr` et `data.assemblee-nationale.fr` sont repris.
@@ -359,12 +382,21 @@ src/assemblee_mcp/
 │   ├── budget.py     budget d'appels CIVIX par appel d'outil
 │   ├── models.py     modèles Pydantic des réponses CIVIX
 │   ├── lookup.py     recherches composées (députés, groupes, sigles)
+│   ├── search.py     recherche d'un ensemble de scrutins par sujet ou période
 │   └── errors.py     erreurs lisibles pour l'utilisateur
+├── analytics/
+│   ├── gather.py     constitution des échantillons de scrutins et de votes
+│   ├── stats.py      calculs (taux d'adoption, accords, cohésion, bilans)
+│   ├── models.py     modèles des résultats d'analyse
+│   ├── render.py     mise en forme, dont le bloc « Méthode »
+│   └── exporting.py  export CSV / JSON (neutralisation des formules de tableur)
 ├── tools/
 │   ├── recherche.py  rechercher
 │   ├── scrutins.py   rechercher_scrutins, obtenir_scrutin, votes_scrutin, declarations_groupes
 │   ├── deputes.py    rechercher_deputes, obtenir_depute, comment_a_vote
 │   ├── groupes.py    lister_groupes, obtenir_groupe
+│   ├── analyses.py   tendances, dossiers, positions, accords, cohésion, bilans, comparaisons
+│   ├── export.py     exporter_scrutins, exporter_votes
 │   ├── chatgpt.py    search, fetch (format ChatGPT)
 │   └── common.py     types de paramètres, annotations lecture seule, budget, conversion d'erreurs
 ├── formatting.py     mise en forme des réponses en français
@@ -398,9 +430,18 @@ Une réponse qui ne respecte pas le modèle devient un message d'erreur lisible,
 <details>
 <summary><b>Référence des outils (paramètres)</b></summary>
 
-Tous les outils sont annotés `readOnlyHint`, `idempotentHint` et `openWorldHint` à vrai, `destructiveHint` à faux. Ils renvoient du markdown français, sauf `search` et `fetch` qui renvoient du JSON. Une erreur CIVIX devient une `ToolError` au message clair. Chaque appel d'outil dispose d'un budget de 10 appels réseau vers CIVIX. Taille de page par défaut : 10.
+Tous les outils sont annotés `readOnlyHint`, `idempotentHint` et `openWorldHint` à vrai, `destructiveHint` à faux. Ils renvoient du markdown français, sauf `search` et `fetch` qui renvoient du JSON. Une erreur CIVIX devient une `ToolError` au message clair. Taille de page par défaut : 10 (20 pour `scrutins_par_periode`).
 
-Types partagés (`tools/common.py`) : `page` entier de 1 à 500 (défaut `1`) ; `legislature` entier de 1 à 30 ; `uid` de scrutin : 3 à 64 caractères `[A-Za-z0-9_-]` ; `groupe` / `abbr` : sigle de 1 à 32 caractères ; `position` : `pour`, `contre`, `abstention` ou `non_votant`.
+Budgets par appel d'outil (`tools/common.py`) : nombre maximal d'appels réseau vers CIVIX (les réponses en cache ne comptent pas) et délai maximal. Dépassement : message d'erreur en français, jamais de trace d'appel.
+
+| Famille | Appels CIVIX max | Délai max | Outils |
+|---|---|---|---|
+| Recherche et fiches | 10 | 25 s | `rechercher`, `rechercher_scrutins`, `obtenir_scrutin`, `votes_scrutin`, `declarations_groupes`, `obtenir_depute`, `comment_a_vote`, `lister_groupes`, `obtenir_groupe`, `search`, `fetch` |
+| Annuaire | 20 | 25 s | `rechercher_deputes` |
+| Analyses sur listes | 30 | 45 s | `tendances_scrutins`, `textes_les_plus_votes`, `dossier_legislatif`, `scrutins_par_periode`, `statistiques_assemblee`, `exporter_scrutins`, `exporter_votes` |
+| Analyses sur détails de scrutins | 45 | 45 s | `positions_groupes`, `accords_entre_groupes`, `cohesion_groupes`, `votes_serres`, `bilan_depute`, `comparer_deputes` |
+
+Types partagés : `page` entier de 1 à 500 (défaut `1`) ; `legislature` entier de 1 à 30 ; `uid` de scrutin : 3 à 64 caractères `[A-Za-z0-9_-]` ; `groupe` / `abbr` : sigle de 1 à 32 caractères ; `position` : `pour`, `contre`, `abstention` ou `non_votant` ; `type_scrutin` / `type` : `tous`, `texte`, `article`, `amendement` ou `autre` ; dates au format `AAAA-MM-JJ` ; `dossier` : référence `DLR…` (3 à 30 caractères alphanumériques après `DLR`).
 
 | Outil | Paramètres (type, défaut) | Rôle |
 |---|---|---|
@@ -416,8 +457,20 @@ Types partagés (`tools/common.py`) : `page` entier de 1 à 500 (défaut `1`) ; 
 | `obtenir_groupe` | `abbr: str` (requis) | Fiche d'un groupe |
 | `search` | `query: str` (2 à 200 car., requis) | JSON `{"results": [{"id", "title", "url"}]}` ; ids `scrutin:<uid>`, `depute:<uid>`, `groupe:<sigle>` |
 | `fetch` | `id: str` (3 à 100 car., requis) | JSON `{"id", "title", "text", "url", "metadata"}` pour un id renvoyé par `search` |
+| `dossier_legislatif` | `texte: str` (2 à 200 car., requis ; mots-clés ou référence `DLR…`) | Chronologie des scrutins d'un texte ; amendements comptés mais non listés ; si plusieurs dossiers correspondent, le plus voté est détaillé |
+| `scrutins_par_periode` | `date_debut: str` (requis), `date_fin: str` (requis, 90 jours au plus), `type: str = "tous"`, `resultat: "adopte" \| "rejete" \| "tous" = "tous"`, `page: int = 1` (1 à 100) | 20 scrutins par page, du plus récent au plus ancien |
+| `votes_serres` | `periode_jours: int = 30` (7 à 30), `max_scrutins: int = 30` (3 à 30), `ecart_max: int = 20` (0 à 100 voix), `type_scrutin: str = "texte"` | Scrutins dont l'écart entre pour et contre est faible |
+| `tendances_scrutins` | `periode_jours: int = 30` (7 à 90), `legislature: int \| None = None` | Volume par semaine, taux d'adoption par type et contexte, jours les plus chargés |
+| `textes_les_plus_votes` | `periode_jours: int = 30` (7 à 90), `limite: int = 10` (1 à 30) | Dossiers classés par nombre de scrutins ; ce nombre reflète surtout celui des amendements |
+| `statistiques_assemblee` | aucun | Totaux de la législature en cours, effectifs par groupe, taux d'adoption estimé sur un échantillon |
+| `positions_groupes` | `sujet: str \| None = None`, `dossier: str \| None = None` (un seul des deux), `max_scrutins: int = 15` (3 à 30), `type_scrutin: str = "tous"` | Position majoritaire de chaque groupe, scrutin par scrutin |
+| `accords_entre_groupes` | `sujet: str \| None = None`, `periode_jours: int \| None = None` (7 à 30), `max_scrutins: int = 30` (3 à 30), `type_scrutin: str = "tous"` | Taux d'accord entre groupes, deux à deux ; un seul de `sujet` ou `periode_jours` |
+| `cohesion_groupes` | `sujet: str \| None = None`, `periode_jours: int \| None = None` (7 à 30), `max_scrutins: int = 30` (3 à 30), `type_scrutin: str = "tous"` | Part des votes conformes à la position majoritaire du groupe ; un seul de `sujet` ou `periode_jours` |
+| `bilan_depute` | `depute: str` (2 à 100 car., requis), `sujet: str \| None = None`, `periode_jours: int \| None = None` (7 à 30), `max_scrutins: int = 30` (3 à 30) | Répartition des positions d'UN député et alignement sur son groupe ; un seul de `sujet` ou `periode_jours` |
+| `comparer_deputes` | `depute_a: str` (requis), `depute_b: str` (requis), `sujet: str \| None = None`, `periode_jours: int \| None = None` (7 à 30), `max_scrutins: int = 30` (3 à 30) | Part de positions identiques sur les scrutins où les deux ont voté ; un seul de `sujet` ou `periode_jours` |
+| `exporter_scrutins` | `date_debut: str \| None = None`, `date_fin: str \| None = None` (90 jours au plus), `sujet: str \| None = None` (max 200), `format: "csv" \| "json" = "csv"`, `max_lignes: int = 500` (1 à 1000) | Export de scrutins ; par sujet, 100 scrutins au plus ; les cellules CSV commençant par `=`, `+`, `-` ou `@` sont neutralisées |
+| `exporter_votes` | `scrutin_uid: str` (requis), `format: "csv" \| "json" = "csv"` | Votes nominatifs d'un scrutin |
 
-<!-- NOUVEAUX OUTILS : ajouter ici une ligne par outil (nom, paramètres, défauts, rôle) -->
 
 Prompts MCP (`src/assemblee_mcp/prompts.py`) :
 
@@ -426,6 +479,9 @@ Prompts MCP (`src/assemblee_mcp/prompts.py`) :
 | `resumer_scrutin` | `sujet: str` | `rechercher_scrutins` puis `obtenir_scrutin` |
 | `mon_depute` | `nom: str` | `rechercher_deputes` puis `obtenir_depute`, puis propose `comment_a_vote` |
 | `comparer_groupes` | `sujet: str` | `rechercher_scrutins`, `obtenir_scrutin` et `declarations_groupes` |
+| `tendances_du_mois` | aucun | `tendances_scrutins` puis `textes_les_plus_votes` (30 derniers jours) |
+| `bilan_groupe` | `groupe: str` (sigle) | `obtenir_groupe`, `cohesion_groupes` et `accords_entre_groupes` (30 derniers jours) |
+| `comparer_deux_deputes` | `depute_a: str`, `depute_b: str` | `comparer_deputes` (sujet au choix ou 30 derniers jours) |
 
 Le serveur expose aussi `GET /health`, qui répond `{"status": "ok"}`.
 
@@ -445,6 +501,8 @@ Le serveur expose aussi `GET /health`, qui répond `{"status": "ok"}`.
 | `PORT` | `8000` | Port d'écoute en mode `--http` |
 
 En cas d'échec réseau ou d'erreur 5xx, le client refait un seul essai après 0,3 s. Il limite aussi les appels simultanés vers CIVIX (4 au maximum).
+
+Caches : réponses gardées `CIVIX_CACHE_TTL` secondes (10 minutes par défaut). Le détail et les votes d'un scrutin vieux de plus de 2 jours, qui ne change plus, sont gardés 24 h. Ces durées et les tailles des caches de votes et de détails ne sont pas réglables par variable d'environnement.
 
 </details>
 
@@ -489,6 +547,7 @@ An [MCP](https://modelcontextprotocol.io) server that lets Claude, ChatGPT or Ge
 - **Remote URL** (Claude custom connectors, ChatGPT developer mode, Gemini CLI `httpUrl`): `https://mcp-assemblee-nationale.vercel.app/mcp`
 - **Local**: `uvx --from git+https://github.com/Toumi-Elyes/mcp-assemblee-nationale mcp-assemblee-nationale` (stdio), or `--http` for streamable HTTP.
 - **Stack**: Python 3.14+, FastMCP 4, Pydantic v2 models, httpx, Poetry, hosted on Vercel (Paris).
+- **Tools**: 25 read-only tools (vote tracking, trends, group agreement and cohesion, per-deputy summary, CSV/JSON exports) and 6 prompts; every analysis ends with a « Méthode » block (period, sample, limits) and nothing ranks deputies.
 - **Scope**: National Assembly only (no Senate). Tool outputs are in French, since the underlying data is French.
 - **Privacy**: the server only receives the tool query, keeps no conversation history, sets no cookies; CIVIX responses are cached for 10 minutes.
 - **Security**: per-tool CIVIX call budget, rate limiting at the hosting firewall, third-party text quoted and marked, links allow-listed. Report vulnerabilities via [SECURITY.md](SECURITY.md).

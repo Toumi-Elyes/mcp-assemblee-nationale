@@ -8,7 +8,7 @@ from starlette.responses import JSONResponse, Response
 
 from assemblee_mcp import prompts
 from assemblee_mcp.civix.client import CivixClient
-from assemblee_mcp.tools import chatgpt, deputes, groupes, recherche, scrutins
+from assemblee_mcp.tools import analyses, chatgpt, deputes, export, groupes, recherche, scrutins
 
 SERVER_NAME = "Assemblée nationale (CIVIX)"
 PACKAGE_NAME = "mcp-assemblee-nationale"
@@ -54,7 +54,7 @@ def create_server(client: CivixClient | None = None) -> FastMCP:
         version=package_version(),
         mask_error_details=True,
     )
-    for module in (recherche, scrutins, deputes, groupes, chatgpt):
+    for module in (recherche, scrutins, deputes, groupes, analyses, export, chatgpt):
         module.register(server, civix)
     prompts.register(server)
 

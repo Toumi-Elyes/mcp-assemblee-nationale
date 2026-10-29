@@ -21,6 +21,19 @@ EXPECTED_TOOLS = {
     "obtenir_groupe",
     "search",
     "fetch",
+    "tendances_scrutins",
+    "textes_les_plus_votes",
+    "dossier_legislatif",
+    "scrutins_par_periode",
+    "statistiques_assemblee",
+    "positions_groupes",
+    "accords_entre_groupes",
+    "cohesion_groupes",
+    "votes_serres",
+    "bilan_depute",
+    "comparer_deputes",
+    "exporter_scrutins",
+    "exporter_votes",
 }
 VALLETOUX = ("PA795350", "Frédéric", "Valletoux", "HOR")
 PANOSYAN = ("PA795050", "Astrid", "Panosyan-Bouvet", "EPR")
