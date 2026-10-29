@@ -9,7 +9,7 @@ import { Unavailable } from "./unavailable";
 const UserBubble: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className="flex justify-end">
-      <p className="max-w-hero rounded-lg bg-hover px-3 py-2 text-base">{children}</p>
+      <p className="max-w-hero rounded bg-hover px-3 py-2 text-base">{children}</p>
     </div>
   );
 };
@@ -18,7 +18,7 @@ const AssistantTurn: React.FC<{ chat: HeroChat }> = ({ chat }) => {
   const { depute, counts, position, result, date } = chat;
   return (
     <div className="flex flex-col gap-3">
-      <p className="flex items-center gap-2 text-sm font-semibold text-muted">
+      <p className="flex items-center gap-2 text-sm font-bold text-muted">
         <SparkleIcon aria-hidden="true" size={16} weight="bold" />
         Assistant
       </p>
@@ -28,9 +28,9 @@ const AssistantTurn: React.FC<{ chat: HeroChat }> = ({ chat }) => {
         <a href={`/scrutins/${chat.scrutinUid}`} className={LINK_TEXT}>
           ce scrutin du {formatDay(date)}
         </a>{" "}
-        : <strong className="font-semibold">{POSITION_LABELS[position]}</strong>.
+        : <strong className="font-bold">{POSITION_LABELS[position]}</strong>.
       </p>
-      <div className="flex flex-col gap-3 rounded-lg bg-surface p-4">
+      <div className="flex flex-col gap-3 rounded bg-surface p-4">
         <p className="text-sm text-muted">{chat.scrutinTitle}</p>
         <ResultBadge result={result} />
         {counts !== null ? (
@@ -61,12 +61,12 @@ const AssistantTurn: React.FC<{ chat: HeroChat }> = ({ chat }) => {
 export const ChatExample: React.FC<{ chat: HeroChat | null; generatedAt: Date }> = ({ chat, generatedAt }) => {
   return (
     <figure className="flex flex-col gap-3">
-      <div className="rounded-2xl border border-line bg-raised p-2">
-        <div className="flex items-center gap-2 px-2 py-2 text-sm font-semibold text-muted">
+      <div className="rounded-lg border border-line bg-raised p-2">
+        <div className="flex items-center gap-2 px-2 py-2 text-sm font-bold text-muted">
           <ChatCircleTextIcon aria-hidden="true" size={20} weight="bold" />
           Conversation avec votre assistant
         </div>
-        <div className="flex flex-col gap-6 rounded-lg bg-bg p-4">
+        <div className="flex flex-col gap-6 rounded bg-bg p-4">
           {chat !== null ? (
             <>
               <UserBubble>{chat.question}</UserBubble>

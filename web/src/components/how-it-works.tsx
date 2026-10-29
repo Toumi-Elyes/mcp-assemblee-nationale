@@ -1,6 +1,5 @@
 import { INSTALL_HREF } from "@/lib/config";
 import { LINK_TEXT } from "./button-styles";
-import { Reveal } from "./reveal";
 import { Section } from "./section";
 
 const STEPS = [
@@ -20,23 +19,25 @@ const STEPS = [
 
 export const HowItWorks: React.FC = () => {
   return (
-    <Section
+    <Section split
       id="fonctionnement"
       eyebrow="Comment ça marche"
       title="Trois étapes, aucune ligne de code"
       intro="Un connecteur est une adresse que votre assistant sait interroger pour obtenir des données fiables. Son nom technique est MCP."
       tone="surface"
     >
-      <ol className="grid gap-6 md:grid-cols-3">
+      <ol className="flex flex-col gap-6">
         {STEPS.map((step, index) => (
           <li key={step.title}>
-            <Reveal delay={index * 100} className="h-full">
-              <div className="flex h-full flex-col gap-3 rounded-2xl border border-line bg-raised p-6">
-                <span className="tabular font-mono text-4xl font-semibold text-muted">0{index + 1}</span>
-                <h3 className="text-xl font-semibold">{step.title}</h3>
-                <p className="text-base text-muted">{step.text}</p>
+            <div className="h-full">
+              <div className="flex gap-6 rounded-lg border border-line bg-raised p-6">
+                <span className="tabular text-6xl font-bold text-accent">0{index + 1}</span>
+                <div className="flex flex-col gap-2">
+                  <h3 className="text-xl font-bold">{step.title}</h3>
+                  <p className="text-base text-muted">{step.text}</p>
+                </div>
               </div>
-            </Reveal>
+            </div>
           </li>
         ))}
       </ol>

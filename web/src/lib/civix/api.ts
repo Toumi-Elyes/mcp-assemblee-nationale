@@ -26,6 +26,7 @@ type ScrutinQuery = {
   legislature?: number;
   search?: string;
   revalidate?: number;
+  timeoutMs?: number;
 };
 
 export async function listScrutins(query: ScrutinQuery = {}): Promise<ScrutinPage> {
@@ -39,6 +40,7 @@ export async function listScrutins(query: ScrutinQuery = {}): Promise<ScrutinPag
     },
     scrutinListSchema,
     query.revalidate,
+    query.timeoutMs,
   );
   const pagination = response.meta?.pagination;
   return {
@@ -48,8 +50,14 @@ export async function listScrutins(query: ScrutinQuery = {}): Promise<ScrutinPag
   };
 }
 
-export async function getScrutinVotes(uid: string) {
-  return civixGet(`/scrutins/${encodeURIComponent(uid)}/votes`, {}, scrutinVotesSchema, DETAIL_REVALIDATE);
+export async function getScrutinVotes(uid: string, timeoutMs?: number) {
+  return civixGet(
+    `/scrutins/${encodeURIComponent(uid)}/votes`,
+    {},
+    scrutinVotesSchema,
+    DETAIL_REVALIDATE,
+    timeoutMs,
+  );
 }
 
 export async function getScrutinDetail(uid: string) {
@@ -87,18 +95,19 @@ export async function listDeputesPage(page: number): Promise<DeputesPage> {
   };
 }
 
-export async function getDepute(uid: string): Promise<Depute> {
+export async function getDepute(uid: string, timeoutMs?: number): Promise<Depute> {
   const response = await civixGet(
     `/deputes/${encodeURIComponent(uid)}`,
     {},
     deputeDetailSchema,
     DIRECTORY_REVALIDATE,
+    timeoutMs,
   );
   return toDepute(response.data.attributes.deputy);
 }
 
-export async function searchDeputes(query: string): Promise<Depute[]> {
-  const response = await civixGet("/search", { search: query }, searchSchema, SEARCH_REVALIDATE);
+export async function searchDeputes(query: string, timeoutMs?: number): Promise<Depute[]> {
+  const response = await civixGet("/search", { search: query }, searchSchema, SEARCH_REVALIDATE, timeoutMs);
   return response.results.deputes.map((hit) =>
     toDepute({
       uid: hit.acteur_uid,

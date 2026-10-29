@@ -1,6 +1,6 @@
 # Site web du projet
 
-Page d'accueil publique du connecteur MCP Assemblée nationale : explication, installation, données en direct et démonstration. Next.js 16 (App Router), React 19, TypeScript strict, Tailwind CSS 4, icônes Phosphor, police Geist.
+Page d'accueil publique du connecteur MCP Assemblée nationale : explication, installation, données en direct et démonstration. Next.js 16 (App Router), React 19, TypeScript strict, Tailwind CSS 4, icônes Phosphor, polices Public Sans et Spectral (auto hébergées).
 
 ## Commandes
 

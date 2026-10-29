@@ -18,7 +18,7 @@ export type ExplorerVote = {
 const PAGE_SIZE = 60;
 const ALL = "tous";
 
-const fieldClass = "rounded-lg border border-line bg-raised px-3 py-2 text-base transition hover:bg-hover";
+const fieldClass = "rounded border border-line bg-raised px-3 py-2 text-base transition hover:bg-hover";
 
 export const VotesExplorer: React.FC<{ votes: readonly ExplorerVote[]; groupOptions: readonly string[] }> = ({
   votes,
@@ -46,7 +46,7 @@ export const VotesExplorer: React.FC<{ votes: readonly ExplorerVote[]; groupOpti
     <div className="flex flex-col gap-4">
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="flex flex-col gap-1">
-          <label htmlFor="filtre-nom" className="text-sm font-semibold">
+          <label htmlFor="filtre-nom" className="text-sm font-bold">
             Nom
           </label>
           <input
@@ -61,7 +61,7 @@ export const VotesExplorer: React.FC<{ votes: readonly ExplorerVote[]; groupOpti
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label htmlFor="filtre-position" className="text-sm font-semibold">
+          <label htmlFor="filtre-position" className="text-sm font-bold">
             Position
           </label>
           <select
@@ -83,7 +83,7 @@ export const VotesExplorer: React.FC<{ votes: readonly ExplorerVote[]; groupOpti
         </div>
         {groupOptions.length > 0 ? (
           <div className="flex flex-col gap-1">
-            <label htmlFor="filtre-groupe" className="text-sm font-semibold">
+            <label htmlFor="filtre-groupe" className="text-sm font-bold">
               Groupe
             </label>
             <select
@@ -111,20 +111,20 @@ export const VotesExplorer: React.FC<{ votes: readonly ExplorerVote[]; groupOpti
       </p>
 
       {matches.length === 0 ? (
-        <div className="rounded-2xl border border-line bg-surface p-6">
-          <p className="text-base font-semibold">Aucun député ne correspond à ces filtres</p>
+        <div className="rounded-lg border border-line bg-surface p-6">
+          <p className="text-base font-bold">Aucun député ne correspond à ces filtres</p>
           <p className="text-sm text-muted">Modifiez le nom, la position ou le groupe pour élargir la liste.</p>
         </div>
       ) : (
         <ul className="grid gap-2 sm:grid-cols-2">
           {shown.map((vote) => (
-            <li key={vote.uid} className="flex items-center justify-between gap-3 rounded-lg bg-surface px-3 py-2 text-sm">
+            <li key={vote.uid} className="flex items-center justify-between gap-3 rounded bg-surface px-3 py-2 text-sm">
               <span>
                 <span className="font-medium">{vote.name}</span>
                 {vote.groupAbbr !== null ? <span className="text-muted"> {vote.groupAbbr}</span> : null}
                 {vote.byDelegation ? <span className="text-muted"> par délégation</span> : null}
               </span>
-              <span className="font-semibold">{POSITION_LABELS[vote.position]}</span>
+              <span className="font-bold">{POSITION_LABELS[vote.position]}</span>
             </li>
           ))}
         </ul>

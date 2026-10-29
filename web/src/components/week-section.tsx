@@ -1,8 +1,7 @@
 import { CheckCircleIcon, XCircleIcon } from "@phosphor-icons/react/dist/ssr";
 import { shownScrutins } from "@/lib/stats";
-import { formatShortDay } from "@/lib/format";
+import { formatShortDay, pluralize } from "@/lib/format";
 import type { WeekData } from "@/lib/data/view-types";
-import { Reveal } from "./reveal";
 import { ScrutinRow } from "./scrutin-row";
 
 const DOSSIERS_SHOWN = 6;
@@ -14,27 +13,27 @@ export const WeekSection: React.FC<{ week: WeekData }> = ({ week }) => {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h3 className="text-2xl font-semibold">Cette semaine à l'Assemblée</h3>
+        <h3 className="text-2xl font-bold">Cette semaine à l'Assemblée</h3>
         <p className="max-w-hero text-base text-muted">
-          <span className="tabular font-mono font-semibold text-ink">{week.total}</span> scrutins du{" "}
+          <span className="tabular font-bold text-ink">{week.total}</span> scrutins du{" "}
           {formatShortDay(week.from)} au {formatShortDay(week.to)}, regroupés par dossier.
         </p>
       </div>
       <div className="grid gap-6 md:grid-cols-2">
-        {shown.map((group, index) => (
-          <Reveal key={group.dossier?.key ?? "sans-dossier"} delay={(index % 2) * 100}>
-            <article className="flex h-full flex-col gap-3 rounded-2xl border border-line bg-raised p-2">
+        {shown.map((group) => (
+          <div key={group.dossier?.key ?? "sans-dossier"}>
+            <article className="flex h-full flex-col gap-3 rounded-lg border border-line bg-raised p-2">
               <header className="flex flex-col gap-2 p-3">
-                <h4 className="text-lg font-semibold">{group.dossier?.label ?? "Scrutins sans dossier rattaché"}</h4>
+                <h4 className="text-lg font-bold">{group.dossier?.label ?? "Scrutins sans dossier rattaché"}</h4>
                 <p className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
-                  <span className="tabular">{group.scrutins.length} scrutins</span>
+                  <span className="tabular">{pluralize(group.scrutins.length, "scrutin")}</span>
                   <span className="inline-flex items-center gap-1">
                     <CheckCircleIcon aria-hidden="true" size={16} weight="bold" />
-                    {group.adopted} adoptés
+                    {pluralize(group.adopted, "adopté")}
                   </span>
                   <span className="inline-flex items-center gap-1">
                     <XCircleIcon aria-hidden="true" size={16} weight="bold" />
-                    {group.rejected} rejetés
+                    {pluralize(group.rejected, "rejeté")}
                   </span>
                 </p>
               </header>
@@ -44,7 +43,7 @@ export const WeekSection: React.FC<{ week: WeekData }> = ({ week }) => {
                 ))}
               </ul>
             </article>
-          </Reveal>
+          </div>
         ))}
       </div>
       {hidden > 0 ? <p className="text-sm text-muted">Et {hidden} autres dossiers votés cette semaine.</p> : null}

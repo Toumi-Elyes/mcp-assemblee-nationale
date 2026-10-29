@@ -7,7 +7,7 @@ const ICONS = { adopte: CheckCircleIcon, rejete: XCircleIcon, inconnu: QuestionI
 export const ResultBadge: React.FC<{ result: VoteResult }> = ({ result }) => {
   const Icon = ICONS[result];
   return (
-    <span className="inline-flex items-center gap-1 rounded-sm border border-line bg-raised px-2 py-0.5 text-sm font-semibold">
+    <span className="inline-flex items-center gap-1 rounded border border-line bg-raised px-2 py-0.5 text-sm font-bold">
       <Icon aria-hidden="true" size={16} weight="bold" />
       {RESULT_LABELS[result]}
     </span>

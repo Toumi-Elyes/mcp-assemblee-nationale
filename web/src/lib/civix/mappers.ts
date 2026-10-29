@@ -1,5 +1,6 @@
 import { cleanTitle, isFinalVoteTitle } from "@/lib/text";
 import { CIVIX_SITE, ASSEMBLEE_SITE } from "@/lib/config";
+import { safeUrl } from "./urls";
 import type {
   DeputeDto,
   GroupeDto,
@@ -65,7 +66,7 @@ export function toGroupe(dto: GroupeDto): Groupe {
     label: dto.libelle,
     size: dto.effectif ?? 0,
     legislature: dto.legislature ?? null,
-    url: dto.urls?.page ?? null,
+    url: dto.urls?.page !== undefined && dto.urls.page !== null ? safeUrl(dto.urls.page, `${CIVIX_SITE}/groupes`) : null,
   };
 }
 
@@ -79,7 +80,7 @@ export function toDepute(dto: DeputeDto): Depute {
     groupAbbr: dto.groupe_abrev ?? null,
     groupLabel: dto.groupe_libelle ?? null,
     department: dto.circ_departement ?? null,
-    civixUrl: dto.urls?.civix_page ?? `${CIVIX_SITE}/deputes/${dto.uid}`,
-    assembleeUrl: dto.urls?.assemblee ?? `${ASSEMBLEE_SITE}/dyn/deputes/${dto.uid}`,
+    civixUrl: safeUrl(dto.urls?.civix_page, `${CIVIX_SITE}/deputes/${dto.uid}`),
+    assembleeUrl: safeUrl(dto.urls?.assemblee, `${ASSEMBLEE_SITE}/dyn/deputes/${dto.uid}`),
   };
 }

@@ -10,7 +10,8 @@ import { toPosition, toResult, toDay } from "@/lib/civix/mappers";
 import type { Counts, Dossier, Position, VoteResult } from "@/lib/civix/types";
 import { cleanTitle } from "@/lib/text";
 import { settle } from "./result";
-import { ASSEMBLEE_SITE, CIVIX_SITE } from "@/lib/config";
+import { firstAssembleeUrl, safeUrl } from "@/lib/civix/urls";
+import { CIVIX_SITE } from "@/lib/config";
 
 export type VoteRow = {
   uid: string;
@@ -52,13 +53,13 @@ export type ScrutinPageData = {
   assembleeUrl: string | null;
 };
 
-const ASSEMBLEE_HOMEPAGE = ASSEMBLEE_SITE;
 const DIRECTORY_FIRST_PAGE = 1;
+const DIRECTORY_MAX_PAGES = 20;
 
 const getDirectory = cache(async (): Promise<Map<string, string>> => {
   const first = await listDeputesPage(DIRECTORY_FIRST_PAGE);
   const total = first.total ?? first.deputes.length;
-  const pageCount = Math.ceil(total / Math.max(first.deputes.length, 1));
+  const pageCount = Math.min(Math.ceil(total / Math.max(first.deputes.length, 1)), DIRECTORY_MAX_PAGES);
   const rest = await Promise.all(
     Array.from({ length: Math.max(pageCount - 1, 0) }, (_, index) =>
       listDeputesPage(DIRECTORY_FIRST_PAGE + 1 + index),
@@ -74,10 +75,6 @@ const getDirectory = cache(async (): Promise<Map<string, string>> => {
   }
   return directory;
 });
-
-function pickAssembleeUrl(urls: readonly string[]): string | null {
-  return urls.find((url) => url.replace(/\/$/, "") !== ASSEMBLEE_HOMEPAGE) ?? null;
-}
 
 export const getScrutinPage = cache(async (uid: string): Promise<ScrutinPageData> => {
   const response = await getScrutinVotes(uid);
@@ -141,8 +138,8 @@ export const getScrutinPage = cache(async (uid: string): Promise<ScrutinPageData
     statementsAvailable: statements.ok,
     votes,
     groupOptions,
-    civixUrl: response.source?.civix_urls["page"] ?? `${CIVIX_SITE}/votes/${scrutin.uid}`,
-    assembleeUrl: pickAssembleeUrl(response.source?.source_urls ?? []),
+    civixUrl: safeUrl(response.source?.civix_urls["page"], `${CIVIX_SITE}/votes/${scrutin.uid}`),
+    assembleeUrl: firstAssembleeUrl(response.source?.source_urls ?? []),
   };
 });
 

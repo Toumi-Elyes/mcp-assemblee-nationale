@@ -40,12 +40,13 @@ export async function civixGet<Schema extends z.ZodType>(
   params: Params,
   schema: Schema,
   revalidate: number = REVALIDATE_SECONDS,
+  timeoutMs: number = TIMEOUT_MS,
 ): Promise<z.infer<Schema>> {
   let response: Response;
   try {
     response = await fetch(buildUrl(path, params), {
       headers: { accept: "application/json" },
-      signal: AbortSignal.timeout(TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
       next: { revalidate },
     });
   } catch {

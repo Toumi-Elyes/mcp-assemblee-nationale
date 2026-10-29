@@ -2,7 +2,8 @@ import "server-only";
 import { cache } from "react";
 import { getScrutinVotes } from "@/lib/civix/api";
 import { toPosition, toResult } from "@/lib/civix/mappers";
-import { ASSEMBLEE_SITE, CIVIX_SITE } from "@/lib/config";
+import { firstAssembleeUrl, safeUrl } from "@/lib/civix/urls";
+import { CIVIX_SITE } from "@/lib/config";
 import { cleanTitle } from "@/lib/text";
 import { getFinalVotes, getSuggestions } from "./home";
 import type { HeroChat } from "./view-types";
@@ -24,8 +25,7 @@ export const getHeroChat = cache(async (): Promise<HeroChat | null> => {
     return null;
   }
   const topic = latest.dossier?.label ?? latest.title;
-  const assembleeUrl =
-    response.source?.source_urls.find((url) => url.replace(/\/$/, "") !== ASSEMBLEE_SITE) ?? null;
+  const assembleeUrl = firstAssembleeUrl(response.source?.source_urls ?? []);
   const cleanTopic = cleanTitle(topic);
   const subject = cleanTopic.length <= QUESTION_TOPIC_LIMIT && !cleanTopic.endsWith("…") ? cleanTopic : GENERIC_SUBJECT;
   return {
@@ -37,7 +37,7 @@ export const getHeroChat = cache(async (): Promise<HeroChat | null> => {
     scrutinTitle: latest.title,
     scrutinUid: latest.uid,
     counts: attributes.results_global ?? null,
-    civixUrl: response.source?.civix_urls["page"] ?? `${CIVIX_SITE}/votes/${latest.uid}`,
+    civixUrl: safeUrl(response.source?.civix_urls["page"], `${CIVIX_SITE}/votes/${latest.uid}`),
     assembleeUrl,
   };
 });

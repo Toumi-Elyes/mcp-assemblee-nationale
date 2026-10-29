@@ -1,12 +1,13 @@
+import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
 import type { Counts, Scrutin } from "@/lib/civix/types";
-import { formatShortDay, formatNumber } from "@/lib/format";
+import { formatShortDay, formatNumber, pluralize } from "@/lib/format";
 import { LINK_TEXT } from "./button-styles";
 import { PositionBar } from "./position-bar";
 import { ResultBadge } from "./result-badge";
 
 export const ScrutinRow: React.FC<{ scrutin: Scrutin; counts: Counts | undefined }> = ({ scrutin, counts }) => {
   return (
-    <li className="flex flex-col gap-2 rounded-lg bg-surface p-3">
+    <li className="flex flex-col gap-2 rounded border border-line bg-bg p-3">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         {scrutin.date !== null ? (
           <time dateTime={scrutin.date} className="text-xs text-muted">
@@ -15,15 +16,17 @@ export const ScrutinRow: React.FC<{ scrutin: Scrutin; counts: Counts | undefined
         ) : null}
         <ResultBadge result={scrutin.result} />
         {counts !== undefined ? (
-          <span className="tabular font-mono text-xs text-muted">
-            {formatNumber(counts.pour)} pour, {formatNumber(counts.contre)} contre, {formatNumber(counts.abstention)} abst.
+          <span className="tabular text-xs text-muted">
+            {formatNumber(counts.pour)} pour, {formatNumber(counts.contre)} contre, {pluralize(counts.abstention, "abstention")}
           </span>
         ) : null}
       </div>
-      <a href={`/scrutins/${scrutin.uid}`} className={`${LINK_TEXT} text-base`}>
-        {scrutin.title}
-      </a>
+      <p className="text-base font-medium">{scrutin.title}</p>
       {counts !== undefined ? <PositionBar counts={counts} label="Répartition des votes" /> : null}
+      <a href={`/scrutins/${scrutin.uid}`} className={`${LINK_TEXT} inline-flex items-center gap-1 self-start text-sm font-bold`}>
+        Voir le scrutin
+        <ArrowRightIcon aria-hidden="true" size={16} weight="bold" />
+      </a>
     </li>
   );
 };

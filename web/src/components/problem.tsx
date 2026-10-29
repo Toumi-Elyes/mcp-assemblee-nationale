@@ -1,5 +1,4 @@
 import { CheckCircleIcon, WarningCircleIcon } from "@phosphor-icons/react/dist/ssr";
-import { Reveal } from "./reveal";
 import { Section } from "./section";
 
 type Side = { title: string; text: string; points: readonly string[]; Icon: typeof WarningCircleIcon };
@@ -29,7 +28,7 @@ const SIDES: readonly Side[] = [
 
 export const Problem: React.FC = () => {
   return (
-    <Section
+    <Section split
       id="pourquoi"
       eyebrow="Le problème"
       title="Vérifier un vote prend une heure. Se fier à une réponse de mémoire, c'est risqué."
@@ -37,11 +36,11 @@ export const Problem: React.FC = () => {
       tone="surface"
     >
       <div className="grid gap-6 md:grid-cols-2">
-        {SIDES.map((side, index) => (
-          <Reveal key={side.title} delay={index * 100}>
-            <article className="flex h-full flex-col gap-4 rounded-2xl border border-line bg-raised p-6">
+        {SIDES.map((side) => (
+          <div key={side.title}>
+            <article className="flex h-full flex-col gap-4 rounded-lg border border-line bg-raised p-6">
               <side.Icon aria-hidden="true" size={32} weight="bold" />
-              <h3 className="text-2xl font-semibold">{side.title}</h3>
+              <h3 className="text-2xl font-bold">{side.title}</h3>
               <p className="text-lg">{side.text}</p>
               <ul className="flex flex-col gap-3 text-base text-muted">
                 {side.points.map((point) => (
@@ -49,7 +48,7 @@ export const Problem: React.FC = () => {
                 ))}
               </ul>
             </article>
-          </Reveal>
+          </div>
         ))}
       </div>
     </Section>

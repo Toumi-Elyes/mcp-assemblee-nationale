@@ -25,7 +25,8 @@ const ConfidentialitePage: React.FC = () => {
         {
           title: "La démonstration en direct",
           paragraphs: [
-            "Quand vous tapez un nom de député ou un sujet, ce texte est envoyé à ce site, qui interroge l'API CIVIX pour trouver les résultats. Il n'est pas enregistré. Les réponses de CIVIX peuvent rester quelques minutes en mémoire sur le serveur pour éviter de les redemander, sans lien avec vous.",
+            "Quand vous tapez un nom de député ou un sujet, ce texte est envoyé à ce site dans l'adresse de la requête (par exemple « /api/demo?sujet=budget »), puis transmis à l'API CIVIX pour trouver les résultats. Comme il figure dans l'adresse, il peut apparaître dans les journaux techniques de requêtes de l'hébergeur. Le code du projet ne l'enregistre pas.",
+            "Pour que deux personnes qui posent la même question partagent la même réponse, les réponses sont conservées par le réseau de diffusion de l'hébergeur pendant 10 minutes, et peuvent être servies jusqu'à environ une heure ensuite en attendant leur renouvellement. Rien n'est relié à une personne : aucun compte, aucun cookie, aucun traceur.",
           ],
         },
         {

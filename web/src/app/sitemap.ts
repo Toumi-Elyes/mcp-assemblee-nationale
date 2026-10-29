@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/config";
 import { getHomeView } from "@/lib/data/home-view";
+import { isEmptyView, keepLastGoodVersion } from "@/lib/data/last-good";
 import { settle } from "@/lib/data/result";
 
 export const revalidate = 1800;
@@ -14,6 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/mentions`, changeFrequency: "yearly", priority: 0.3 },
   ];
   const loaded = await settle(getHomeView());
+  keepLastGoodVersion(!loaded.ok || isEmptyView(loaded.data));
   if (!loaded.ok) {
     return pages;
   }

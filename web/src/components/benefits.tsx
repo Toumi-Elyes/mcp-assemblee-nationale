@@ -1,7 +1,6 @@
 import { LinkIcon, LockOpenIcon, ScalesIcon, DatabaseIcon } from "@phosphor-icons/react/dist/ssr";
 import { formatNumber } from "@/lib/format";
 import type { HeroCounters } from "@/lib/data/view-types";
-import { Reveal } from "./reveal";
 import { Section } from "./section";
 
 type Benefit = { title: string; text: string; Icon: typeof LinkIcon };
@@ -35,17 +34,18 @@ function buildBenefits(counters: HeroCounters): Benefit[] {
 
 export const Benefits: React.FC<{ counters: HeroCounters }> = ({ counters }) => {
   return (
-    <Section id="avantages" eyebrow="Ce que vous obtenez" title="Quatre garanties pour une réponse que vous pouvez vérifier">
+    <Section split
+ id="avantages" eyebrow="Ce que vous obtenez" title="Quatre garanties pour une réponse que vous pouvez vérifier">
       <ul className="grid gap-6 sm:grid-cols-2">
-        {buildBenefits(counters).map((benefit, index) => (
+        {buildBenefits(counters).map((benefit) => (
           <li key={benefit.title}>
-            <Reveal delay={index * 80} className="h-full">
-              <article className="flex h-full flex-col gap-3 rounded-2xl border border-line bg-surface p-6 transition hover:-translate-y-0.5 hover:bg-hover motion-reduce:hover:translate-y-0">
+            <div className="h-full">
+              <article className="flex h-full flex-col gap-3 rounded-lg border border-line bg-raised p-6 transition hover:bg-hover">
                 <benefit.Icon aria-hidden="true" size={32} weight="bold" />
-                <h3 className="text-xl font-semibold">{benefit.title}</h3>
+                <h3 className="text-xl font-bold">{benefit.title}</h3>
                 <p className="text-base text-muted">{benefit.text}</p>
               </article>
-            </Reveal>
+            </div>
           </li>
         ))}
       </ul>

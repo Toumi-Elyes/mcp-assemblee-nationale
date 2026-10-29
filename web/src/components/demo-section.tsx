@@ -8,6 +8,7 @@ import type { DemoDepute } from "@/lib/data/view-types";
 import { POSITION_LABELS, formatShortDay } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { BUTTON_PRIMARY, BUTTON_SECONDARY_SMALL, LINK_TEXT } from "./button-styles";
+import { markProps, type MarkKey } from "./position-bar";
 import { ResultBadge } from "./result-badge";
 import { Section } from "./section";
 
@@ -17,22 +18,22 @@ type Status = "idle" | "loading" | "done" | "error";
 
 const SEARCH_DELAY_MS = 300;
 const MIN_QUERY = 2;
-const POSITION_FILL: Record<Position, string> = {
-  pour: "fill-pour",
-  contre: "fill-contre",
-  abstention: "fill-abstention",
-  non_votant: "fill-absent",
-  unknown: "fill-absent",
+const POSITION_MARK: Record<Position, MarkKey> = {
+  pour: "pour",
+  contre: "contre",
+  abstention: "abstention",
+  non_votant: "non_votant",
+  unknown: "non_votant",
 };
 
 const Skeleton: React.FC = () => {
   return (
     <div aria-hidden="true" className="flex flex-col gap-3">
       {[0, 1, 2].map((item) => (
-        <div key={item} className="rounded-lg bg-surface p-4">
-          <div className="skeleton h-4 w-1/4 rounded-sm" />
-          <div className="skeleton mt-3 h-4 w-full rounded-sm" />
-          <div className="skeleton mt-2 h-4 w-3/4 rounded-sm" />
+        <div key={item} className="rounded bg-surface p-4">
+          <div className="skeleton h-4 w-1/4 rounded" />
+          <div className="skeleton mt-3 h-4 w-full rounded" />
+          <div className="skeleton mt-2 h-4 w-3/4 rounded" />
         </div>
       ))}
     </div>
@@ -42,8 +43,8 @@ const Skeleton: React.FC = () => {
 const Results: React.FC<{ answer: DemoAnswer }> = ({ answer }) => {
   if (answer.entries.length === 0) {
     return (
-      <div className="flex flex-col gap-2 rounded-lg bg-surface p-4">
-        <p className="text-base font-semibold">Aucun scrutin trouvé pour « {answer.topic} »</p>
+      <div className="flex flex-col gap-2 rounded bg-surface p-4">
+        <p className="text-base font-bold">Aucun scrutin trouvé pour « {answer.topic} »</p>
         <p className="text-sm text-muted">
           Essayez un mot du titre officiel, par exemple « retraites » plutôt que le nom courant d'une réforme.
         </p>
@@ -53,14 +54,14 @@ const Results: React.FC<{ answer: DemoAnswer }> = ({ answer }) => {
   return (
     <div className="flex flex-col gap-3">
       <p className="text-base">
-        Position de <strong className="font-semibold">{answer.depute.fullName}</strong>
+        Position de <strong className="font-bold">{answer.depute.fullName}</strong>
         {answer.depute.groupAbbr !== null ? ` (${answer.depute.groupAbbr})` : ""} sur les {answer.entries.length}{" "}
         scrutins les plus pertinents pour « {answer.topic} »
         {answer.total !== null ? `, sur ${answer.total} au total` : ""}.
       </p>
       <ul className="flex flex-col gap-2">
         {answer.entries.map((entry) => (
-          <li key={entry.uid} className="flex flex-col gap-2 rounded-lg bg-surface p-4">
+          <li key={entry.uid} className="flex flex-col gap-2 rounded bg-surface p-4">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               {entry.date !== null ? (
                 <time dateTime={entry.date} className="text-xs text-muted">
@@ -68,9 +69,9 @@ const Results: React.FC<{ answer: DemoAnswer }> = ({ answer }) => {
                 </time>
               ) : null}
               <ResultBadge result={entry.result} />
-              <span className="inline-flex items-center gap-1 text-sm font-semibold">
+              <span className="inline-flex items-center gap-1 text-sm font-bold">
                 <svg aria-hidden="true" viewBox="0 0 12 12" className="size-3">
-                  <circle cx="6" cy="6" r="6" className={POSITION_FILL[entry.position]} />
+                  <circle cx="6" cy="6" r="5.5" strokeWidth={1} className="stroke-ink-soft" {...markProps(POSITION_MARK[entry.position])} />
                 </svg>
                 {POSITION_LABELS[entry.position]}
               </span>
@@ -242,7 +243,7 @@ export const DemoSection: React.FC<{ suggestions: Suggestions }> = ({ suggestion
       <div className="grid gap-8 lg:grid-cols-5">
         <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6 lg:col-span-2">
           <div className="relative flex flex-col gap-2">
-            <label htmlFor="demo-depute" className="text-sm font-semibold">
+            <label htmlFor="demo-depute" className="text-sm font-bold">
               Député
             </label>
             <div className="relative">
@@ -260,7 +261,7 @@ export const DemoSection: React.FC<{ suggestions: Suggestions }> = ({ suggestion
                 onChange={onQueryChange}
                 onKeyDown={onKeyDown}
                 placeholder="Commencez à taper un nom"
-                className="w-full rounded-lg border border-line bg-raised py-2 pl-10 pr-3 text-base transition hover:bg-hover"
+                className="w-full rounded border border-line bg-raised py-2 pl-10 pr-3 text-base transition hover:bg-hover"
               />
             </div>
             {listOpen ? (
@@ -268,7 +269,7 @@ export const DemoSection: React.FC<{ suggestions: Suggestions }> = ({ suggestion
                 id="demo-depute-liste"
                 role="listbox"
                 aria-label="Députés correspondants"
-                className="absolute inset-x-0 top-20 z-10 flex listbox-height flex-col gap-1 overflow-auto rounded-xl border border-line bg-raised p-1"
+                className="absolute inset-x-0 top-20 z-10 flex listbox-height flex-col gap-1 overflow-auto rounded-lg border border-line bg-raised p-1"
               >
                 {candidates.length === 0 ? (
                   <li className="px-3 py-2 text-sm text-muted">Aucun député ne correspond à cette recherche.</li>
@@ -282,11 +283,11 @@ export const DemoSection: React.FC<{ suggestions: Suggestions }> = ({ suggestion
                         pick(candidate);
                       }}
                       className={cn(
-                        "cursor-pointer rounded-lg px-3 py-2 text-sm transition hover:bg-hover",
+                        "cursor-pointer rounded px-3 py-2 text-sm transition hover:bg-hover",
                         index === activeIndex ? "bg-hover" : undefined,
                       )}
                     >
-                      <span className="font-semibold">{candidate.fullName}</span>
+                      <span className="font-bold">{candidate.fullName}</span>
                       <span className="text-muted">
                         {candidate.groupAbbr !== null ? ` ${candidate.groupAbbr}` : ""}
                         {candidate.department !== null ? `, ${candidate.department}` : ""}
@@ -300,7 +301,7 @@ export const DemoSection: React.FC<{ suggestions: Suggestions }> = ({ suggestion
               {searching ? "Recherche en cours" : null}
             </p>
             {fieldError.depute !== undefined ? (
-              <p id="demo-depute-erreur" className="text-sm font-semibold">
+              <p id="demo-depute-erreur" className="text-sm font-bold">
                 {fieldError.depute}
               </p>
             ) : null}
@@ -316,7 +317,7 @@ export const DemoSection: React.FC<{ suggestions: Suggestions }> = ({ suggestion
           </div>
 
           <div className="flex flex-col gap-2">
-            <label htmlFor="demo-sujet" className="text-sm font-semibold">
+            <label htmlFor="demo-sujet" className="text-sm font-bold">
               Sujet
             </label>
             <input
@@ -327,12 +328,12 @@ export const DemoSection: React.FC<{ suggestions: Suggestions }> = ({ suggestion
               }}
               aria-describedby={fieldError.topic !== undefined ? "demo-sujet-erreur" : undefined}
               aria-invalid={fieldError.topic !== undefined}
-              maxLength={200}
+              maxLength={80}
               placeholder="Par exemple : budget, retraites, logement"
-              className="rounded-lg border border-line bg-raised px-3 py-2 text-base transition hover:bg-hover"
+              className="rounded border border-line bg-raised px-3 py-2 text-base transition hover:bg-hover"
             />
             {fieldError.topic !== undefined ? (
-              <p id="demo-sujet-erreur" className="text-sm font-semibold">
+              <p id="demo-sujet-erreur" className="text-sm font-bold">
                 {fieldError.topic}
               </p>
             ) : null}
@@ -354,8 +355,8 @@ export const DemoSection: React.FC<{ suggestions: Suggestions }> = ({ suggestion
 
         <div className="flex flex-col gap-3 lg:col-span-3" aria-live="polite" aria-busy={status === "loading"}>
           {status === "idle" ? (
-            <div className="flex h-full flex-col justify-center gap-2 rounded-2xl border border-line bg-surface p-6">
-              <p className="text-lg font-semibold">Les résultats apparaissent ici</p>
+            <div className="flex h-full flex-col justify-center gap-2 rounded-lg border border-line bg-surface p-6">
+              <p className="text-lg font-bold">Les résultats apparaissent ici</p>
               <p className="text-base text-muted">
                 Choisissez un député dans les suggestions ou tapez son nom, ajoutez un sujet, puis lancez la recherche.
               </p>
@@ -363,8 +364,8 @@ export const DemoSection: React.FC<{ suggestions: Suggestions }> = ({ suggestion
           ) : null}
           {status === "loading" ? <Skeleton /> : null}
           {status === "error" ? (
-            <div role="alert" className="flex flex-col gap-2 rounded-2xl border border-line bg-surface p-6">
-              <p className="text-lg font-semibold">La recherche n'a pas abouti</p>
+            <div role="alert" className="flex flex-col gap-2 rounded-lg border border-line bg-surface p-6">
+              <p className="text-lg font-bold">La recherche n'a pas abouti</p>
               <p className="text-base text-muted">{message}</p>
             </div>
           ) : null}

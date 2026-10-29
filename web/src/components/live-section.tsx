@@ -1,5 +1,6 @@
 import { formatTimestamp } from "@/lib/format";
 import type { HomeView } from "@/lib/data/view-types";
+import { LiveFigures } from "./live-figures";
 import { GroupsSection } from "./groups-section";
 import { Section } from "./section";
 import { TrendsSection } from "./trends-section";
@@ -21,6 +22,7 @@ export const LiveSection: React.FC<{ view: HomeView }> = ({ view }) => {
         <Unavailable />
       ) : (
         <div className="flex flex-col gap-16">
+          <LiveFigures counters={view.counters} week={week} trends={trends} />
           {week !== null ? <WeekSection week={week} /> : null}
           {trends !== null ? <TrendsSection trends={trends} /> : null}
           {groupes !== null ? <GroupsSection groupes={groupes} /> : null}

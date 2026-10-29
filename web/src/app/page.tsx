@@ -12,6 +12,7 @@ import { Problem } from "@/components/problem";
 import { Tagline } from "@/components/tagline";
 import { GITHUB_URL, MCP_URL, SITE_NAME, SITE_URL } from "@/lib/config";
 import { getHomeView } from "@/lib/data/home-view";
+import { isEmptyView, keepLastGoodVersion } from "@/lib/data/last-good";
 import { settle } from "@/lib/data/result";
 import type { HomeView } from "@/lib/data/view-types";
 
@@ -49,6 +50,7 @@ function structuredData(): string {
 const HomePage = async () => {
   const loaded = await settle(getHomeView());
   const view = loaded.ok ? loaded.data : EMPTY_VIEW;
+  keepLastGoodVersion(!loaded.ok || isEmptyView(view));
   return (
     <main id="contenu">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: structuredData() }} />

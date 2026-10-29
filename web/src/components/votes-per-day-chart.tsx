@@ -37,7 +37,7 @@ export const VotesPerDayChart: React.FC<{ data: VotesPerDay }> = ({ data }) => {
       </svg>
       <figcaption className="flex justify-between text-xs text-muted">
         <span>{first ? formatShortDay(first.date) : ""}</span>
-        <span className="tabular font-mono">max {peak} par jour</span>
+        <span className="tabular">max {peak} par jour</span>
         <span>{last ? formatShortDay(last.date) : ""}</span>
       </figcaption>
     </figure>

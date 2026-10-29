@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { getHomeView } from "@/lib/data/home-view";
+import { isEmptyView, keepLastGoodVersion } from "@/lib/data/last-good";
 import { settle } from "@/lib/data/result";
 import { formatDay, formatNumber } from "@/lib/format";
 import { SITE_NAME } from "@/lib/config";
@@ -11,7 +12,7 @@ export const alt = "Comment ont voté vos députés ? Chiffres officiels et sour
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const FONT_PATH = join(process.cwd(), "node_modules", "geist", "dist", "fonts", "geist-sans", "Geist-SemiBold.ttf");
+const FONT_PATH = join(process.cwd(), "node_modules", "@fontsource", "public-sans", "files", "public-sans-latin-700-normal.woff");
 
 async function loadFont(): Promise<ArrayBuffer | null> {
   try {
@@ -24,6 +25,7 @@ async function loadFont(): Promise<ArrayBuffer | null> {
 
 export default async function OpenGraphImage() {
   const [loaded, font] = await Promise.all([settle(getHomeView()), loadFont()]);
+  keepLastGoodVersion(!loaded.ok || isEmptyView(loaded.data));
   const counters = loaded.ok ? loaded.data.counters : null;
   const proof =
     counters !== null && counters.scrutins !== null && counters.latestDate !== null
@@ -39,26 +41,26 @@ export default async function OpenGraphImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 72,
-          backgroundColor: "#131209",
-          color: "#f4f4f1",
-          fontFamily: font !== null ? "Geist" : "sans-serif",
+          backgroundColor: "#ffffff",
+          color: "#161616",
+          fontFamily: font !== null ? "Public Sans" : "sans-serif",
         }}
       >
-        <div style={{ display: "flex", fontSize: 32, color: "#a6a6a0", fontWeight: 600 }}>{SITE_NAME}</div>
+        <div style={{ display: "flex", fontSize: 32, color: "#666666", fontWeight: 700 }}>{SITE_NAME}</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          <div style={{ display: "flex", fontSize: 76, fontWeight: 600, lineHeight: 1.05 }}>
+          <div style={{ display: "flex", fontSize: 76, fontWeight: 700, lineHeight: 1.05 }}>
             Sachez comment ont voté vos députés, source à l'appui
           </div>
-          <div style={{ display: "flex", fontSize: 32, color: "#a6a6a0" }}>{proof}</div>
+          <div style={{ display: "flex", fontSize: 32, color: "#666666" }}>{proof}</div>
         </div>
-        <div style={{ display: "flex", fontSize: 28, color: "#93a6ff", fontWeight: 600 }}>
+        <div style={{ display: "flex", fontSize: 28, color: "#000091", fontWeight: 700 }}>
           Connecteur gratuit pour Claude et ChatGPT
         </div>
       </div>
     ),
     {
       ...size,
-      fonts: font !== null ? [{ name: "Geist", data: font, weight: 600, style: "normal" }] : undefined,
+      fonts: font !== null ? [{ name: "Public Sans", data: font, weight: 700, style: "normal" }] : undefined,
     },
   );
 }

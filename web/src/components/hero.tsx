@@ -11,25 +11,27 @@ const ProofLine: React.FC<{ counters: HeroCounters }> = ({ counters }) => {
     return <p className="text-sm text-muted">Chiffres en direct momentanément indisponibles.</p>;
   }
   return (
-    <p className="text-sm text-muted">
-      <span className="tabular font-mono font-semibold text-ink">{formatNumber(scrutins)}</span> scrutins sous la{" "}
-      {legislature ?? 17}e législature, dernier vote le{" "}
-      <time dateTime={latestDate} className="font-semibold text-ink">
-        {formatDay(latestDate)}
-      </time>
-      .
-    </p>
+    <div className="flex flex-col gap-2">
+      <p className="tabular text-6xl font-bold text-accent">{formatNumber(scrutins)}</p>
+      <p className="max-w-hero text-sm text-muted">
+        scrutins sous la {legislature ?? 17}e législature. Dernier vote le{" "}
+        <time dateTime={latestDate} className="font-bold text-ink">
+          {formatDay(latestDate)}
+        </time>
+        .
+      </p>
+    </div>
   );
 };
 
 export const Hero: React.FC<HeroProps> = ({ counters, chat, generatedAt }) => {
   return (
-    <section aria-labelledby="titre-principal" className="pb-16 pt-24 sm:pb-24 sm:pt-24">
-      <div className="mx-auto grid w-full max-w-page items-center gap-12 px-4 sm:px-6 lg:grid-cols-2">
-        <div className="flex flex-col gap-6">
-          <h1 id="titre-principal" className="hero-title max-w-hero text-5xl font-semibold tracking-tight sm:text-6xl">
-            Sachez comment ont voté
-            <br className="hidden sm:block" /> vos députés, source à l'appui
+    <section aria-labelledby="titre-principal" className="bg-bg pb-16 pt-12 sm:pb-24 sm:pt-16">
+      <div className="mx-auto grid w-full max-w-page items-start gap-12 px-4 sm:px-6 lg:grid-cols-12">
+        <div className="flex flex-col gap-6 lg:col-span-7">
+          <h1 id="titre-principal" className="max-w-hero font-serif text-5xl font-bold sm:text-6xl">
+            <span className="block">Sachez comment ont voté vos députés,</span>
+            <span className="block">source à l'appui</span>
           </h1>
           <p className="max-w-hero text-lg text-muted">
             Ajoutez un connecteur gratuit à votre assistant IA. Il va chercher les vrais scrutins de l'Assemblée
@@ -41,7 +43,9 @@ export const Hero: React.FC<HeroProps> = ({ counters, chat, generatedAt }) => {
           </div>
           <ProofLine counters={counters} />
         </div>
-        <ChatExample chat={chat} generatedAt={generatedAt} />
+        <div className="lg:col-span-5 lg:mt-24">
+          <ChatExample chat={chat} generatedAt={generatedAt} />
+        </div>
       </div>
     </section>
   );

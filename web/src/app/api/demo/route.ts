@@ -1,31 +1,40 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { CivixError } from "@/lib/civix";
+import { errorResponse, okResponse, rejectCrossSite } from "@/lib/api-guard";
 import { commentAVote } from "@/lib/data/demo";
+
+const MAX_TOPIC_LENGTH = 80;
 
 const querySchema = z.object({
   depute: z.string().regex(/^PA\d{3,12}$/i, "Identifiant de député invalide"),
-  sujet: z.string().trim().min(2, "Indiquez un sujet").max(200),
+  sujet: z
+    .string()
+    .trim()
+    .min(2, "Indiquez un sujet")
+    .max(MAX_TOPIC_LENGTH, "Sujet trop long")
+    .transform((value) => value.toLowerCase().replace(/\s+/g, " ")),
 });
-const CACHE_CONTROL = "public, s-maxage=600, stale-while-revalidate=3600";
 
 export async function GET(request: NextRequest) {
+  const blocked = rejectCrossSite(request);
+  if (blocked !== null) {
+    return blocked;
+  }
   const params = request.nextUrl.searchParams;
   const parsed = querySchema.safeParse({
     depute: params.get("depute") ?? "",
     sujet: params.get("sujet") ?? "",
   });
   if (!parsed.success) {
-    const message = parsed.error.issues[0]?.message ?? "Requête invalide";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return errorResponse(parsed.error.issues[0]?.message ?? "Requête invalide", 400);
   }
   try {
-    const answer = await commentAVote(parsed.data.depute.toUpperCase(), parsed.data.sujet);
-    return NextResponse.json(answer, { headers: { "Cache-Control": CACHE_CONTROL } });
+    return okResponse(await commentAVote(parsed.data.depute.toUpperCase(), parsed.data.sujet));
   } catch (error) {
     if (error instanceof CivixError && error.status === 404) {
-      return NextResponse.json({ error: "Député introuvable." }, { status: 404 });
+      return errorResponse("Député introuvable.", 404);
     }
-    return NextResponse.json({ error: "Données momentanément indisponibles." }, { status: 502 });
+    return errorResponse("Données momentanément indisponibles.", 502);
   }
 }

@@ -14,7 +14,7 @@ export const TopDossiers: React.FC<{ periods: readonly TopDossierPeriod[] }> = (
   const peak = Math.max(1, ...period.items.map((item) => item.total));
   return (
     <div className="flex flex-col gap-3">
-      <div role="tablist" aria-label="Période" className="flex gap-1 self-start rounded-xl border border-line bg-surface p-1">
+      <div role="tablist" aria-label="Période" className="flex gap-1 self-start rounded-lg border border-line bg-surface p-1">
         {periods.map((item) => (
           <button
             key={item.id}
@@ -27,7 +27,7 @@ export const TopDossiers: React.FC<{ periods: readonly TopDossierPeriod[] }> = (
               setSelected(item.id);
             }}
             className={cn(
-              "rounded-lg px-3 py-1 text-sm font-semibold transition active:scale-98",
+              "rounded px-3 py-1 text-sm font-bold transition",
               item.id === period.id ? "bg-raised text-ink" : "text-muted hover:text-ink",
             )}
           >
@@ -44,9 +44,9 @@ export const TopDossiers: React.FC<{ periods: readonly TopDossierPeriod[] }> = (
               <li key={item.key} className="flex flex-col gap-1">
                 <div className="flex items-baseline justify-between gap-3">
                   <span className="text-sm font-medium">{item.label}</span>
-                  <span className="tabular font-mono text-sm">{item.total}</span>
+                  <span className="tabular text-sm">{item.total}</span>
                 </div>
-                <svg role="img" aria-label={`${item.total} scrutins, ${item.adopted} adoptés, ${item.rejected} rejetés`} className="h-2 w-full overflow-hidden rounded-sm" preserveAspectRatio="none">
+                <svg role="img" aria-label={`${item.total} scrutins, ${item.adopted} adoptés, ${item.rejected} rejetés`} className="h-2 w-full overflow-hidden rounded" preserveAspectRatio="none">
                   <rect width="100%" height="100%" className="fill-absent" />
                   <rect width={`${(item.total / peak) * 100}%`} height="100%" className="fill-accent" />
                 </svg>

@@ -130,3 +130,16 @@ describe("groupShares", () => {
     expect(shares[0]?.groupe.abbr).toBe("RN");
   });
 });
+
+describe("hemicycleSeats", () => {
+  it("places one seat per deputy and keeps each group's count", async () => {
+    const { hemicycleSeats } = await import("@/lib/stats/hemicycle");
+    const sizes = [5, 3, 9, 1];
+    const seats = hemicycleSeats(sizes);
+    expect(seats).toHaveLength(18);
+    sizes.forEach((size, group) => {
+      expect(seats.filter((seat) => seat.group === group)).toHaveLength(size);
+    });
+    expect(hemicycleSeats([])).toEqual([]);
+  });
+});
