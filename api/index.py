@@ -33,12 +33,14 @@ class LazyLifespanApp:
     """Enveloppe ASGI qui garantit que le lifespan de l'application a démarré."""
 
     def __init__(self, inner: Any) -> None:
+        """Enveloppe l'application ASGI `inner`."""
         self.inner = inner
         self._native_lifespan = False
         self._context: AbstractAsyncContextManager[Any] | None = None
         self._lock = asyncio.Lock()
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        """Démarre le lifespan au besoin, puis transmet la requête à l'application."""
         if scope["type"] == "lifespan":
             self._native_lifespan = True
             await self.inner(scope, receive, send)

@@ -3,15 +3,16 @@
 from contextvars import ContextVar
 
 from assemblee_mcp.civix.errors import CivixError
+from assemblee_mcp.limits import DEFAULT_MAX_CALLS
 
 TOO_BROAD_MESSAGE = "Demande trop large : précisez le nom, le groupe ou le sujet."
-DEFAULT_MAX_CALLS = 10
 
 
 class CivixBudgetError(CivixError):
     """Le nombre d'appels autorisés pour cette demande est épuisé."""
 
     def __init__(self) -> None:
+        """Construit l'erreur avec le message « demande trop large »."""
         super().__init__(TOO_BROAD_MESSAGE)
 
 
@@ -19,6 +20,7 @@ class CallBudget:
     """Compteur d'appels réseau ; les succès de cache ne sont pas comptés."""
 
     def __init__(self, max_calls: int = DEFAULT_MAX_CALLS) -> None:
+        """Crée un budget de `max_calls` appels, aucun n'étant encore consommé."""
         self.max_calls = max_calls
         self.used = 0
 

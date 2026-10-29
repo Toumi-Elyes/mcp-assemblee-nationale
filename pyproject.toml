@@ -39,13 +39,12 @@ line-length = 100
 src = ["src", "tests"]
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4", "RUF", "PT", "ASYNC", "PL", "N"]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4", "RUF", "PT", "ASYNC", "PL", "N", "D1"]
 # TC : FastMCP et Pydantic lisent les annotations à l'exécution, les imports doivent rester réels.
 ignore = ["PLR0913", "RUF001", "RUF002", "RUF003", "TC001", "TC002", "TC003"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["PLR2004", "S101"]
-"src/assemblee_mcp/tools/analyses.py" = ["PLR0915"]
+"tests/**" = ["PLR2004", "S101", "D1"]
 
 [tool.mypy]
 python_version = "3.14"

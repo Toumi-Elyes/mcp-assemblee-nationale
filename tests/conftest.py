@@ -3,12 +3,13 @@ from collections.abc import AsyncIterator, Iterator
 from dataclasses import dataclass, field
 from datetime import date, timedelta
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 import httpx
 import pytest
 import respx
 from fastmcp import Client, FastMCP
+from mcp.types import TextContent
 
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.config import Settings
@@ -19,6 +20,20 @@ API = "https://www.civix.fr/api/v1"
 SCRUTIN_UID = "VTANR5L17V7324"
 
 Payload = dict[str, Any]
+McpClient = Client[Any]
+
+
+class DeputeStub(NamedTuple):
+    """Député fictif tel que renvoyé par la recherche globale de CIVIX."""
+
+    uid: str
+    prenom: str
+    nom: str
+    groupe: str
+
+
+VALLETOUX = DeputeStub("PA795350", "Frédéric", "Valletoux", "HOR")
+PANOSYAN = DeputeStub("PA795050", "Astrid", "Panosyan-Bouvet", "EPR")
 
 
 def load_fixture(name: str) -> Payload:
@@ -203,3 +218,28 @@ def make_listing(days: int, per_day: int, end: str = "2026-10-29") -> list[Paylo
             sort = "adopté" if (offset + index) % 3 == 0 else "rejeté"
             items.append(make_item(number, day, kind=kind, sort=sort))
     return items
+
+
+async def call(client: McpClient, name: str, **arguments: Any) -> str:
+    """Appelle un outil MCP et renvoie son texte."""
+    result = await client.call_tool(name, arguments)
+    content = result.content[0]
+    assert isinstance(content, TextContent)
+    return content.text
+
+
+def search_with_deputes(*deputes: DeputeStub) -> Payload:
+    """Réponse de `/search` ne contenant que les députés donnés."""
+    payload = load_fixture("search_depute")
+    payload["data"]["attributes"]["results"]["deputes"] = [
+        {
+            "acteur_uid": depute.uid,
+            "prenom": depute.prenom,
+            "nom": depute.nom,
+            "groupe_libelle_abrev": depute.groupe,
+            "circ_departement": "Paris",
+            "slug": f"{depute.prenom}-{depute.nom}".lower(),
+        }
+        for depute in deputes
+    ]
+    return payload

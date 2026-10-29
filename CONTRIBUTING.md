@@ -37,7 +37,7 @@ Une faille de sécurité ne s'ouvre pas en issue : voir [SECURITY.md](SECURITY.m
 ## Règles de code
 
 - Typage complet, pas de `Any` hors de la frontière JSON brute.
-- Les réponses de CIVIX sont lues par des modèles Pydantic (`src/assemblee_mcp/civix/models.py`) ; la mise en forme est dans `formatting.py`, sans appel réseau.
+- Les réponses de CIVIX sont lues par des modèles Pydantic (`src/assemblee_mcp/civix/models/`) ; la mise en forme est dans `formatting/` et `analytics/render/`, sans appel réseau. Le plan du code est dans `src/assemblee_mcp/README.md`.
 - Un nouvel outil : un module dans `src/assemblee_mcp/tools/`, une description en français rédigée pour qu'un modèle choisisse le bon outil, les annotations en lecture seule, et des tests avec les fixtures de `tests/fixtures/`.
 
 ## Règle de neutralité

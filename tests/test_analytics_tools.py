@@ -2,52 +2,36 @@ import csv
 import io
 import json
 from datetime import UTC, date, datetime
-from typing import Any
 
 import pytest
-from fastmcp import Client
 from fastmcp.exceptions import ToolError
-from mcp.types import TextContent
 
 from assemblee_mcp.analytics import gather
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.config import Settings
 from assemblee_mcp.formatting import FOOTER
-from tests.conftest import SCRUTIN_UID, CivixStub, Payload, load_fixture, make_item, make_listing
+from tests.conftest import (
+    PANOSYAN,
+    SCRUTIN_UID,
+    VALLETOUX,
+    CivixStub,
+    DeputeStub,
+    McpClient,
+    call,
+    load_fixture,
+    make_item,
+    make_listing,
+    search_with_deputes,
+)
 
-McpClient = Client[Any]
 TODAY = date(2026, 10, 29)
-PANOSYAN = ("PA795050", "Astrid", "Panosyan-Bouvet", "EPR")
-VALLETOUX = ("PA795350", "Frédéric", "Valletoux", "HOR")
 LIST_BUDGET = 30
 ANALYTICS_BUDGET = 45
-
-
-async def call(client: McpClient, name: str, **arguments: Any) -> str:
-    result = await client.call_tool(name, arguments)
-    content = result.content[0]
-    assert isinstance(content, TextContent)
-    return content.text
 
 
 @pytest.fixture(autouse=True)
 def fixed_today(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(gather, "current_day", lambda: TODAY)
-
-
-def search_with(deputes: list[tuple[str, str, str, str]]) -> Payload:
-    payload = load_fixture("search_depute")
-    payload["data"]["attributes"]["results"]["deputes"] = [
-        {
-            "acteur_uid": uid,
-            "prenom": prenom,
-            "nom": nom,
-            "groupe_libelle_abrev": groupe,
-            "circ_departement": "Paris",
-        }
-        for uid, prenom, nom, groupe in deputes
-    ]
-    return payload
 
 
 def assert_analysis_shape(text: str) -> None:
@@ -222,7 +206,7 @@ async def test_votes_serres(mcp_client: McpClient, civix_mock: CivixStub) -> Non
 
 async def test_bilan_depute(mcp_client: McpClient, civix_mock: CivixStub) -> None:
     civix_mock.listings[None] = make_listing(40, 8)
-    civix_mock.add("/search", search_with([PANOSYAN]), search="Astrid Panosyan-Bouvet")
+    civix_mock.add("/search", search_with_deputes(PANOSYAN), search="Astrid Panosyan-Bouvet")
     text = await call(mcp_client, "bilan_depute", depute="Astrid Panosyan-Bouvet", periode_jours=30)
     assert_analysis_shape(text)
     assert "(EPR)" in text
@@ -245,7 +229,10 @@ async def test_bilan_depute_ambiguous_name_asks_to_choose(
 ) -> None:
     civix_mock.add(
         "/search",
-        search_with([("PA1", "Élisa", "Martin", "LFI-NFP"), ("PA2", "Patrice", "Martin", "RN")]),
+        search_with_deputes(
+            DeputeStub("PA1", "Élisa", "Martin", "LFI-NFP"),
+            DeputeStub("PA2", "Patrice", "Martin", "RN"),
+        ),
         search="Martin",
     )
     text = await call(mcp_client, "bilan_depute", depute="Martin", periode_jours=30)
@@ -260,8 +247,8 @@ async def test_bilan_depute_needs_exactly_one_criterion(mcp_client: McpClient) -
 
 async def test_comparer_deputes_fits_budget(mcp_client: McpClient, civix_mock: CivixStub) -> None:
     civix_mock.listings[None] = make_listing(40, 8)
-    civix_mock.add("/search", search_with([PANOSYAN]), search="Astrid Panosyan-Bouvet")
-    civix_mock.add("/search", search_with([VALLETOUX]), search="Frédéric Valletoux")
+    civix_mock.add("/search", search_with_deputes(PANOSYAN), search="Astrid Panosyan-Bouvet")
+    civix_mock.add("/search", search_with_deputes(VALLETOUX), search="Frédéric Valletoux")
     text = await call(
         mcp_client,
         "comparer_deputes",

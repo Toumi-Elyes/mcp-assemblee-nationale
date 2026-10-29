@@ -145,7 +145,7 @@ async def search_scrutins(
     if broad is None or not scrutins_empty(exact):
         return ScrutinSearch(exact, list(exact.attributes.results), exact.pagination)
     pool, truncated = await broad_pool(client, broad, legislature)
-    matches = [s for s in pool if contains_all(summary_text(s), broad.required)]
+    matches = [item for item in pool if contains_all(summary_text(item), broad.required)]
     start = (page - 1) * page_size
     shown = matches[start : start + page_size]
     pagination = Pagination(
@@ -205,10 +205,10 @@ async def search_everything(client: CivixClient, query: str, *, page: int = 1) -
             break
     required = broad.required
     results = SearchResultsByKind(
-        deputes=[d for d in deputes if contains_all(f"{d.prenom} {d.nom}", required)],
-        scrutins=[s for s in scrutins if contains_all(s.titre, required)],
-        groupes=[g for g in groupes if contains_all(f"{g.abbr} {g.libelle}", required)],
-        dossiers=[d for d in dossiers if contains_all(d.titre, required)],
+        deputes=[hit for hit in deputes if contains_all(f"{hit.prenom} {hit.nom}", required)],
+        scrutins=[hit for hit in scrutins if contains_all(hit.titre, required)],
+        groupes=[hit for hit in groupes if contains_all(f"{hit.abbr} {hit.libelle}", required)],
+        dossiers=[hit for hit in dossiers if contains_all(hit.titre, required)],
     )
     total = (
         len(results.deputes) + len(results.scrutins) + len(results.groupes) + len(results.dossiers)

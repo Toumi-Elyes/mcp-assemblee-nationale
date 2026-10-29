@@ -3,6 +3,7 @@ import io
 import json
 from datetime import date
 
+from assemblee_mcp import limits
 from assemblee_mcp.analytics import exporting, gather, render
 from assemblee_mcp.analytics.models import Method, Rate, Stance
 from assemblee_mcp.analytics.stats import trends
@@ -18,7 +19,7 @@ async def test_fetch_period_scans_from_the_newest_page(
     found = await gather.fetch_period(client, date(2026, 10, 20), date(2026, 10, 29))
     assert len(found.items) == 100
     assert not found.truncated
-    assert len(civix_mock.requests) <= 1 + gather.BATCH_PAGES + 1
+    assert len(civix_mock.requests) <= 1 + limits.BATCH_PAGES + 1
 
 
 async def test_fetch_period_in_the_past_jumps_with_a_binary_search(
@@ -37,8 +38,8 @@ async def test_fetch_period_caps_pages_and_flags_truncation(
     civix_mock.listings[None] = make_listing(200, 20)
     found = await gather.fetch_period(client, date(2026, 1, 1), date(2026, 10, 29))
     assert found.truncated
-    assert found.pages == gather.MAX_LIST_PAGES
-    assert len(found.items) == gather.MAX_LIST_PAGES * gather.LIST_PAGE_SIZE
+    assert found.pages == limits.MAX_LIST_PAGES
+    assert len(found.items) == limits.MAX_LIST_PAGES * limits.CIVIX_PAGE_SIZE
 
 
 async def test_fetch_period_with_no_scrutin(client: CivixClient, civix_mock: CivixStub) -> None:

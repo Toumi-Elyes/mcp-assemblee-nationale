@@ -1,4 +1,8 @@
-"""Collecte des données CIVIX nécessaires aux analyses, avec des volumes d'appels bornés."""
+"""Collecte des données CIVIX nécessaires aux analyses, avec des volumes d'appels bornés.
+
+La liste des scrutins est triée du plus récent au plus ancien et ne sait pas filtrer par date :
+on lit donc les pages utiles, en repérant par dichotomie la page de départ d'une période passée.
+"""
 
 import asyncio
 import math
@@ -9,13 +13,15 @@ from assemblee_mcp.analytics.stats import day_of, evenly_spaced
 from assemblee_mcp.civix.budget import CivixBudgetError
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.civix.errors import CivixError
-from assemblee_mcp.civix.models import Scrutin, ScrutinSummary, ScrutinVotes
+from assemblee_mcp.civix.models import Scrutin, ScrutinListResponse, ScrutinSummary, ScrutinVotes
 from assemblee_mcp.civix.search import search_scrutin_pool
-
-LIST_PAGE_SIZE = 50
-MAX_LIST_PAGES = 20
-BATCH_PAGES = 3
-SAMPLE_MAX_PAGES = 10
+from assemblee_mcp.limits import (
+    BATCH_PAGES,
+    CIVIX_PAGE_SIZE,
+    DOSSIER_MAX_PAGES,
+    MAX_LIST_PAGES,
+    SAMPLE_MAX_PAGES,
+)
 
 
 @dataclass(frozen=True)
@@ -38,9 +44,19 @@ class Sample:
     note: str | None = None
 
 
-def page_dates(items: list[ScrutinSummary]) -> list[date]:
+def current_day() -> date:
+    """Jour courant (UTC)."""
+    return datetime.now(UTC).date()
+
+
+def page_days(page: ScrutinListResponse) -> list[date]:
     """Jours des scrutins d'une page."""
-    return [day for item in items if (day := day_of(item)) is not None]
+    return [day for item in page.attributes.results if (day := day_of(item)) is not None]
+
+
+def is_last_page(page: ScrutinListResponse) -> bool:
+    """Vrai si CIVIX n'annonce pas de page suivante."""
+    return page.pagination is None or page.pagination.next_page is None
 
 
 async def first_page_reaching(
@@ -51,14 +67,48 @@ async def first_page_reaching(
     while low < high:
         middle = (low + high) // 2
         page = await client.list_scrutins(
-            legislature=legislature, page=middle, page_size=LIST_PAGE_SIZE
+            legislature=legislature, page=middle, page_size=CIVIX_PAGE_SIZE
         )
-        days = page_dates(list(page.attributes.results))
+        days = page_days(page)
         if days and min(days) <= end:
             high = middle
         else:
             low = middle + 1
     return low
+
+
+async def read_pages_until(
+    client: CivixClient,
+    first_page: int,
+    start: date,
+    legislature: int | None,
+    max_pages: int,
+) -> tuple[list[ScrutinSummary], int, bool]:
+    """Lit des pages par lots jusqu'à dépasser `start`.
+
+    Renvoie les scrutins lus, le nombre de pages lues et si la fin de la période est atteinte.
+    """
+    collected: list[ScrutinSummary] = []
+    fetched = 0
+    reached_end = False
+    while fetched < max_pages and not reached_end:
+        count = min(BATCH_PAGES, max_pages - fetched)
+        numbers = range(first_page + fetched, first_page + fetched + count)
+        pages = await asyncio.gather(
+            *(
+                client.list_scrutins(
+                    legislature=legislature, page=number, page_size=CIVIX_PAGE_SIZE
+                )
+                for number in numbers
+            )
+        )
+        for page in pages:
+            collected.extend(page.attributes.results)
+            days = page_days(page)
+            passed_start = bool(days) and min(days) < start
+            reached_end = reached_end or passed_start or is_last_page(page) or not days
+        fetched += count
+    return collected, fetched, reached_end
 
 
 async def fetch_period(
@@ -69,36 +119,19 @@ async def fetch_period(
     legislature: int | None = None,
     max_pages: int = MAX_LIST_PAGES,
 ) -> Listing:
-    """Scrutins entre `start` et `end` (la liste CIVIX est triée du plus récent au plus ancien)."""
-    first = await client.list_scrutins(legislature=legislature, page=1, page_size=LIST_PAGE_SIZE)
+    """Scrutins entre `start` et `end`, lus page par page depuis la plus utile."""
+    first = await client.list_scrutins(legislature=legislature, page=1, page_size=CIVIX_PAGE_SIZE)
     total = first.pagination.total if first.pagination else None
-    first_days = page_dates(list(first.attributes.results))
+    first_days = page_days(first)
     first_page = 1
     if total and first_days and max(first_days) > end:
-        last_page = math.ceil(total / LIST_PAGE_SIZE)
+        last_page = math.ceil(total / CIVIX_PAGE_SIZE)
         first_page = await first_page_reaching(client, end, last_page, legislature)
-    collected: list[ScrutinSummary] = []
-    page = first_page
-    fetched = 0
-    exhausted = False
-    while fetched < max_pages and not exhausted:
-        numbers = list(range(page, page + min(BATCH_PAGES, max_pages - fetched)))
-        responses = await asyncio.gather(
-            *(
-                client.list_scrutins(legislature=legislature, page=n, page_size=LIST_PAGE_SIZE)
-                for n in numbers
-            )
-        )
-        for response in responses:
-            collected.extend(response.attributes.results)
-            days = page_dates(list(response.attributes.results))
-            reached_start = bool(days) and min(days) < start
-            last = response.pagination is None or response.pagination.next_page is None
-            exhausted = exhausted or reached_start or last or not days
-        fetched += len(numbers)
-        page += len(numbers)
-    kept = [i for i in collected if (d := day_of(i)) is not None and start <= d <= end]
-    return Listing(kept, total, fetched, truncated=not exhausted)
+    collected, fetched, reached_end = await read_pages_until(
+        client, first_page, start, legislature, max_pages
+    )
+    kept = [item for item in collected if (day := day_of(item)) is not None and start <= day <= end]
+    return Listing(kept, total, fetched, truncated=not reached_end)
 
 
 def select_kind(items: list[ScrutinSummary], kind: str | None) -> list[ScrutinSummary]:
@@ -130,6 +163,54 @@ async def sample_from_query(
     return Sample(items[:count], len(items), pool.truncated or len(items) > count, pool.note)
 
 
+async def fetch_dossier_scrutins(
+    client: CivixClient, reference: str | None, title: str, fallback: list[ScrutinSummary]
+) -> tuple[list[ScrutinSummary], int]:
+    """Scrutins d'un dossier (au plus `DOSSIER_MAX_PAGES` pages) et leur nombre total."""
+    if reference is None:
+        same = [
+            item for item in fallback if item.dossier_libelle == title or item.dossier_ref is None
+        ]
+        return same, len(same)
+    first = await client.list_scrutins(reference, page=1, page_size=CIVIX_PAGE_SIZE)
+    total = first.pagination.total if first.pagination and first.pagination.total else 0
+    items = list(first.attributes.results)
+    last_page = min(math.ceil(total / CIVIX_PAGE_SIZE), DOSSIER_MAX_PAGES)
+    for batch_start in range(2, last_page + 1, BATCH_PAGES):
+        numbers = range(batch_start, min(batch_start + BATCH_PAGES, last_page + 1))
+        pages = await asyncio.gather(
+            *(
+                client.list_scrutins(reference, page=number, page_size=CIVIX_PAGE_SIZE)
+                for number in numbers
+            )
+        )
+        for page in pages:
+            items.extend(page.attributes.results)
+    return [item for item in items if item.dossier_ref == reference], total
+
+
+async def sample_legislature_pages(
+    client: CivixClient, legislature: int, page_count: int
+) -> tuple[list[ScrutinSummary], int | None]:
+    """Scrutins de pages réparties sur la législature, et le nombre total de scrutins."""
+    first = await client.list_scrutins(legislature=legislature, page=1, page_size=CIVIX_PAGE_SIZE)
+    total = first.pagination.total if first.pagination else None
+    last_page = math.ceil(total / CIVIX_PAGE_SIZE) if total else 1
+    others = [
+        number for number in evenly_spaced(list(range(1, last_page + 1)), page_count) if number != 1
+    ]
+    pages = await asyncio.gather(
+        *(
+            client.list_scrutins(legislature=legislature, page=number, page_size=CIVIX_PAGE_SIZE)
+            for number in others
+        )
+    )
+    items = list(first.attributes.results)
+    for page in pages:
+        items.extend(page.attributes.results)
+    return items, total
+
+
 async def fetch_details(client: CivixClient, scrutins: list[ScrutinSummary]) -> list[Scrutin]:
     """Détail (décomptes par groupe) de chaque scrutin ; ceux indisponibles sont omis."""
 
@@ -158,8 +239,3 @@ async def fetch_votes(client: CivixClient, scrutins: list[ScrutinSummary]) -> li
 
     results = await asyncio.gather(*(one(item.uid) for item in scrutins))
     return [result for result in results if result is not None]
-
-
-def current_day() -> date:
-    """Jour courant (UTC)."""
-    return datetime.now(UTC).date()

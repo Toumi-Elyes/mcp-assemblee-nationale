@@ -4,18 +4,25 @@ import os
 from dataclasses import dataclass
 
 DEFAULT_BASE_URL = "https://www.civix.fr/api/v1"
+# Délais courts : un outil MCP doit répondre vite, mieux vaut échouer proprement que bloquer.
 DEFAULT_TIMEOUT_SECONDS = 10.0
 CONNECT_TIMEOUT_SECONDS = 5.0
 POOL_TIMEOUT_SECONDS = 5.0
+# Les listes et recherches changent peu : 10 minutes allègent CIVIX sans rien rendre périmé.
 DEFAULT_CACHE_TTL_SECONDS = 600.0
 DEFAULT_CACHE_MAX_ENTRIES = 500
+# Les votes et détails de scrutins sont lourds (≈ 20 Ko) : caches séparés et plus petits.
 DEFAULT_VOTES_CACHE_MAX_ENTRIES = 150
 DEFAULT_DETAIL_CACHE_MAX_ENTRIES = 400
+# Un scrutin de plus de 2 jours ne change plus : on le garde 24 h au lieu de 10 minutes.
 IMMUTABLE_TTL_SECONDS = 86400.0
 IMMUTABLE_AFTER_DAYS = 2
+# Requêtes simultanées vers CIVIX : assez pour lire des pages en parallèle, assez peu pour
+# rester courtois avec une API publique.
 MAX_CONCURRENT_REQUESTS = 4
 MAX_CONNECTIONS = 8
 MAX_KEEPALIVE_CONNECTIONS = 4
+# Courte pause avant l'unique nouvelle tentative (erreurs réseau, 502, 504).
 DEFAULT_RETRY_DELAY_SECONDS = 0.3
 DEFAULT_USER_AGENT = (
     "mcp-assemblee-nationale (+https://github.com/Toumi-Elyes/mcp-assemblee-nationale)"

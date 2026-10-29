@@ -6,66 +6,15 @@ from assemblee_mcp.analytics import stats
 from assemblee_mcp.analytics.models import Stance
 from assemblee_mcp.civix.models import (
     Position,
-    ScrutinSummary,
-    ScrutinVotes,
     VoteCounts,
 )
-from tests.conftest import make_item
-
-ABBREVIATIONS = {"G1": "AAA", "G2": "BBB", "G3": "CCC"}
-
-
-def summary(number: int, day: str, **kwargs: object) -> ScrutinSummary:
-    return ScrutinSummary.model_validate(make_item(number, day, **kwargs))  # type: ignore[arg-type]
-
-
-def groups(**counts: tuple[int, int, int]) -> list[dict[str, object]]:
-    return [
-        {
-            "groupe_uid": uid,
-            "pour": pour,
-            "contre": contre,
-            "abstention": abstention,
-            "non_votant": 0,
-            "total": pour + contre + abstention,
-        }
-        for uid, (pour, contre, abstention) in counts.items()
-    ]
-
-
-def scrutin(
-    number: int, by_group: list[dict[str, object]], votes: list[dict[str, object]] | None = None
-) -> ScrutinVotes:
-    total = [sum(int(str(g[key])) for g in by_group) for key in ("pour", "contre", "abstention")]
-    return ScrutinVotes.model_validate(
-        {
-            "scrutin": {
-                "uid": f"U{number}",
-                "numero": number,
-                "date_scrutin": "2026-10-01T00:00:00+00:00",
-                "titre": f"scrutin {number}",
-                "sort_libelle": "adopté",
-            },
-            "results_global": {
-                "pour": total[0],
-                "contre": total[1],
-                "abstention": total[2],
-                "total": sum(total),
-            },
-            "results_by_group": by_group,
-            "votes": votes or [],
-        }
-    )
-
-
-def vote(uid: str, position: str, *, delegated: bool = False) -> dict[str, object]:
-    return {
-        "deputy_uid": uid,
-        "prenom": "A",
-        "nom": uid,
-        "position": position,
-        "par_delegation": delegated,
-    }
+from tests.builders import (
+    ABBREVIATIONS,
+    group_counts,
+    scrutin_votes,
+    summary,
+    vote_entry,
+)
 
 
 def test_adopted_property() -> None:
@@ -183,8 +132,8 @@ def test_stance(counts: tuple[int, int, int], expected: Stance | None) -> None:
 
 
 def test_group_stances_and_agreements() -> None:
-    first = scrutin(1, groups(G1=(10, 0, 0), G2=(8, 1, 0), G3=(0, 5, 0)))
-    second = scrutin(2, groups(G1=(0, 9, 0), G2=(4, 4, 0), G3=(0, 5, 1)))
+    first = scrutin_votes(1, group_counts(G1=(10, 0, 0), G2=(8, 1, 0), G3=(0, 5, 0)))
+    second = scrutin_votes(2, group_counts(G1=(0, 9, 0), G2=(4, 4, 0), G3=(0, 5, 1)))
     rows = stats.group_stances([first, second], ABBREVIATIONS)
     assert rows[0].stances == {"AAA": Stance.POUR, "BBB": Stance.POUR, "CCC": Stance.CONTRE}
     assert rows[1].stances["BBB"] is Stance.PARTAGE
@@ -195,14 +144,14 @@ def test_group_stances_and_agreements() -> None:
 
 
 def test_unknown_group_uid_is_kept_as_label() -> None:
-    rows = stats.group_stances([scrutin(1, groups(ZZ=(3, 0, 0)))], {})
+    rows = stats.group_stances([scrutin_votes(1, group_counts(ZZ=(3, 0, 0)))], {})
     assert list(rows[0].stances) == ["ZZ"]
 
 
 def test_cohesion_is_weighted_by_expressed_votes() -> None:
     sample = [
-        scrutin(1, groups(G1=(9, 1, 0))),
-        scrutin(2, groups(G1=(2, 6, 0), G2=(0, 0, 0))),
+        scrutin_votes(1, group_counts(G1=(9, 1, 0))),
+        scrutin_votes(2, group_counts(G1=(2, 6, 0), G2=(0, 0, 0))),
     ]
     rows = {r.group: r for r in stats.cohesion(sample, ABBREVIATIONS)}
     assert (rows["AAA"].scrutins, rows["AAA"].expressed, rows["AAA"].aligned) == (2, 18, 15)
@@ -212,9 +161,9 @@ def test_cohesion_is_weighted_by_expressed_votes() -> None:
 
 def test_close_votes_sorted_by_margin_and_filtered() -> None:
     sample = [
-        scrutin(1, groups(G1=(100, 90, 0))),
-        scrutin(2, groups(G1=(50, 49, 0))),
-        scrutin(3, groups(G1=(10, 80, 0))),
+        scrutin_votes(1, group_counts(G1=(100, 90, 0))),
+        scrutin_votes(2, group_counts(G1=(50, 49, 0))),
+        scrutin_votes(3, group_counts(G1=(10, 80, 0))),
     ]
     close = stats.close_votes(sample, 15)
     assert [(c.scrutin.numero, c.margin) for c in close] == [(2, 1), (1, 10)]
@@ -230,11 +179,11 @@ def test_evenly_spaced() -> None:
 
 def test_depute_bilan_counts_alignment_absence_and_delegation() -> None:
     sample = [
-        scrutin(1, groups(G1=(9, 1, 0)), [vote("D1", "pour")]),
-        scrutin(2, groups(G1=(9, 1, 0)), [vote("D1", "contre", delegated=True)]),
-        scrutin(3, groups(G1=(5, 5, 0)), [vote("D1", "pour")]),
-        scrutin(4, groups(G1=(0, 9, 0)), [vote("D1", "non_votant")]),
-        scrutin(5, groups(G1=(0, 9, 0)), [vote("D2", "contre")]),
+        scrutin_votes(1, group_counts(G1=(9, 1, 0)), [vote_entry("D1", "pour")]),
+        scrutin_votes(2, group_counts(G1=(9, 1, 0)), [vote_entry("D1", "contre", delegated=True)]),
+        scrutin_votes(3, group_counts(G1=(5, 5, 0)), [vote_entry("D1", "pour")]),
+        scrutin_votes(4, group_counts(G1=(0, 9, 0)), [vote_entry("D1", "non_votant")]),
+        scrutin_votes(5, group_counts(G1=(0, 9, 0)), [vote_entry("D2", "contre")]),
     ]
     bilan = stats.depute_bilan("Anne D1", "D1", "G1", "AAA", sample)
     assert (bilan.pour, bilan.contre, bilan.abstention, bilan.non_votant, bilan.absent) == (
@@ -251,7 +200,7 @@ def test_depute_bilan_counts_alignment_absence_and_delegation() -> None:
 
 
 def test_depute_bilan_without_group_has_no_alignment() -> None:
-    sample = [scrutin(1, groups(G1=(9, 1, 0)), [vote("D1", "pour")])]
+    sample = [scrutin_votes(1, group_counts(G1=(9, 1, 0)), [vote_entry("D1", "pour")])]
     bilan = stats.depute_bilan("Anne D1", "D1", None, None, sample)
     assert bilan.comparable == 0
     assert bilan.alignment_rate is None
@@ -259,10 +208,18 @@ def test_depute_bilan_without_group_has_no_alignment() -> None:
 
 def test_compare_deputes() -> None:
     sample = [
-        scrutin(1, groups(G1=(1, 0, 0)), [vote("A", "pour"), vote("B", "pour")]),
-        scrutin(2, groups(G1=(1, 0, 0)), [vote("A", "pour"), vote("B", "contre")]),
-        scrutin(3, groups(G1=(1, 0, 0)), [vote("A", "pour")]),
-        scrutin(4, groups(G1=(1, 0, 0)), [vote("A", "non_votant"), vote("B", "contre")]),
+        scrutin_votes(
+            1, group_counts(G1=(1, 0, 0)), [vote_entry("A", "pour"), vote_entry("B", "pour")]
+        ),
+        scrutin_votes(
+            2, group_counts(G1=(1, 0, 0)), [vote_entry("A", "pour"), vote_entry("B", "contre")]
+        ),
+        scrutin_votes(3, group_counts(G1=(1, 0, 0)), [vote_entry("A", "pour")]),
+        scrutin_votes(
+            4,
+            group_counts(G1=(1, 0, 0)),
+            [vote_entry("A", "non_votant"), vote_entry("B", "contre")],
+        ),
     ]
     result = stats.compare_deputes("A", "A", "B", "B", sample)
     assert (result.shared, result.agreed, result.only_a, result.only_b) == (2, 1, 1, 1)

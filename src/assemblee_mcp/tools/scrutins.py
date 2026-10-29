@@ -1,16 +1,15 @@
-"""Outils sur les scrutins publics."""
+"""Outils de consultation des scrutins publics."""
 
 import asyncio
 from typing import Annotated
 
 from fastmcp import FastMCP
-from fastmcp.exceptions import ToolError
 from pydantic import Field
 
 from assemblee_mcp.civix import lookup
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.civix.errors import CivixError
-from assemblee_mcp.civix.models import Position
+from assemblee_mcp.civix.models import Position, ScrutinVotesResponse
 from assemblee_mcp.civix.search import search_scrutins
 from assemblee_mcp.formatting import (
     VoteFilters,
@@ -20,31 +19,34 @@ from assemblee_mcp.formatting import (
     format_votes,
     select_votes,
 )
+from assemblee_mcp.limits import DEFAULT_PAGE_SIZE
 from assemblee_mcp.tools.common import (
-    DEFAULT_PAGE_SIZE,
-    READ_ONLY_ANNOTATIONS,
     GroupeAbbreviation,
     LegislatureNumber,
     Page,
     PositionName,
     ScrutinUid,
+    ToolFunction,
+    ToolSet,
     civix_tool,
 )
 
 
-async def abbreviations_or_empty(client: CivixClient) -> dict[str, str]:
-    """Sigles des groupes ; un échec n'empêche pas d'afficher le scrutin."""
-    try:
-        return await lookup.groupe_abbreviations(client)
-    except CivixError:
-        return {}
+class ScrutinTools(ToolSet):
+    """Recherche, détail, votes individuels et déclarations de groupes."""
 
-
-def register(mcp: FastMCP, client: CivixClient) -> None:
-    """Enregistre les outils sur les scrutins."""
+    def tools(self) -> tuple[ToolFunction, ...]:
+        """Outils exposés."""
+        return (
+            self.rechercher_scrutins,
+            self.obtenir_scrutin,
+            self.votes_scrutin,
+            self.declarations_groupes,
+        )
 
     @civix_tool
     async def rechercher_scrutins(
+        self,
         mots_cles: Annotated[
             str | None,
             Field(
@@ -66,24 +68,29 @@ def register(mcp: FastMCP, client: CivixClient) -> None:
         (amendements, articles, vote sur l'ensemble).
         """
         found = await search_scrutins(
-            client, mots_cles, legislature=legislature, page=page, page_size=DEFAULT_PAGE_SIZE
+            self.client,
+            mots_cles,
+            legislature=legislature,
+            page=page,
+            page_size=DEFAULT_PAGE_SIZE,
         )
         return format_scrutin_list(found, mots_cles)
 
     @civix_tool
-    async def obtenir_scrutin(uid: ScrutinUid) -> str:
+    async def obtenir_scrutin(self, uid: ScrutinUid) -> str:
         """Détail d'un scrutin : titre, date, type, résultat officiel et décomptes.
 
         Donne le nombre de pour, contre et abstentions, global puis par groupe parlementaire.
         Pour savoir comment un député ou un groupe a voté, utiliser ensuite votes_scrutin.
         """
         response, abbreviations = await asyncio.gather(
-            client.get_scrutin(uid), abbreviations_or_empty(client)
+            self.client.get_scrutin(uid), self._abbreviations_or_empty()
         )
         return format_scrutin(response, abbreviations)
 
     @civix_tool
     async def votes_scrutin(
+        self,
         uid: ScrutinUid,
         groupe: Annotated[
             GroupeAbbreviation | None,
@@ -111,34 +118,43 @@ def register(mcp: FastMCP, client: CivixClient) -> None:
         (utiliser `groupe`, `position` ou `nom` pour affiner). Pour savoir comment UN député a
         voté sur un sujet, préférer comment_a_vote.
         """
-        member_uids: set[str] | None = None
-        groupe_sigle: str | None = None
-        if groupe is None:
-            response = await client.get_votes(uid)
-        else:
-            found = await lookup.find_groupe(client, groupe)
-            if found is None:
-                known = ", ".join(g.abbr for g in await lookup.list_groupes(client))
-                raise ToolError(f"Groupe « {groupe} » inconnu. Groupes disponibles : {known}.")
-            groupe_sigle = found.abbr
-            response, member_uids = await asyncio.gather(
-                client.get_votes(uid), lookup.groupe_member_uids(client, found.abbr)
-            )
+        response, group_abbr, member_uids = await self._votes_of_group(uid, groupe)
         wanted = Position(position) if position is not None else None
         selected = select_votes(
             response.attributes.votes, member_uids=member_uids, position=wanted, nom=nom
         )
-        return format_votes(response, selected, VoteFilters(groupe_sigle, wanted, nom))
+        return format_votes(response, selected, VoteFilters(group_abbr, wanted, nom))
 
     @civix_tool
-    async def declarations_groupes(uid: ScrutinUid) -> str:
+    async def declarations_groupes(self, uid: ScrutinUid) -> str:
         """Déclarations publiques des groupes parlementaires sur un scrutin.
 
         Reprend telles quelles les explications de vote publiées par les groupes (souvent
         aucune). Ne contient aucune analyse : à citer comme déclarations des groupes.
         """
-        response = await client.get_statements(uid)
+        response = await self.client.get_statements(uid)
         return format_statements(response, uid)
 
-    for function in (rechercher_scrutins, obtenir_scrutin, votes_scrutin, declarations_groupes):
-        mcp.tool(function, annotations=READ_ONLY_ANNOTATIONS, output_schema=None)
+    async def _abbreviations_or_empty(self) -> dict[str, str]:
+        """Sigles des groupes ; un échec n'empêche pas d'afficher le scrutin."""
+        try:
+            return await lookup.groupe_abbreviations(self.client)
+        except CivixError:
+            return {}
+
+    async def _votes_of_group(
+        self, uid: str, groupe: str | None
+    ) -> tuple[ScrutinVotesResponse, str | None, set[str] | None]:
+        """Votes d'un scrutin et, si `groupe` est donné, sigle officiel et membres du groupe."""
+        if groupe is None:
+            return await self.client.get_votes(uid), None, None
+        abbr = await lookup.resolve_groupe(self.client, groupe)
+        response, members = await asyncio.gather(
+            self.client.get_votes(uid), lookup.groupe_member_uids(self.client, abbr)
+        )
+        return response, abbr, members
+
+
+def register(mcp: FastMCP, client: CivixClient) -> None:
+    """Enregistre les outils sur les scrutins."""
+    ScrutinTools(client).register(mcp)
