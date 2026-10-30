@@ -29,6 +29,7 @@ EXPECTED_TOOLS = {
     "search",
     "fetch",
     "tendances_scrutins",
+    "suivre_sujet",
     "textes_les_plus_votes",
     "dossier_legislatif",
     "scrutins_par_periode",

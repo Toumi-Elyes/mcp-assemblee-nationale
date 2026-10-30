@@ -279,3 +279,12 @@ async def test_live_subject_search_in_the_14th(live_mcp_client: Client[Any]) -> 
     text = str(result.content[0].text)
     assert "VTANR5L14V511" in text or "n°511" in text
     assert "A voté : **Contre**." in text
+
+
+async def test_live_suivre_sujet_covers_every_legislature(live_mcp_client: Client[Any]) -> None:
+    async with live_mcp_client as connected:
+        result = await connected.call_tool("suivre_sujet", {"sujet": "retraite"})
+    text = str(result.content[0].text)
+    for legislature in ("17e", "16e", "15e", "14e"):
+        assert f"### {legislature} législature" in text
+    assert "Aucun scrutin trouvé de 2012" not in text
