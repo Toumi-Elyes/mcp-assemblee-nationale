@@ -130,6 +130,7 @@ jobs:
         with:
           node-version: 22
       - name: Déployer
+        id: deploy
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           TARGET: ${{ steps.plan.outputs.target }}
@@ -137,13 +138,19 @@ jobs:
         run: |
           report="report.md"
           echo "Déploiement **$TARGET** du commit \`$(git rev-parse --short HEAD)\` :" > "$report"
+          failed=0
           for project in $PROJECTS; do
-            url=$(.github/scripts/vercel-deploy.sh "$project" "$TARGET")
-            echo "- $project : $url" >> "$report"
+            if url=$(.github/scripts/vercel-deploy.sh "$project" "$TARGET"); then
+              echo "- $project : $url" >> "$report"
+            else
+              echo "- $project : échec (voir les journaux du workflow ; quota Vercel atteint ?)" >> "$report"
+              failed=1
+            fi
           done
           cat "$report" >> "$GITHUB_STEP_SUMMARY"
+          echo "failed=$failed" >> "$GITHUB_OUTPUT"
       - name: Commenter la PR
-        if: github.event_name == 'pull_request'
+        if: always() && github.event_name == 'pull_request' && steps.deploy.outcome != 'skipped'
         env:
           GH_TOKEN: ${{ github.token }}
           PR: ${{ github.event.pull_request.number }}
@@ -151,3 +158,8 @@ jobs:
           echo "" >> report.md
           echo "_Pour redéployer après de nouveaux commits, retirez puis remettez le label « preview »._" >> report.md
           gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file report.md
+      - name: Signaler un échec
+        if: steps.deploy.outputs.failed == '1'
+        run: |
+          echo "::error::Au moins un déploiement a échoué."
+          exit 1

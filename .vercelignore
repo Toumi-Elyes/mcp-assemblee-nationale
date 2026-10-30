@@ -3,3 +3,5 @@ scripts/
 .venv/
 .github/
 .env
+.env.local
+.vercel/
