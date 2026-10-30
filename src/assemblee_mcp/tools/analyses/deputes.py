@@ -3,15 +3,17 @@
 import asyncio
 from collections.abc import Callable
 from dataclasses import replace
+from itertools import combinations
 from typing import Annotated
 
 from fastmcp import FastMCP
+from fastmcp.exceptions import ToolError
 from pydantic import Field
 
 from assemblee_mcp.analytics import gather, render, stats
 from assemblee_mcp.analytics.models import Method
 from assemblee_mcp.analytics.stats import spread_order
-from assemblee_mcp.analytics.stats.deputes import both_expressed, deputy_present
+from assemblee_mcp.analytics.stats.deputes import both_expressed, deputy_present, expressed_by
 from assemblee_mcp.civix import lookup
 from assemblee_mcp.civix.archive import ARCHIVED_LEGISLATURES, load_archive
 from assemblee_mcp.civix.client import CivixClient
@@ -20,6 +22,7 @@ from assemblee_mcp.limits import (
     ANALYTICS_DEADLINE_SECONDS,
     ANALYTICS_MAX_CALLS,
     MAX_ANALYSED_SCRUTINS,
+    SMALL_SAMPLE_THRESHOLD,
     TARGET_USABLE_SCRUTINS,
 )
 from assemblee_mcp.tools.analyses.parameters import (
@@ -43,6 +46,17 @@ DeputeNameA = Annotated[
 ]
 DeputeNameB = Annotated[
     str, Field(description="Nom du second député ou son `uid`.", min_length=2, max_length=100)
+]
+PAIR = 2
+MIN_COMPARED = 3
+MAX_COMPARED = 5
+DeputeNames = Annotated[
+    list[Annotated[str, Field(min_length=2, max_length=100)]],
+    Field(
+        description=f"Noms (ou `uid`) de {MIN_COMPARED} à {MAX_COMPARED} députés, tous distincts.",
+        min_length=MIN_COMPARED,
+        max_length=MAX_COMPARED,
+    ),
 ]
 
 
@@ -188,7 +202,7 @@ class DeputeAnalyses(ToolSet):
 
     def tools(self) -> tuple[ToolFunction, ...]:
         """Outils exposés."""
-        return (self.bilan_depute, self.comparer_deputes)
+        return (self.bilan_depute, self.comparer_deputes, self.accords_entre_deputes)
 
     @analytics_tool
     async def bilan_depute(
@@ -285,6 +299,93 @@ class DeputeAnalyses(ToolSet):
         )
         method = with_partial_note(comparison_method(selection, scan, legislature), partial)
         return render.render_comparison(result, method)
+
+    @analytics_tool
+    async def accords_entre_deputes(
+        self,
+        deputes: DeputeNames,
+        *,
+        sujet: OptionalSubject = None,
+        periode_jours: OptionalSamplePeriodDays = None,
+        max_scrutins: MaxScrutins = MAX_ANALYSED_SCRUTINS,
+        legislature: DeputeLegislature = None,
+    ) -> str:
+        """Compare les votes de 3 à 5 députés nommés, deux à deux, sur un échantillon de scrutins.
+
+        À utiliser pour « Ces députés votent-ils pareil ? » avec plus de deux personnes : pour
+        chaque paire, part des scrutins votés de la même façon parmi ceux où les deux ont exprimé
+        un vote. Pour deux députés, préférer comparer_deputes. Indiquer `sujet` ou
+        `periode_jours`. Description factuelle d'un échantillon borné, sans jugement.
+        """
+        require_subject_or_period(sujet, periode_jours)
+        found = await asyncio.gather(
+            *(resolve_depute(self.client, name, legislature) for name in deputes)
+        )
+        resolved: list[Depute] = []
+        for item in found:
+            if not isinstance(item, Depute):
+                return item
+            resolved.append(item)
+        if len({depute.uid for depute in resolved}) < len(resolved):
+            raise ToolError("Chaque député ne doit apparaître qu'une fois dans `deputes`.")
+        uids = [depute.uid for depute in resolved]
+        selection = await select_sample(
+            self.client, sujet, periode_jours, max_scrutins, "tous", legislature=legislature
+        )
+        scan = await gather.scan_votes(
+            self.client,
+            spread_order(selection.sample.chosen),
+            lambda votes: (
+                complete_list_of_votes(votes)
+                and sum(1 for uid in uids if expressed_by(votes, uid)) >= PAIR
+            ),
+            TARGET_USABLE_SCRUTINS,
+        )
+        scan, partial = without_partial_lists(scan)
+        comparisons = [
+            stats.compare_deputes(a.full_name, a.uid, b.full_name, b.uid, scan.votes)
+            for a, b in combinations(resolved, 2)
+        ]
+        expressed = {
+            depute.full_name: expressed_count(scan.votes, depute.uid) for depute in resolved
+        }
+        method = with_partial_note(matrix_method(selection, scan, legislature), partial)
+        thin = sum(1 for item in comparisons if item.shared < SMALL_SAMPLE_THRESHOLD)
+        if thin:
+            warning = (
+                f"{thin} paire(s) de députés ont moins de {SMALL_SAMPLE_THRESHOLD} scrutins en "
+                "commun : leur taux d'accord est trop fragile pour conclure."
+            )
+            method = method.model_copy(update={"warnings": [*method.warnings, warning]})
+        names = [depute.full_name for depute in resolved]
+        return render.render_deputes_matrix(names, comparisons, expressed, method)
+
+
+def expressed_count(votes: list[ScrutinVotes], uid: str) -> int:
+    """Nombre de scrutins de la lecture où le député a exprimé un vote."""
+    return sum(1 for item in votes if expressed_by(item, uid))
+
+
+def matrix_method(
+    selection: SelectedSample, scan: gather.VotesScan, legislature: int | None
+) -> Method:
+    """Méthode de `accords_entre_deputes`."""
+    return depute_method(
+        selection,
+        scan,
+        noun="où au moins deux des députés ont voté",
+        counted=(
+            "pour chaque paire de députés, scrutins où les deux ont exprimé un vote (pour, "
+            "contre, abstention) ; accord = même position."
+        ),
+        limits=[
+            "chaque paire est comparée sur ses propres scrutins communs, qui diffèrent d'une "
+            "paire à l'autre ;",
+            "un accord sur un amendement ou un article n'est pas un accord sur un texte ;",
+            "échantillon borné, sans valeur de classement.",
+        ],
+        legislature=legislature,
+    )
 
 
 def register(mcp: FastMCP, client: CivixClient) -> None:

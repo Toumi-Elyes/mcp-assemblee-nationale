@@ -393,3 +393,48 @@ async def test_group_analyses_of_a_closed_legislature_end_at_its_last_scrutin(
 async def test_group_analyses_reject_a_legislature_without_data(mcp_client: McpClient) -> None:
     with pytest.raises(ToolError, match="greater than or equal to 14"):
         await call(mcp_client, "cohesion_groupes", periode_jours=7, legislature=13)
+
+
+# Accords entre plusieurs députés
+
+
+async def test_accords_entre_deputes_compares_every_pair(
+    mcp_client: McpClient, archived: CivixStub
+) -> None:
+    archived.add("/scrutins", l15_listing(), legislature="15", page="1")
+    for item in l15_listing()["data"]["attributes"]["results"]:
+        archived.add(f"/scrutins/{item['uid']}/votes", l15_votes(item["uid"]))
+    text = await call(
+        mcp_client,
+        "accords_entre_deputes",
+        deputes=["Bruneel", "Saïd Ahamada", "Julien Aubert"],
+        periode_jours=7,
+        legislature=15,
+    )
+    assert "|  | Alain Bruneel | Saïd Ahamada | Julien Aubert |" in text
+    assert "| Alain Bruneel |  | 0 % (3) | 0 % (3) |" in text
+    assert "- Saïd Ahamada : 3 vote(s) exprimé(s)" in text
+    assert "3 paire(s) de députés ont moins de 10 scrutins en commun" in text
+    assert "chaque paire est comparée sur ses propres scrutins communs" in text
+    assert deputy_calls(archived) == []
+
+
+async def test_accords_entre_deputes_needs_distinct_deputies(
+    mcp_client: McpClient, archived: CivixStub
+) -> None:
+    with pytest.raises(ToolError, match="qu'une fois"):
+        await call(
+            mcp_client,
+            "accords_entre_deputes",
+            deputes=["Bruneel", "Alain Bruneel", "Julien Aubert"],
+            periode_jours=7,
+            legislature=15,
+        )
+    with pytest.raises(ToolError, match="at least 3 items"):
+        await call(
+            mcp_client,
+            "accords_entre_deputes",
+            deputes=["Bruneel", "Julien Aubert"],
+            periode_jours=7,
+            legislature=15,
+        )

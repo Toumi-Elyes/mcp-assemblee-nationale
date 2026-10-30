@@ -9,7 +9,11 @@ from assemblee_mcp.analytics.render.activity import (
     render_top_texts,
     render_trends,
 )
-from assemblee_mcp.analytics.render.deputes import render_bilan, render_comparison
+from assemblee_mcp.analytics.render.deputes import (
+    render_bilan,
+    render_comparison,
+    render_deputes_matrix,
+)
 from assemblee_mcp.analytics.render.groups import (
     STANCE_SYMBOLS,
     render_agreements,
@@ -30,6 +34,7 @@ __all__ = [
     "render_close_votes",
     "render_cohesion",
     "render_comparison",
+    "render_deputes_matrix",
     "render_positions",
     "render_timeline",
     "render_top_texts",

@@ -1,11 +1,18 @@
 """Rendu des analyses de députés nommés."""
 
+from collections.abc import Mapping, Sequence
+
 from assemblee_mcp.analytics.models import (
     DeputeBilan,
     DeputeComparison,
     Method,
 )
-from assemblee_mcp.analytics.render.shared import explained_percent, finish_analysis, table
+from assemblee_mcp.analytics.render.shared import (
+    explained_percent,
+    finish_analysis,
+    percent,
+    table,
+)
 from assemblee_mcp.formatting import (
     field_text,
 )
@@ -54,3 +61,34 @@ def render_comparison(result: DeputeComparison, method: Method) -> str:
         f"- Vote exprimé par {field_text(result.name_b)} seulement : {result.only_b}",
     ]
     return finish_analysis("\n".join(lines), method)
+
+
+def render_deputes_matrix(
+    names: Sequence[str],
+    comparisons: Sequence[DeputeComparison],
+    expressed: Mapping[str, int],
+    method: Method,
+) -> str:
+    """Matrice d'accord entre plusieurs députés, deux à deux."""
+    lookup = {(item.name_a, item.name_b): item for item in comparisons} | {
+        (item.name_b, item.name_a): item for item in comparisons
+    }
+    labels = [field_text(name) for name in names]
+    rows = []
+    for name, label in zip(names, labels, strict=True):
+        cells = []
+        for other in names:
+            pair = lookup.get((name, other))
+            cells.append("" if pair is None else f"{percent(pair.rate)} ({pair.shared})")
+        rows.append([label, *cells])
+    votes = "\n".join(
+        f"- {label} : {expressed[name]} vote(s) exprimé(s)"
+        for name, label in zip(names, labels, strict=True)
+    )
+    body = (
+        "## Accords entre députés (même position)\n\n"
+        + table(["", *labels], rows)
+        + "\n\nDans chaque case : part de scrutins votés de la même façon, et entre parenthèses "
+        "le nombre de scrutins où les deux ont exprimé un vote.\n\n" + votes
+    )
+    return finish_analysis(body, method)

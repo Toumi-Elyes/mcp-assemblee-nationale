@@ -30,6 +30,7 @@ EXPECTED_TOOLS = {
     "fetch",
     "tendances_scrutins",
     "suivre_sujet",
+    "accords_entre_deputes",
     "textes_les_plus_votes",
     "dossier_legislatif",
     "scrutins_par_periode",
