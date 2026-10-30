@@ -9,7 +9,7 @@ Gratuit, en français, avec les sources.
 
 ### [Voir la démo en direct](https://landing-page-mcp-assemblee-national.vercel.app)
 
-[Ajouter à mon assistant](#ajouter-en-2-minutes) · [Exemples de questions](#exemples-de-questions) · [English](#english)
+[Ajouter à mon assistant](#ajouter-en-2-minutes) · [Exemples de questions](#exemples-de-questions) · [Signaler un problème](#signaler-un-problème) · [English](#english)
 
 [![CI](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/actions/workflows/ci.yml/badge.svg)](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/actions/workflows/ci.yml)
 ![Python 3.14+](https://img.shields.io/badge/python-3.14%2B-blue)
@@ -293,6 +293,24 @@ Le connecteur est en lecture seule et sans compte. Il est protégé ainsi :
 
 Vous avez trouvé une faille ? Ne l'ouvrez pas en issue publique : suivez [SECURITY.md](SECURITY.md).
 
+## Signaler un problème
+
+Vous avez repéré un bug, une donnée qui semble fausse, ou vous avez une idée ? Ouvrez une issue avec le formulaire qui correspond : il pose les bonnes questions et range automatiquement votre signalement dans le [tableau du projet](https://github.com/users/Toumi-Elyes/projects/3). Il faut un compte GitHub (gratuit).
+
+| Vous voulez… | Formulaire |
+|---|---|
+| Signaler un bug (le connecteur ou la page ne marche pas comme prévu) | [Signaler un bug](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/issues/new?template=bug.yml) |
+| Signaler une donnée incorrecte (un vote, un député ou un chiffre différent de la source officielle) | [Signaler une donnée incorrecte](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/issues/new?template=donnees.yml) |
+| Proposer une amélioration (une question à couvrir, un nouvel outil, une idée pour la page) | [Proposer une amélioration](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/issues/new?template=amelioration.yml) |
+
+Pour que l'on puisse vous aider vite :
+
+1. Indiquez la question posée à votre assistant et la réponse obtenue (une capture suffit).
+2. Pour une donnée, ajoutez le lien vers la page officielle du scrutin sur assemblee-nationale.fr.
+3. Retirez toute information personnelle avant de publier : les issues sont publiques.
+
+Une faille de sécurité ne se signale **pas** en issue publique : utilisez le [signalement privé](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/security/advisories/new) (voir [SECURITY.md](SECURITY.md)).
+
 ## Questions fréquentes
 
 <details>
@@ -342,8 +360,8 @@ Ouvrez le lien « Source » de la réponse : il mène à la page du scrutin. Les
 <details>
 <summary>Comment signaler une erreur ?</summary>
 
-- *Les données elles-mêmes semblent fausses* (vote ou député mal enregistré) : signalez-le à [CIVIX](https://www.civix.fr), ou à l'Assemblée nationale pour la donnée d'origine.
-- *Le connecteur se comporte mal* (erreur, réponse mal formée) : [ouvrez une issue](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/issues) en indiquant votre question et la réponse obtenue.
+- *Les données elles-mêmes semblent fausses* (vote ou député mal enregistré) : utilisez le formulaire [Signaler une donnée incorrecte](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/issues/new?template=donnees.yml) ; nous transmettrons à CIVIX si l'erreur vient de la source.
+- *Le connecteur se comporte mal* (erreur, réponse mal formée) : utilisez le formulaire [Signaler un bug](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/issues/new?template=bug.yml) (voir [Signaler un problème](#signaler-un-problème)).
 - *Une faille de sécurité* : voir [SECURITY.md](SECURITY.md).
 
 </details>
@@ -544,3 +562,4 @@ A connector (an [MCP](https://modelcontextprotocol.io) server) that lets Claude,
 - **Stack**: Python 3.14+, FastMCP 4, Pydantic v2, httpx, Poetry, hosted on Vercel (Paris).
 - **Not official**: independent project, not affiliated with the Assemblée nationale or CIVIX.
 - **Licence**: code under [MIT](LICENSE); data under Licence Ouverte Etalab 2.0.
+- **Bug reports**: use the [issue forms](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/issues/new/choose) (bug, incorrect data, idea); security issues go through [private reporting](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/security/advisories/new).
