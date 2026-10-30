@@ -49,6 +49,18 @@ MaxScrutins = Annotated[
         le=MAX_ANALYSED_SCRUTINS,
     ),
 ]
+AnalysisLegislature = Annotated[
+    int | None,
+    Field(
+        description=(
+            "Législature analysée, de 14 (2012) à 17 (en cours). Sans valeur : un sujet est "
+            "cherché dans les titres publiés par CIVIX (16e et 17e), une période compte les "
+            "derniers jours."
+        ),
+        ge=14,
+        le=17,
+    ),
+]
 OptionalSubject = Annotated[
     str | None,
     Field(description="Sujet en mots-clés (« retraites »), avec accents.", max_length=200),

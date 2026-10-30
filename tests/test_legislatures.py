@@ -343,3 +343,53 @@ async def test_archived_lookup_never_calls_the_directory(
         found = await lookup.find_deputes(client, "Damien Abad", legislature=legislature)
         assert [depute.uid for depute in found] == [ABAD]
     assert archived.requests == []
+
+
+# Analyses de groupes sur une législature close
+
+
+def archived_detail(tag: str, uid: str) -> Payload:
+    """Détail CIVIX réel d'un scrutin des 14e ou 15e, sous un autre identifiant."""
+    payload = load_fixture(f"scrutin_detail_{tag}")
+    scrutin = payload["data"]["attributes"]["scrutin"]
+    scrutin.update(uid=uid, numero=int(uid.rsplit("V", 1)[1]))
+    return payload
+
+
+async def test_positions_groupes_in_the_14th_uses_the_archive(
+    mcp_client: McpClient, archived: CivixStub
+) -> None:
+    for uid in ("VTANR5L14V511", "VTANR5L14V259"):
+        archived.add(f"/scrutins/{uid}", archived_detail("l14", uid))
+    text = await call(
+        mcp_client,
+        "positions_groupes",
+        sujet="mariage",
+        legislature=14,
+        type_scrutin="texte",
+        max_scrutins=5,
+    )
+    assert "| Scrutin | ECOLO | GDR | NI | RRDP | SRC | UDI | UMP |" in text
+    assert "n°511 — l'ensemble du projet de loi ouvrant le mariage" in text
+    assert "| P | P | C | P | P | C | C |" in text
+    assert "archive des scrutins de l'Assemblée nationale" in text
+    assert "https://www.assemblee-nationale.fr/dyn/14/scrutins" in text
+    assert [path for path in archived.paths() if path == "/scrutins"] == []
+
+
+async def test_group_analyses_of_a_closed_legislature_end_at_its_last_scrutin(
+    mcp_client: McpClient, archived: CivixStub
+) -> None:
+    archived.add("/scrutins", l15_listing(), legislature="15", page="1")
+    for item in l15_listing()["data"]["attributes"]["results"]:
+        archived.add(f"/scrutins/{item['uid']}", archived_detail("l15", item["uid"]))
+    for tool in ("accords_entre_groupes", "cohesion_groupes"):
+        text = await call(mcp_client, tool, periode_jours=7, legislature=15)
+        assert "du 2022-02-18 au 2022-02-24" in text
+        assert "LAREM" in text
+        assert "https://www.assemblee-nationale.fr/dyn/15/scrutins" in text
+
+
+async def test_group_analyses_reject_a_legislature_without_data(mcp_client: McpClient) -> None:
+    with pytest.raises(ToolError, match="greater than or equal to 14"):
+        await call(mcp_client, "cohesion_groupes", periode_jours=7, legislature=13)
