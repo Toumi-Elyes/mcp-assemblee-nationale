@@ -3,6 +3,7 @@ import pytest
 from assemblee_mcp import limits
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.civix.search import broaden, contains_all, search_everything, search_scrutins
+from assemblee_mcp.civix.search.broaden import stem, stem_query
 from tests.conftest import CivixStub, Payload, load_fixture
 
 
@@ -78,7 +79,8 @@ async def test_fallback_filters_pool_and_notes_it(
     assert found.note.startswith("Recherche élargie")
     assert found.pagination is not None
     assert found.pagination.total == 2
-    assert len(civix_mock.requests) == 2
+    # Expression exacte, la même au singulier (« loi de finance 2027 »), puis le mot distinctif.
+    assert len(civix_mock.requests) == 3
 
 
 async def test_fallback_reads_only_the_announced_pages_up_to_the_limit(
@@ -86,7 +88,7 @@ async def test_fallback_reads_only_the_announced_pages_up_to_the_limit(
 ) -> None:
     civix_mock.listings["finances"] = scrutin_items(["loi de finances pour 2027"] * 700)
     found = await search_scrutins(client, "loi de finances 2027")
-    assert len(civix_mock.requests) == 1 + limits.BROAD_POOL_PAGES
+    assert len(civix_mock.requests) == 2 + limits.BROAD_POOL_PAGES
     assert found.note is not None
     assert (
         f"{limits.CIVIX_PAGE_SIZE * limits.BROAD_POOL_PAGES} scrutins les plus récents"
@@ -150,3 +152,35 @@ async def test_global_search_exact_hit(client: CivixClient, query: str) -> None:
     found = await search_everything(client, query)
     assert found.note is None
     assert found.total > 0
+
+
+def test_stem_removes_the_plural_mark_of_long_words_only() -> None:
+    assert stem("retraites") == "retraite"
+    assert stem("hôpitaux") == "hôpita"
+    assert stem("impôts") == "impôt"
+    assert stem("chômage") == "chômage"
+    assert stem("prix") == "prix"
+    assert stem("loi") == "loi"
+    assert stem_query("réforme des retraites") == "réforme des retraite"
+    assert stem_query("chômage") is None
+
+
+async def test_plural_query_finds_singular_titles(
+    client: CivixClient, civix_mock: CivixStub
+) -> None:
+    civix_mock.listings["pension"] = scrutin_items(["la revalorisation de la pension"])
+    found = await search_scrutins(client, "pensions")
+    assert [s.uid for s in found.results] == ["VTANR5L17V0"]
+    assert found.note is not None
+    assert "résultats pour « pension » (singulier et pluriel confondus)" in found.note
+    assert [r.url.params["search"] for r in civix_mock.requests] == ["pensions", "pension"]
+
+
+async def test_plural_query_in_the_archive(client: CivixClient, civix_mock: CivixStub) -> None:
+    found = await search_scrutins(client, "harcèlements", legislature=14)
+    exact = await search_scrutins(client, "harcèlement", legislature=14)
+    assert found.results
+    assert found.note is not None
+    assert "singulier et pluriel" in found.note
+    assert [s.uid for s in found.results] == [s.uid for s in exact.results]
+    assert civix_mock.requests == []

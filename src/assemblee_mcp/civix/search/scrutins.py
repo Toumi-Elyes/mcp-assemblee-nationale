@@ -2,7 +2,7 @@
 
 import asyncio
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.civix.models import (
@@ -16,6 +16,8 @@ from assemblee_mcp.civix.search.broaden import (
     broad_note,
     broaden,
     contains_all,
+    stem_note,
+    stem_query,
     summary_text,
 )
 from assemblee_mcp.limits import (
@@ -47,9 +49,16 @@ def archive_matches(legislature: int, query: str) -> tuple[list[ScrutinSummary],
     Même logique que chez CIVIX, sur les titres de l'archive de l'Assemblée, sans appel réseau.
     """
     exact = search_archive(legislature, (fold(query.strip()),))
-    broad = broaden(query)
-    if exact or broad is None:
+    if exact:
         return exact, None
+    stemmed = stem_query(query.strip())
+    if stemmed is not None:
+        singular = search_archive(legislature, (fold(stemmed),))
+        if singular:
+            return singular, stem_note(query, stemmed)
+    broad = broaden(query)
+    if broad is None:
+        return [], None
     matches = search_archive(legislature, broad.required)
     return matches, broad_note(query, broad, truncated=False) if matches else None
 
@@ -68,7 +77,10 @@ async def search_scrutins(
     page: int = 1,
     page_size: int = 10,
 ) -> ScrutinSearch:
-    """Cherche des scrutins (au plus 3 appels CIVIX ; aucun pour les 14e et 15e législatures)."""
+    """Cherche des scrutins (au plus 4 appels CIVIX ; aucun pour les 14e et 15e législatures).
+
+    Expression exacte, puis la même au singulier, puis tous ses mots utiles (recherche élargie).
+    """
     if query and legislature in COMPLETED_LEGISLATURES:
         items, note = archive_matches(legislature, query)
         start = (page - 1) * page_size
@@ -82,9 +94,20 @@ async def search_scrutins(
     exact = await client.list_scrutins(
         query, legislature=legislature, page=page, page_size=page_size
     )
-    broad = broaden(query) if query else None
-    if broad is None or not scrutins_empty(exact):
+    if query is None or not scrutins_empty(exact):
         return ScrutinSearch(exact, list(exact.attributes.results), exact.pagination)
+    stemmed = stem_query(query)
+    if stemmed is not None:
+        singular = await client.list_scrutins(
+            stemmed, legislature=legislature, page=page, page_size=page_size
+        )
+        if not scrutins_empty(singular):
+            results = list(singular.attributes.results)
+            note = stem_note(query, stemmed)
+            return ScrutinSearch(singular, results, singular.pagination, note)
+    broad = broaden(query)
+    if broad is None:
+        return ScrutinSearch(exact, [], exact.pagination)
     pool, truncated = await broad_pool(client, broad, legislature)
     matches = [item for item in pool if contains_all(summary_text(item), broad.required)]
     start = (page - 1) * page_size
@@ -146,7 +169,10 @@ class ScrutinPool:
 async def search_scrutin_pool(
     client: CivixClient, query: str, *, legislature: int | None = None
 ) -> ScrutinPool:
-    """Rassemble les scrutins d'une recherche (au plus 7 appels CIVIX), sans pagination."""
+    """Rassemble les scrutins d'une recherche (au plus 9 appels CIVIX), sans pagination.
+
+    Expression exacte, puis la même au singulier, puis tous ses mots utiles (recherche élargie).
+    """
     if legislature in COMPLETED_LEGISLATURES:
         items, note = archive_matches(legislature, query)
         return ScrutinPool(
@@ -157,6 +183,14 @@ async def search_scrutin_pool(
     )
     if not scrutins_empty(first):
         return await exact_pool(client, query, legislature, first)
+    stemmed = stem_query(query)
+    if stemmed is not None:
+        singular = await client.list_scrutins(
+            stemmed, legislature=legislature, page=1, page_size=CIVIX_PAGE_SIZE
+        )
+        if not scrutins_empty(singular):
+            found = await exact_pool(client, stemmed, legislature, singular)
+            return replace(found, note=stem_note(query, stemmed))
     broad = broaden(query)
     if broad is None:
         return ScrutinPool([], 0, False)
