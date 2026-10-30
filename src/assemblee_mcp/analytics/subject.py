@@ -3,15 +3,18 @@
 Pour chaque législature, les scrutins dont le titre correspond au sujet : recherche CIVIX pour
 les 16e et 17e, archive de l'Assemblée embarquée pour les 14e et 15e (aucun appel réseau). On
 compte les scrutins lus, leur résultat et leur nature, et on cite les derniers votes sur
-l'ensemble d'un texte. Rien n'est classé : c'est un relevé, pas une mesure d'importance.
+l'ensemble d'un texte avec la position majoritaire de chaque groupe. Rien n'est classé : c'est
+un relevé, pas une mesure d'importance.
 """
 
 import asyncio
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, field, replace
 from datetime import date
 
-from assemblee_mcp.analytics.models import Method
+from assemblee_mcp.analytics import gather, stats
+from assemblee_mcp.analytics.models import GroupStances, Method
+from assemblee_mcp.analytics.render.groups import STANCE_LEGEND, STANCE_SYMBOLS
 from assemblee_mcp.analytics.render.shared import (
     SOURCE_CIVIX,
     method_block,
@@ -19,6 +22,7 @@ from assemblee_mcp.analytics.render.shared import (
     type_label,
     warning_block,
 )
+from assemblee_mcp.civix import lookup
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.civix.models import ScrutinSummary
 from assemblee_mcp.civix.models.kinds import KIND_ENSEMBLE
@@ -41,6 +45,8 @@ class LegislatureSubject:
     items: list[ScrutinSummary]
     truncated: bool
     note: str | None
+    stances: list[GroupStances] = field(default_factory=list)
+    """Position majoritaire des groupes sur les votes sur l'ensemble cités."""
 
     @property
     def adopted(self) -> int:
@@ -62,10 +68,13 @@ class LegislatureSubject:
         """Jours des scrutins lus."""
         return [item.date_scrutin.date() for item in self.items if item.date_scrutin]
 
+    def whole_texts(self) -> list[ScrutinSummary]:
+        """Derniers votes sur l'ensemble d'un texte."""
+        return [item for item in self.items if item.kind == KIND_ENSEMBLE][:MAX_HIGHLIGHTS]
+
     def highlights(self) -> list[ScrutinSummary]:
         """Derniers votes sur l'ensemble d'un texte, sinon derniers scrutins."""
-        whole = [item for item in self.items if item.kind == KIND_ENSEMBLE]
-        return (whole or self.items)[:MAX_HIGHLIGHTS]
+        return self.whole_texts() or self.items[:MAX_HIGHLIGHTS]
 
 
 async def follow_subject(client: CivixClient, subject: str) -> list[LegislatureSubject]:
@@ -76,10 +85,40 @@ async def follow_subject(client: CivixClient, subject: str) -> list[LegislatureS
             for number in FOLLOWED_LEGISLATURES
         )
     )
-    return [
+    rows = [
         legislature_subject(number, pool)
         for number, pool in zip(FOLLOWED_LEGISLATURES, pools, strict=True)
     ]
+    stances = await asyncio.gather(*(whole_text_stances(client, row) for row in rows))
+    return [replace(row, stances=found) for row, found in zip(rows, stances, strict=True)]
+
+
+async def whole_text_stances(client: CivixClient, row: LegislatureSubject) -> list[GroupStances]:
+    """Position majoritaire des groupes sur les votes sur l'ensemble cités d'une législature."""
+    whole = row.whole_texts()
+    if not whole:
+        return []
+    details, abbreviations = await asyncio.gather(
+        gather.fetch_details(client, whole),
+        lookup.groupe_abbreviations(client, row.legislature),
+    )
+    return stats.group_stances(details, abbreviations)
+
+
+def stances_table(rows: list[GroupStances]) -> str:
+    """Positions des groupes, une ligne par vote sur l'ensemble cité."""
+    groups = sorted({name for row in rows for name in row.stances})
+    body = [
+        [
+            f"n°{row.scrutin.numero} ({format_date(row.scrutin.day)})",
+            *[
+                STANCE_SYMBOLS[stance] if (stance := row.stances.get(group)) else "–"
+                for group in groups
+            ],
+        ]
+        for row in rows
+    ]
+    return table(["Vote", *groups], body)
 
 
 def legislature_subject(legislature: int, pool: ScrutinPool) -> LegislatureSubject:
@@ -139,6 +178,9 @@ def legislature_section(row: LegislatureSubject) -> str:
     cited = "Derniers votes sur l'ensemble d'un texte" if whole else "Derniers scrutins"
     lines = [title, "", f"Scrutins lus : {kinds}.", "", f"{cited} :"]
     lines += [highlight_line(item) for item in row.highlights()]
+    if row.stances:
+        lines += ["", "Position majoritaire des groupes sur ces votes :", ""]
+        lines.append(stances_table(row.stances))
     if row.note:
         lines += ["", f"_{field_text(row.note)}_"]
     return "\n".join(lines)
@@ -160,6 +202,8 @@ def subject_method(rows: list[LegislatureSubject]) -> Method:
         ),
         limits=[
             "un texte peut traiter du sujet sans le nommer dans le titre de ses scrutins ;",
+            "position d'un groupe = position (pour, contre, abstention) qui réunit le plus de "
+            "votes exprimés de ses membres ; elle ne dit rien des votes minoritaires ;",
             "un texte donne souvent beaucoup de scrutins d'amendements : un nombre plus élevé "
             "d'une législature à l'autre ne mesure ni l'importance du sujet ni l'activité des "
             "députés ;",
@@ -180,6 +224,8 @@ def render_subject(subject: str, rows: list[LegislatureSubject]) -> str:
         )
         return finish(body, source_line(SOURCE_CIVIX, ARCHIVE_SOURCE))
     sections = "\n\n".join(legislature_section(row) for row in rows)
+    if any(row.stances for row in rows):
+        sections += f"\n\nLégende : {STANCE_LEGEND}."
     follow = "Pour le détail ou les votes d'un scrutin, utilisez son identifiant (`uid`)."
     body = f"{heading}\n\n{overview_table(rows)}\n\n{sections}\n\n{follow}"
     text = f"{warning_block(method)}{body}\n\n{method_block(method)}"

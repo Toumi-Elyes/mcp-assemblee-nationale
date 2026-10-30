@@ -448,8 +448,8 @@ Budgets par appel d'outil (`limits.py`) : nombre maximal d'appels réseau vers C
 |---|---|---|---|
 | Recherche et fiches | 10 | 25 s | `rechercher`, `rechercher_scrutins`, `obtenir_scrutin`, `votes_scrutin`, `declarations_groupes`, `obtenir_depute`, `comment_a_vote`, `lister_groupes`, `obtenir_groupe`, `search`, `fetch` |
 | Annuaire | 20 | 25 s | `rechercher_deputes` |
-| Analyses sur listes | 30 | 45 s | `tendances_scrutins`, `textes_les_plus_votes`, `dossier_legislatif`, `suivre_sujet`, `scrutins_par_periode`, `statistiques_assemblee`, `exporter_scrutins`, `exporter_votes` |
-| Analyses sur détails de scrutins | 45 | 45 s | `positions_groupes`, `accords_entre_groupes`, `cohesion_groupes`, `votes_serres`, `bilan_depute`, `comparer_deputes` |
+| Analyses sur listes | 30 | 45 s | `tendances_scrutins`, `textes_les_plus_votes`, `dossier_legislatif`, `scrutins_par_periode`, `statistiques_assemblee`, `exporter_scrutins`, `exporter_votes` |
+| Analyses sur détails de scrutins | 45 | 45 s | `positions_groupes`, `accords_entre_groupes`, `cohesion_groupes`, `votes_serres`, `bilan_depute`, `comparer_deputes`, `suivre_sujet` |
 
 Types partagés : `page` entier de 1 à 500 (défaut `1`) ; `legislature` entier de 1 à 30 ; `uid` de scrutin : 3 à 64 caractères `[A-Za-z0-9_-]` ; `groupe` / `abbr` : sigle de 1 à 32 caractères ; `position` : `pour`, `contre`, `abstention` ou `non_votant` ; `type_scrutin` / `type` : `tous`, `texte`, `article`, `amendement` ou `autre` ; dates au format `AAAA-MM-JJ` ; `dossier` : référence `DLR…` (3 à 30 caractères alphanumériques après `DLR`).
 
@@ -468,7 +468,7 @@ Types partagés : `page` entier de 1 à 500 (défaut `1`) ; `legislature` entier
 | `search` | `query: str` (2 à 200 car., requis) | JSON `{"results": [{"id", "title", "url"}]}` ; ids `scrutin:<uid>`, `depute:<uid>`, `groupe:<sigle>`, `dossier:<DLR…>` |
 | `fetch` | `id: str` (3 à 100 car., requis) | JSON `{"id", "title", "text", "url", "metadata"}` pour un id renvoyé par `search` ; un `dossier:<DLR…>` donne la chronologie de ses scrutins |
 | `dossier_legislatif` | `texte: str` (2 à 200 car., requis ; mots-clés ou référence `DLR…`) | Chronologie des scrutins d'un texte ; amendements comptés mais non listés ; si plusieurs dossiers correspondent, le plus voté est détaillé |
-| `suivre_sujet` | `sujet: str` (2 à 200 car., requis) | Par législature, de la 14e à la 17e : scrutins dont le titre correspond, nature, adoptés et rejetés, derniers votes sur l'ensemble ; 100 scrutins lus au plus par législature |
+| `suivre_sujet` | `sujet: str` (2 à 200 car., requis) | Par législature, de la 14e à la 17e : scrutins dont le titre correspond, nature, adoptés et rejetés, derniers votes sur l'ensemble avec la position majoritaire de chaque groupe ; 100 scrutins lus au plus par législature |
 | `scrutins_par_periode` | `date_debut: str` (requis), `date_fin: str` (requis, 90 jours au plus), `type: str = "tous"`, `resultat: "adopte" \| "rejete" \| "tous" = "tous"`, `page: int = 1` (1 à 100) | 20 scrutins par page, du plus récent au plus ancien |
 | `votes_serres` | `periode_jours: int = 30` (7 à 30), `max_scrutins: int = 30` (3 à 30), `ecart_max: int = 20` (0 à 100 voix), `type_scrutin: str = "texte"` | Scrutins dont l'écart entre pour et contre est faible |
 | `tendances_scrutins` | `periode_jours: int = 30` (7 à 90), `legislature: int \| None = None` | Volume par semaine, taux d'adoption par type et contexte, jours les plus chargés ; pour une législature close, la période finit à son dernier scrutin |
