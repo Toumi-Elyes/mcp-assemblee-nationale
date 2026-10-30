@@ -25,6 +25,7 @@ from assemblee_mcp.formatting import (
     format_date,
     truncate,
 )
+from assemblee_mcp.links import assemblee_scrutin_url
 
 TITLE_WIDTH = 90
 
@@ -100,9 +101,11 @@ def render_top_texts(rows: Sequence[TextActivity], method: Method) -> str:
 def entry_line(entry: TimelineEntry) -> str:
     """Ligne de chronologie."""
     number = f"n°{entry.numero} · " if entry.numero is not None else ""
+    link = assemblee_scrutin_url(entry.legislature, entry.numero)
+    page = f" · {link}" if link else ""
     return (
         f"- {format_date(entry.day)} · {number}{type_label(entry.kind)} · {entry.result} — "
-        f"{truncate(entry.title, 200)} (`{entry.uid}`)"
+        f"{truncate(entry.title, 200)} (`{entry.uid}`){page}"
     )
 
 

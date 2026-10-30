@@ -96,6 +96,7 @@ class TimelineEntry(ResultModel):
     """Scrutin d'un dossier dans la chronologie."""
 
     uid: str
+    legislature: int | None = None
     numero: int | None
     day: date | None
     kind: str

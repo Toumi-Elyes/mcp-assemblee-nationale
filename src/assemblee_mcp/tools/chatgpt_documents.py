@@ -6,6 +6,9 @@ import re
 from fastmcp.exceptions import ToolError
 from pydantic import BaseModel
 
+from assemblee_mcp.analytics.dossier import analyse_dossier
+from assemblee_mcp.analytics.models import DossierTimeline
+from assemblee_mcp.analytics.render import render_timeline
 from assemblee_mcp.civix import lookup
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.civix.models import SearchResultsByKind
@@ -17,6 +20,7 @@ from assemblee_mcp.formatting import (
     truncate,
 )
 from assemblee_mcp.links import (
+    assemblee_dossier_url,
     assemblee_scrutin_url,
     civix_depute_url,
     civix_groupe_url,
@@ -27,11 +31,13 @@ SEARCH_TITLE_LENGTH = 200
 SCRUTIN_PREFIX = "scrutin"
 DEPUTE_PREFIX = "depute"
 GROUPE_PREFIX = "groupe"
+DOSSIER_PREFIX = "dossier"
 ID_SEPARATOR = ":"
 ID_PATTERNS = {
     SCRUTIN_PREFIX: re.compile(r"[A-Za-z0-9_-]{3,64}"),
     DEPUTE_PREFIX: re.compile(r"[A-Za-z0-9]{3,32}"),
     GROUPE_PREFIX: re.compile(r"[A-Za-z0-9_-]{1,32}"),
+    DOSSIER_PREFIX: re.compile(r"DLR5L\d{1,2}N\d{3,8}"),
 }
 Metadata = dict[str, str | int | bool | None]
 
@@ -70,8 +76,8 @@ def split_id(identifier: str) -> tuple[str, str]:
     prefix, separator, value = identifier.partition(ID_SEPARATOR)
     if not separator or not value:
         raise ToolError(
-            "Identifiant invalide : attendu « scrutin:<uid> », « depute:<uid> » "
-            "ou « groupe:<sigle> »."
+            "Identifiant invalide : attendu « scrutin:<uid> », « depute:<uid> », "
+            "« groupe:<sigle> » ou « dossier:<DLR…> »."
         )
     pattern = ID_PATTERNS.get(prefix)
     if pattern is None:
@@ -81,9 +87,9 @@ def split_id(identifier: str) -> tuple[str, str]:
     return prefix, value
 
 
-def search_items(results: SearchResultsByKind) -> list[SearchItem]:
-    """Résultats de `search` : scrutins, puis députés, puis groupes."""
-    scrutins = [
+def scrutin_items(results: SearchResultsByKind) -> list[SearchItem]:
+    """Résultats `search` pour les scrutins."""
+    return [
         SearchItem(
             id=make_id(SCRUTIN_PREFIX, hit.uid),
             title=truncate(
@@ -93,7 +99,11 @@ def search_items(results: SearchResultsByKind) -> list[SearchItem]:
         )
         for hit in results.scrutins
     ]
-    deputes = [
+
+
+def depute_items(results: SearchResultsByKind) -> list[SearchItem]:
+    """Résultats `search` pour les députés."""
+    return [
         SearchItem(
             id=make_id(DEPUTE_PREFIX, hit.uid),
             title=f"Député : {hit.prenom} {hit.nom}"
@@ -102,7 +112,11 @@ def search_items(results: SearchResultsByKind) -> list[SearchItem]:
         )
         for hit in results.deputes
     ]
-    groupes = [
+
+
+def groupe_items(results: SearchResultsByKind) -> list[SearchItem]:
+    """Résultats `search` pour les groupes."""
+    return [
         SearchItem(
             id=make_id(GROUPE_PREFIX, hit.abbr),
             title=f"Groupe : {hit.libelle} ({hit.abbr})",
@@ -110,7 +124,26 @@ def search_items(results: SearchResultsByKind) -> list[SearchItem]:
         )
         for hit in results.groupes
     ]
-    return [*scrutins, *deputes, *groupes]
+
+
+def dossier_items(results: SearchResultsByKind) -> list[SearchItem]:
+    """Résultats `search` pour les dossiers législatifs (ceux dont la page existe)."""
+    items: list[SearchItem] = []
+    for hit in results.dossiers:
+        url = assemblee_dossier_url(hit.uid)
+        if url is not None:
+            title = truncate(f"Dossier : {hit.titre}", SEARCH_TITLE_LENGTH)
+            items.append(SearchItem(id=make_id(DOSSIER_PREFIX, hit.uid), title=title, url=url))
+    return items
+
+
+def search_items(results: SearchResultsByKind) -> list[SearchItem]:
+    """Résultats de `search` : députés d'abord pour un nom, sinon dossiers puis scrutins."""
+    if results.deputes:
+        parts = (depute_items, scrutin_items, dossier_items, groupe_items)
+    else:
+        parts = (dossier_items, scrutin_items, groupe_items, depute_items)
+    return [item for build in parts for item in build(results)]
 
 
 async def fetch_document(client: CivixClient, identifier: str) -> FetchPayload:
@@ -120,6 +153,8 @@ async def fetch_document(client: CivixClient, identifier: str) -> FetchPayload:
         return await fetch_scrutin(client, value)
     if prefix == DEPUTE_PREFIX:
         return await fetch_depute(client, value)
+    if prefix == DOSSIER_PREFIX:
+        return await fetch_dossier(client, value)
     return await fetch_groupe(client, value)
 
 
@@ -183,3 +218,55 @@ async def fetch_groupe(client: CivixClient, abbr: str) -> FetchPayload:
             "legislature": groupe.legislature,
         },
     )
+
+
+async def fetch_dossier(client: CivixClient, reference: str) -> FetchPayload:
+    """Chronologie d'un dossier législatif pour `fetch` (même analyse que `dossier_legislatif`)."""
+    url = assemblee_dossier_url(reference) or civix_scrutin_url(reference)
+    analysis = await analyse_dossier(client, reference)
+    if analysis is None or analysis.timeline.dossier_ref != reference:
+        return dossier_without_scrutin(reference, url)
+    timeline = analysis.timeline
+    return FetchPayload(
+        id=make_id(DOSSIER_PREFIX, reference),
+        title=truncate(f"Dossier : {timeline.libelle}", SEARCH_TITLE_LENGTH),
+        text=render_timeline(timeline, analysis.method),
+        url=url,
+        metadata={
+            "type": DOSSIER_PREFIX,
+            "reference": reference,
+            "contexte": timeline.context,
+            "scrutins": timeline.total,
+            "amendements": timeline.amendements.total,
+            "amendements_adoptes": timeline.amendements.adopted,
+            "amendements_rejetes": timeline.amendements.rejected,
+            "votes_sur_l_ensemble": len(timeline.final_votes),
+            "dernier_vote_sur_l_ensemble": dernier_vote(timeline),
+            "source_assemblee": url,
+        },
+    )
+
+
+def dossier_without_scrutin(reference: str, url: str) -> FetchPayload:
+    """Document d'un dossier sans scrutin public rattaché (résolution, texte jamais voté…)."""
+    text = (
+        f"## Dossier `{reference}`\n\nAucun scrutin public n'est rattaché à ce dossier dans "
+        "CIVIX : il n'a pas donné lieu à un vote nominatif, ou la référence est inexacte. "
+        f"Si elle est correcte, la page de l'Assemblée nationale détaille le dossier : {url}"
+    )
+    return FetchPayload(
+        id=make_id(DOSSIER_PREFIX, reference),
+        title=f"Dossier {reference} (aucun scrutin public)",
+        text=text,
+        url=url,
+        metadata={"type": DOSSIER_PREFIX, "reference": reference, "scrutins": 0},
+    )
+
+
+def dernier_vote(timeline: DossierTimeline) -> str | None:
+    """Résultat du dernier vote sur l'ensemble du texte, ou `None` s'il n'y en a pas."""
+    if not timeline.final_votes:
+        return None
+    last = timeline.final_votes[-1]
+    day = last.day.isoformat() if last.day else "date inconnue"
+    return f"{day} : {last.result}"

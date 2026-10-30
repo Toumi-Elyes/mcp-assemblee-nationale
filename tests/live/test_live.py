@@ -1,3 +1,4 @@
+import json
 import os
 from typing import Any
 
@@ -163,4 +164,19 @@ async def test_live_assemblee_scrutin_links_work(live_mcp_client: Client[Any]) -
     assert "/scrutins/jo" not in text
     async with httpx.AsyncClient(follow_redirects=True, timeout=20) as http:
         response = await http.get(link, headers={"User-Agent": "Mozilla/5.0"})
+    assert response.status_code == 200
+
+
+async def test_live_search_then_fetch_a_dossier(live_mcp_client: Client[Any]) -> None:
+    async with live_mcp_client as connected:
+        found = await connected.call_tool("search", {"query": "projet de loi de finances 2027"})
+        results = json.loads(str(found.content[0].text))["results"]
+        dossier = next(item for item in results if item["id"].startswith("dossier:"))
+        fetched = await connected.call_tool("fetch", {"id": dossier["id"]})
+    payload = json.loads(str(fetched.content[0].text))
+    assert payload["id"] == dossier["id"]
+    assert payload["metadata"]["scrutins"] > 0
+    assert "### Chronologie" in payload["text"]
+    async with httpx.AsyncClient(follow_redirects=True, timeout=20) as http:
+        response = await http.get(dossier["url"], headers={"User-Agent": "Mozilla/5.0"})
     assert response.status_code == 200

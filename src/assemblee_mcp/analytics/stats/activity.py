@@ -134,6 +134,7 @@ def timeline_entry(item: ScrutinSummary) -> TimelineEntry:
     """Entrée de chronologie."""
     return TimelineEntry(
         uid=item.uid,
+        legislature=item.legislature,
         numero=item.numero,
         day=day_of(item),
         kind=item.kind,
