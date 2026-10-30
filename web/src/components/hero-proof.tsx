@@ -22,6 +22,12 @@ export const HeroProof: React.FC = () => {
           {formatDay(latestDate)}
         </time>
         .
+        <br />
+        Votes consultables depuis le{" "}
+        <time dateTime="2012-07-03" className="font-bold text-ink">
+          3 juillet 2012
+        </time>{" "}
+        (14e législature).
       </p>
     </div>
   );

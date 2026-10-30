@@ -108,13 +108,13 @@ export const CAPABILITY_GROUPS: readonly CapabilityGroup[] = [
     items: [
       {
         tool: "rechercher_deputes",
-        question: "Quels députés s'appellent Martin ?",
-        detail: "Retrouve un député par son nom, sans tenir compte des accents ni de la casse.",
+        question: "Quels députés s'appelaient Martin sous la 15e législature ?",
+        detail: "Retrouve un député par son nom, sans tenir compte des accents ni de la casse, de la 14e législature (2012) à aujourd'hui.",
       },
       {
         tool: "obtenir_depute",
         question: "Dans quel groupe siège ce député, et dans quelle circonscription ?",
-        detail: "Affiche la fiche d'un député avec ses liens officiels.",
+        detail: "Affiche la fiche d'un député avec ses liens officiels, y compris pour un ancien député.",
       },
       {
         tool: "lister_groupes",
