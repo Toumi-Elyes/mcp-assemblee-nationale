@@ -13,6 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: SITE_URL, changeFrequency: "daily", priority: 1 },
     { url: `${SITE_URL}/confidentialite`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${SITE_URL}/mentions`, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${SITE_URL}/nouveautes`, changeFrequency: "weekly", priority: 0.6 },
   ];
   const loaded = await settle(getHomeView());
   keepLastGoodVersion(!loaded.ok || isEmptyView(loaded.data));

@@ -31,6 +31,7 @@ La branche `main` est protégée : on ne pousse pas dessus directement.
 1. Forkez le dépôt (ou créez une branche si vous avez les droits), puis travaillez sur une branche dédiée.
 2. Ouvrez une pull request vers `main`.
 3. La CI doit être verte (lint, format, typage, tests) avant la fusion.
+4. Si la PR change ce que le connecteur sait faire (nouvel outil, amélioration visible, correction), ajoutez une entrée datée au journal des nouveautés dans `web/src/content/changelog.ts`, puis lancez `pnpm changelog` dans `web/` pour régénérer [CHANGELOG.md](CHANGELOG.md). La landing l'affiche dans sa section « Nouveautés » et sur `/nouveautes` ; un test vérifie que les deux restent identiques.
 
 Une faille de sécurité ne s'ouvre pas en issue : voir [SECURITY.md](SECURITY.md).
 

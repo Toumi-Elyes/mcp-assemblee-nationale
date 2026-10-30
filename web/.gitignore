@@ -4,3 +4,6 @@ node_modules/
 next-env.d.ts
 .env*
 .impeccable/review/
+
+# Généré par next dev (consignes pour agents IA), non versionné.
+AGENTS.md

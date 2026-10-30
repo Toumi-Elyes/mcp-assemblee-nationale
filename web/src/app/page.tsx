@@ -1,4 +1,5 @@
 import { Benefits } from "@/components/benefits";
+import { ChangelogSection } from "@/components/changelog-section";
 import { CapabilitiesSection } from "@/components/capabilities-section";
 import { DemoSection } from "@/components/demo-section";
 import { FaqSection } from "@/components/faq-section";
@@ -66,6 +67,7 @@ const HomePage = async () => {
       <CapabilitiesSection />
       <InstallSection />
       <GuaranteesSection />
+      <ChangelogSection />
       <FaqSection />
       <FinalCta />
     </main>

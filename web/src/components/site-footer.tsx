@@ -18,6 +18,7 @@ const PROJECT: readonly FooterLink[] = [
   { href: GITHUB_ISSUES_URL, label: "Signaler un problème" },
   { href: "/#installer", label: "Installer le connecteur" },
   { href: "/#faq", label: "Questions fréquentes" },
+  { href: "/nouveautes", label: "Nouveautés" },
 ];
 
 const DATA: readonly FooterLink[] = [
