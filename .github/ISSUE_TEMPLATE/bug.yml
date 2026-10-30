@@ -1,0 +1,50 @@
+name: Signaler un bug
+description: Quelque chose ne marche pas comme prévu (connecteur MCP ou page de démo).
+title: "[Bug] "
+labels: ["bug"]
+projects: ["Toumi-Elyes/3"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci de prendre le temps de signaler un problème. Pour une faille de sécurité, n'ouvrez pas d'issue publique : utilisez le [signalement privé](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/security/advisories/new).
+  - type: dropdown
+    id: partie
+    attributes:
+      label: Où se produit le problème ?
+      options:
+        - Connecteur MCP (dans Claude, ChatGPT, Gemini CLI…)
+        - Page de démo (landing)
+        - Documentation
+        - Je ne sais pas
+    validations:
+      required: true
+  - type: textarea
+    id: probleme
+    attributes:
+      label: Que s'est-il passé ?
+      description: Décrivez ce que vous avez fait et ce que vous avez obtenu.
+      placeholder: "J'ai demandé « Comment a voté … sur … ? » et l'assistant a répondu …"
+    validations:
+      required: true
+  - type: textarea
+    id: attendu
+    attributes:
+      label: Qu'attendiez-vous ?
+    validations:
+      required: true
+  - type: input
+    id: outil
+    attributes:
+      label: Outil ou page concerné (si vous le savez)
+      placeholder: "comment_a_vote, /scrutins/VTANR5L17V9231…"
+  - type: input
+    id: assistant
+    attributes:
+      label: Assistant utilisé
+      placeholder: "Claude (web), ChatGPT (mode développeur), Gemini CLI…"
+  - type: textarea
+    id: contexte
+    attributes:
+      label: Captures, liens ou messages d'erreur
+      description: Retirez toute information personnelle avant de coller.

@@ -44,6 +44,12 @@ Une faille de sécurité ne s'ouvre pas en issue : voir [SECURITY.md](SECURITY.m
 
 Le serveur restitue des données publiques, sans opinion. Les sorties ne doivent contenir aucune interprétation politique, aucun jugement sur un député ou un groupe, aucun qualificatif partisan : uniquement des faits (positions, décomptes, résultats officiels), toujours accompagnés du lien source. Toute contribution qui ajoute de l'analyse, du classement ou de l'éditorial sera refusée.
 
+## Issues et pull requests
+
+Pour signaler un bug, une donnée incorrecte ou proposer une amélioration, utilisez les formulaires proposés à l'ouverture d'une issue : ils ajoutent l'issue au [tableau du projet](https://github.com/users/Toumi-Elyes/projects/3) avec le bon label. Les failles de sécurité se signalent en privé (voir [SECURITY.md](SECURITY.md)).
+
+Dans une pull request, indiquez `Closes #<numéro>` : la carte du tableau passe alors en « In Review » à l'ouverture et en « Done » à la fusion.
+
 ## Déploiement
 
 Il n'y a aucun déploiement manuel. Le serveur MCP et la page de démo sont déployés automatiquement par l'intégration GitHub de Vercel quand une pull request est fusionnée sur `main`, après revue et CI verte. Les pull requests ont un déploiement de prévisualisation privé.
