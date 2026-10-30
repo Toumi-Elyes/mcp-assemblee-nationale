@@ -3,13 +3,16 @@
 import asyncio
 import math
 import re
+from datetime import date
 
+from assemblee_mcp.civix.archive import ARCHIVED_LEGISLATURES, load_archive
 from assemblee_mcp.civix.budget import CivixBudgetError, can_afford
-from assemblee_mcp.civix.client import CivixClient
+from assemblee_mcp.civix.client import CivixClient, unsupported_legislature_message
 from assemblee_mcp.civix.errors import CivixNotFoundError
 from assemblee_mcp.civix.models import Depute, Groupe
 from assemblee_mcp.limits import (
     CIVIX_PAGE_SIZE,
+    CURRENT_LEGISLATURE,
     MAX_DIRECTORY_PAGES,
     MAX_NAME_SEARCHES,
     SEARCH_CATEGORY_CAP,
@@ -17,29 +20,57 @@ from assemblee_mcp.limits import (
 from assemblee_mcp.textutils import fold, strip_accents, tokens
 
 DEPUTE_UID_PATTERN = re.compile(r"^PA\d+$", re.IGNORECASE)
-CURRENT_LEGISLATURE = 17
+SCRUTIN_UID_PATTERN = re.compile(r"^VTANR5L(\d+)V\d+$")
 ASCII_LIMIT = 127
 MIN_STEM_LENGTH = 3
 MAX_WORD_SEARCHES = 2
+HINT_MAX_NAMES = 5
 
 
-async def list_groupes(client: CivixClient) -> list[Groupe]:
-    """Groupes parlementaires (appel mis en cache)."""
-    return list((await client.list_groupes()).attributes.groups)
+def legislature_of_scrutin(uid: str) -> int | None:
+    """Législature lue dans l'identifiant d'un scrutin (`VTANR5L16V4105` : la 16e), sinon `None`."""
+    found = SCRUTIN_UID_PATTERN.match(uid)
+    return int(found.group(1)) if found else None
 
 
-async def find_groupe(client: CivixClient, abbr: str) -> Groupe | None:
+async def list_groupes(client: CivixClient, legislature: int | None = None) -> list[Groupe]:
+    """Groupes parlementaires d'une législature (17e par défaut ; la 17e vient du cache CIVIX)."""
+    number = legislature or CURRENT_LEGISLATURE
+    if number == CURRENT_LEGISLATURE:
+        return list((await client.list_groupes()).attributes.groups)
+    archive = load_archive(number)
+    if archive is None:
+        raise CivixNotFoundError(unsupported_legislature_message(number))
+    return list(archive.groupes.values())
+
+
+async def find_groupe(
+    client: CivixClient, abbr: str, legislature: int | None = None
+) -> Groupe | None:
     """Retrouve un groupe par son sigle, sans tenir compte de la casse."""
     wanted = fold(abbr)
-    for groupe in await list_groupes(client):
+    for groupe in await list_groupes(client, legislature):
         if fold(groupe.abbr) == wanted:
             return groupe
     return None
 
 
-async def groupe_abbreviations(client: CivixClient) -> dict[str, str]:
-    """Correspondance identifiant de groupe vers sigle."""
-    return {groupe.uid: groupe.abbr for groupe in await list_groupes(client)}
+async def groupe_abbreviations(
+    client: CivixClient, legislature: int | None = None
+) -> dict[str, str]:
+    """Correspondance identifiant de groupe vers sigle.
+
+    Sans législature, réunit tous les groupes connus (17e par l'API, législatures closes par
+    l'index) : leurs identifiants sont distincts, ce qui suffit à afficher des scrutins anciens.
+    """
+    if legislature is not None:
+        return {groupe.uid: groupe.abbr for groupe in await list_groupes(client, legislature)}
+    mapping = {groupe.uid: groupe.abbr for groupe in await list_groupes(client)}
+    for number in ARCHIVED_LEGISLATURES:
+        archive = load_archive(number)
+        if archive is not None:
+            mapping.update({uid: groupe.abbr for uid, groupe in archive.groupes.items()})
+    return mapping
 
 
 async def all_deputes(
@@ -78,6 +109,18 @@ async def groupe_member_uids(client: CivixClient, abbr: str) -> set[str]:
     return {depute.uid for depute in await all_deputes(client, groupe=abbr)}
 
 
+def archived_member_uids(legislature: int, abbr: str, day: date) -> set[str]:
+    """Membres d'un groupe d'une législature close au jour donné (sigle déjà résolu)."""
+    archive = load_archive(legislature)
+    if archive is None:
+        raise CivixNotFoundError(unsupported_legislature_message(legislature))
+    members: set[str] = set()
+    for groupe in archive.groupes.values():
+        if groupe.abbr == abbr:
+            members |= archive.members_at(groupe.uid, day)
+    return members
+
+
 def name_score(depute: Depute, query_tokens: list[str]) -> int | None:
     """Score de correspondance nom/requête (plus petit = meilleur), `None` si aucune."""
     words = tokens(depute.full_name)
@@ -105,12 +148,12 @@ def is_exact_name(depute: Depute, query: str) -> bool:
     return sorted(tokens(depute.full_name)) == query_tokens
 
 
-async def resolve_groupe(client: CivixClient, groupe: str) -> str:
+async def resolve_groupe(client: CivixClient, groupe: str, legislature: int | None = None) -> str:
     """Sigle officiel d'un groupe ; lève `CivixNotFoundError` s'il est inconnu."""
-    found = await find_groupe(client, groupe)
+    found = await find_groupe(client, groupe, legislature)
     if found is not None:
         return found.abbr
-    known = ", ".join(groupe.abbr for groupe in await list_groupes(client))
+    known = ", ".join(item.abbr for item in await list_groupes(client, legislature))
     raise CivixNotFoundError(f"Groupe « {groupe} » inconnu. Groupes disponibles : {known}.")
 
 
@@ -154,6 +197,21 @@ async def search_deputes(client: CivixClient, nom: str) -> tuple[list[Depute], b
     return [], False
 
 
+def archived_name_hint(nom: str) -> str:
+    """Indique, si le nom existe dans une législature close, comment la demander ; sinon `""`."""
+    lines: list[str] = []
+    for number in ARCHIVED_LEGISLATURES:
+        archive = load_archive(number)
+        matches = rank_by_name(archive.deputes, nom)[:HINT_MAX_NAMES] if archive else []
+        if matches:
+            names = ", ".join(f"{depute.full_name} (`{depute.uid}`)" for depute in matches)
+            lines.append(
+                f"Correspondance dans la {number}e législature : {names}. "
+                f"Relancez avec `legislature={number}`."
+            )
+    return "\n".join(lines)
+
+
 async def find_deputes(
     client: CivixClient,
     nom: str,
@@ -161,30 +219,42 @@ async def find_deputes(
     groupe: str | None = None,
     legislature: int | None = None,
 ) -> list[Depute]:
-    """Cherche des députés par nom (législature en cours uniquement) : le résolveur unique.
+    """Cherche des députés par nom dans une législature (17e par défaut) : le résolveur unique.
 
-    Un identifiant (PA…) est exact. Sinon, si l'annuaire est déjà en mémoire il fait foi ;
-    sinon on essaie `/search` (plusieurs formulations), puis l'annuaire complet quand la
-    recherche ne trouve rien ou que sa liste est tronquée. La comparaison ignore accents et casse.
+    Un identifiant (PA…) est exact. Sinon, si l'annuaire de la législature est déjà en mémoire
+    il fait foi ; sinon, pour la 17e, on essaie `/search` (plusieurs formulations) puis
+    l'annuaire complet quand la recherche ne trouve rien ou que sa liste est tronquée. Les
+    législatures closes se lisent dans l'index embarqué. La comparaison ignore accents et casse.
     """
-    if legislature not in {None, CURRENT_LEGISLATURE}:
-        raise CivixNotFoundError("Seule la 17e législature est couverte pour les députés.")
-    abbr = await resolve_groupe(client, groupe) if groupe is not None else None
+    number = legislature or CURRENT_LEGISLATURE
+    client.directory_for(number)
+    abbr = await resolve_groupe(client, groupe, number) if groupe is not None else None
     if DEPUTE_UID_PATTERN.match(nom.strip()):
-        return [(await client.get_depute(nom.strip().upper())).attributes.deputy]
-    matches = await _match_by_name(client, nom)
+        return [await find_depute_by_uid(client, nom.strip().upper(), number)]
+    matches = await _match_by_name(client, nom, number)
     return _only_groupe(matches, abbr) if abbr is not None else matches
 
 
-async def _match_by_name(client: CivixClient, nom: str) -> list[Depute]:
+async def find_depute_by_uid(client: CivixClient, uid: str, legislature: int) -> Depute:
+    """Député d'identifiant `uid` dans la législature ; `CivixNotFoundError` s'il est inconnu."""
+    if legislature == CURRENT_LEGISLATURE:
+        return (await client.get_depute(uid)).attributes.deputy
+    found = next((d for d in await client.directory_for(legislature).load() if d.uid == uid), None)
+    if found is None:
+        raise CivixNotFoundError(f"Aucun député {uid} dans la {legislature}e législature.")
+    return found
+
+
+async def _match_by_name(client: CivixClient, nom: str, legislature: int) -> list[Depute]:
     """Députés dont le nom correspond, via l'annuaire en mémoire, `/search` ou l'annuaire."""
-    cached = client.directory.cached()
+    directory = client.directory_for(legislature)
+    cached = directory.cached()
     if cached is not None:
         return rank_by_name(cached, nom)
     matches, truncated = await search_deputes(client, nom)
     if matches and not truncated:
         return matches
-    return rank_by_name(await client.directory.load(), nom)
+    return rank_by_name(await directory.load(), nom)
 
 
 def _only_groupe(deputes: list[Depute], groupe: str) -> list[Depute]:

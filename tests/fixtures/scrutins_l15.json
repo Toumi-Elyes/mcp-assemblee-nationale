@@ -1,0 +1,182 @@
+{
+  "publisher": "CIVIX.fr",
+  "api_version": "v1",
+  "retrieved_at": "2026-10-30T14:04:56.966Z",
+  "license": {
+    "name": "Open Data – Assemblée nationale",
+    "notice": "Données publiques de l'Assemblée nationale, présentées par CIVIX.fr (initiative indépendante)."
+  },
+  "schema_version": "2026-04-29",
+  "answer": "Cette page renvoie 3 résultat(s).",
+  "canonical_url": "https://www.civix.fr/api/v1/scrutins?page=1&page_size=3&legislature=15",
+  "confidence": "high",
+  "meta": {
+    "schema_version": "2026-04-29",
+    "api_version": "v1",
+    "retrieved_at": "2026-10-30T14:04:56.966Z",
+    "last_updated": "2026-10-30T14:04:56.966Z",
+    "query": {
+      "search": null,
+      "page": 1,
+      "page_size": 3,
+      "legislature": 15,
+      "type": null,
+      "tags": null
+    },
+    "pagination": {
+      "page": 1,
+      "page_size": 3,
+      "next_page": 2,
+      "count_total": 4417,
+      "count_returned": 3
+    }
+  },
+  "summary": "Liste des scrutins : 3 résultat(s) sur la page 1.",
+  "source": {
+    "type": "dataset",
+    "provider": "Assemblée nationale",
+    "via": "CIVIX.fr",
+    "source_urls": [
+      "https://www.assemblee-nationale.fr"
+    ],
+    "civix_urls": {
+      "page": "https://www.civix.fr/api",
+      "api": "https://www.civix.fr/api/v1/scrutins?page=1&page_size=3&legislature=15"
+    }
+  },
+  "citation": {
+    "text": "Selon CIVIX.fr (données publiques de l'Assemblée nationale, consultées le 30 octobre 2026), la liste des scrutins renvoie 3 résultat(s) sur la page 1.",
+    "url": "https://www.civix.fr/api/v1/scrutins?page=1&page_size=3&legislature=15"
+  },
+  "data": {
+    "type": "scrutins",
+    "attributes": {
+      "query": {
+        "search": null,
+        "page": 1,
+        "page_size": 3,
+        "legislature": 15
+      },
+      "results": [
+        {
+          "uid": "VTANR5L15V4419",
+          "legislature": 15,
+          "numero": 4419,
+          "date_scrutin": "2022-02-24T00:00:00+00:00",
+          "titre": "",
+          "objet": null,
+          "objet_libelle": null,
+          "sort": null,
+          "type_vote": null,
+          "question": null,
+          "type": null,
+          "context": null,
+          "sort_code": null,
+          "type_primary": null,
+          "tags": []
+        },
+        {
+          "uid": "VTANR5L15V4418",
+          "legislature": 15,
+          "numero": 4418,
+          "date_scrutin": "2022-02-24T00:00:00+00:00",
+          "titre": "",
+          "objet": null,
+          "objet_libelle": null,
+          "sort": null,
+          "type_vote": null,
+          "question": null,
+          "type": null,
+          "context": null,
+          "sort_code": null,
+          "type_primary": null,
+          "tags": []
+        },
+        {
+          "uid": "VTANR5L15V4417",
+          "legislature": 15,
+          "numero": 4417,
+          "date_scrutin": "2022-02-24T00:00:00+00:00",
+          "titre": "",
+          "objet": null,
+          "objet_libelle": null,
+          "sort": null,
+          "type_vote": null,
+          "question": null,
+          "type": null,
+          "context": null,
+          "sort_code": null,
+          "type_primary": null,
+          "tags": []
+        }
+      ],
+      "pagination": {
+        "page": 1,
+        "page_size": 3,
+        "next_page": 2,
+        "count_total": 4417,
+        "count_returned": 3
+      }
+    },
+    "results": [
+      {
+        "uid": "VTANR5L15V4419",
+        "legislature": 15,
+        "numero": 4419,
+        "date_scrutin": "2022-02-24T00:00:00+00:00",
+        "titre": "",
+        "objet": null,
+        "objet_libelle": null,
+        "sort": null,
+        "type_vote": null,
+        "question": null,
+        "type": null,
+        "context": null,
+        "sort_code": null,
+        "type_primary": null,
+        "tags": []
+      },
+      {
+        "uid": "VTANR5L15V4418",
+        "legislature": 15,
+        "numero": 4418,
+        "date_scrutin": "2022-02-24T00:00:00+00:00",
+        "titre": "",
+        "objet": null,
+        "objet_libelle": null,
+        "sort": null,
+        "type_vote": null,
+        "question": null,
+        "type": null,
+        "context": null,
+        "sort_code": null,
+        "type_primary": null,
+        "tags": []
+      },
+      {
+        "uid": "VTANR5L15V4417",
+        "legislature": 15,
+        "numero": 4417,
+        "date_scrutin": "2022-02-24T00:00:00+00:00",
+        "titre": "",
+        "objet": null,
+        "objet_libelle": null,
+        "sort": null,
+        "type_vote": null,
+        "question": null,
+        "type": null,
+        "context": null,
+        "sort_code": null,
+        "type_primary": null,
+        "tags": []
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "page_size": 3,
+      "next_page": 2,
+      "count_total": 4417,
+      "count_returned": 3
+    }
+  }
+}

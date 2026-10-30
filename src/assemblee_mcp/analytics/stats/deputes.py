@@ -17,7 +17,7 @@ from assemblee_mcp.civix.models import (
 EXPRESSED = (Position.POUR, Position.CONTRE, Position.ABSTENTION)
 
 
-def vote_of(votes: ScrutinVotes, deputy_uid: str) -> tuple[Position, bool] | None:
+def vote_of(votes: ScrutinVotes, deputy_uid: str) -> tuple[Position, bool | None] | None:
     """Position (et délégation) d'un député dans un scrutin ; `None` s'il n'y figure pas."""
     for vote in votes.votes:
         if vote.deputy_uid == deputy_uid:

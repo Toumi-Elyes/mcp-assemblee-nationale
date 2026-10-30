@@ -172,11 +172,14 @@ async def test_fetch_rejects_dot_segment_without_upstream_call(
     assert civix_mock.requests == []
 
 
-async def test_legislature_other_than_17_never_crawls(
+async def test_closed_legislatures_never_crawl_the_directory(
     mcp_client: McpClient, civix_mock: CivixStub
 ) -> None:
-    with pytest.raises(ToolError, match="17e législature"):
-        await call(mcp_client, "rechercher_deputes", nom="zz", legislature=16)
+    for legislature in (14, 15, 16):
+        text = await call(mcp_client, "rechercher_deputes", nom="zzzz", legislature=legislature)
+        assert "aucun député trouvé" in text
+    with pytest.raises(ToolError, match="législatures disponibles"):
+        await call(mcp_client, "rechercher_deputes", nom="zz", legislature=13)
     assert civix_mock.requests == []
 
 

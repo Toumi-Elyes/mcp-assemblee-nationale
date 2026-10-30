@@ -96,3 +96,22 @@ class DeputyDirectory:
         for page in pages:
             deputes.extend(page.attributes.results)
         return deputes
+
+
+class ArchivedDirectory:
+    """Annuaire d'une législature close : index embarqué, sans appel réseau."""
+
+    def __init__(self, deputes: list[Depute]) -> None:
+        """Garde la liste des députés de l'index."""
+        self._deputes = deputes
+
+    def cached(self) -> list[Depute]:
+        """Tous les députés de la législature (toujours disponibles)."""
+        return self._deputes
+
+    async def load(self) -> list[Depute]:
+        """Tous les députés de la législature (aucun chargement nécessaire)."""
+        return self._deputes
+
+
+type Directory = DeputyDirectory | ArchivedDirectory

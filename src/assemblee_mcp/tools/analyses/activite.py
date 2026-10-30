@@ -136,16 +136,20 @@ class ActiviteTools(ToolSet):
     ) -> str:
         """Tendances générales des scrutins de l'Assemblée sur une période récente.
 
+        Pour une législature close (`legislature`), la période se termine à son dernier scrutin.
+
         À utiliser pour les questions d'ensemble (« que s'est-il passé à l'Assemblée ce mois-ci ? »,
         « combien de votes, quelle part d'adoption ? ») plutôt que pour un vote précis. Donne le
         volume de scrutins par semaine, la part de scrutins adoptés au total, par type
         (amendements, articles, ensembles de textes) et par contexte (PLF, PLFSS, propositions
         de loi), et les jours les plus chargés.
         """
-        start, end = gather.last_days(periode_jours)
+        end = await gather.period_end(self.client, legislature)
+        start = gather.period_start(end, periode_jours)
         found = await gather.fetch_period(self.client, start, end, legislature=legislature)
         result = stats.trends(found.items, start, end)
-        return render.render_trends(result, trends_method(found, start, end))
+        method = trends_method(found, start, end).model_copy(update={"legislature": legislature})
+        return render.render_trends(result, method)
 
     @listing_tool
     async def textes_les_plus_votes(

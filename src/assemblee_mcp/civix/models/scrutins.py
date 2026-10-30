@@ -1,8 +1,9 @@
 """Modèles des scrutins : liste, détail, décomptes, votes individuels et déclarations de groupes."""
 
 from datetime import datetime
+from typing import Any
 
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from assemblee_mcp.civix.models.base import CivixModel, Position
 from assemblee_mcp.civix.models.kinds import classify_scrutin
@@ -142,6 +143,18 @@ class Scrutin(CivixModel):
     results_global: VoteCounts | None = None
     results_by_group: list[GroupVoteCounts] = Field(default_factory=list)
 
+    @field_validator("results_by_group", mode="before")
+    @classmethod
+    def drop_ungrouped(cls, rows: Any) -> Any:
+        """Ignore les lignes sans groupe.
+
+        Pour les 14e et 15e législatures, CIVIX ne ventile pas les votes par groupe et renvoie
+        une seule ligne `groupe_uid: null` qui reprend le décompte global.
+        """
+        if not isinstance(rows, list):
+            return rows
+        return [row for row in rows if not isinstance(row, dict) or row.get("groupe_uid")]
+
 
 class Vote(CivixModel):
     """Vote individuel d'un député."""
@@ -151,7 +164,8 @@ class Vote(CivixModel):
     nom: str = ""
     mandat_uid: str | None = None
     position: Position = Position.UNKNOWN
-    par_delegation: bool = False
+    par_delegation: bool | None = False
+    """`None` quand CIVIX ne le précise pas (14e et 15e législatures)."""
 
     @property
     def full_name(self) -> str:

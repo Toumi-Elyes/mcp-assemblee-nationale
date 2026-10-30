@@ -1,0 +1,160 @@
+{
+  "publisher": "CIVIX.fr",
+  "api_version": "v1",
+  "retrieved_at": "2026-10-30T14:04:42.024Z",
+  "license": {
+    "name": "Open Data – Assemblée nationale",
+    "notice": "Données publiques de l'Assemblée nationale, présentées par CIVIX.fr (initiative indépendante)."
+  },
+  "schema_version": "2026-04-29",
+  "answer": "Le scrutin n°4000 a abouti au résultat officiel suivant : non précisé.",
+  "canonical_url": "https://www.civix.fr/votes/VTANR5L15V4000",
+  "confidence": "high",
+  "meta": {
+    "schema_version": "2026-04-29",
+    "api_version": "v1",
+    "retrieved_at": "2026-10-30T14:04:42.024Z",
+    "last_updated": "2021-10-12T00:00:00.000Z",
+    "query": {
+      "uid": "VTANR5L15V4000",
+      "include_votes": true
+    },
+    "pagination": null
+  },
+  "summary": "Scrutin n°4000 (législature 15) du 12 octobre 2021 : Scrutin VTANR5L15V4000. Le résultat officiel du scrutin est : non précisé. Résultat: 72 pour, 3 contre, 5 abstentions, 0 non-votants (total 80).",
+  "source": {
+    "type": "dataset",
+    "provider": "Assemblée nationale",
+    "via": "CIVIX.fr",
+    "source_urls": [
+      "https://www.assemblee-nationale.fr/dyn/15/scrutins/jo4000"
+    ],
+    "civix_urls": {
+      "page": "https://www.civix.fr/votes/VTANR5L15V4000",
+      "api": "https://www.civix.fr/api/v1/scrutins?uid=VTANR5L15V4000"
+    }
+  },
+  "citation": {
+    "text": "Selon CIVIX.fr (données publiques de l'Assemblée nationale, consultées le 30 octobre 2026), le scrutin n°4000 du 12 octobre 2021 portant sur \"Scrutin VTANR5L15V4000\" a abouti au résultat officiel suivant : non précisé. Résultat: 72 pour, 3 contre, 5 abstentions, 0 non-votants (total 80).",
+    "url": "https://www.civix.fr/votes/VTANR5L15V4000"
+  },
+  "data": {
+    "type": "scrutin",
+    "attributes": {
+      "scrutin": {
+        "uid": "VTANR5L15V4000",
+        "numero": 4000,
+        "legislature": 15,
+        "date_scrutin": "2021-10-12T00:00:00+00:00",
+        "titre": "Scrutin VTANR5L15V4000",
+        "objet": null,
+        "objet_libelle": null,
+        "objet_raw": null,
+        "sort_code": null,
+        "sort_libelle": null,
+        "sort_raw": null,
+        "is_adopted": null,
+        "official_result": null,
+        "majority_rule": "majorité simple des suffrages exprimés",
+        "majority_threshold": null,
+        "majority_explanation": "Aucune règle spéciale détectée : le scrutin relève de la majorité simple des suffrages exprimés.",
+        "type_primary": "autre",
+        "tags": [],
+        "type_vote": null,
+        "vote_mode": "vote nominal",
+        "demandeur": null,
+        "synthese": null
+      },
+      "results_global": {
+        "pour": 72,
+        "contre": 3,
+        "abstention": 5,
+        "non_votant": 0,
+        "unknown": 0,
+        "total": 80
+      },
+      "results_by_group": [
+        {
+          "groupe_uid": null,
+          "pour": 72,
+          "contre": 3,
+          "abstention": 5,
+          "non_votant": 0,
+          "unknown": 0,
+          "total": 80
+        }
+      ],
+      "include_votes": true,
+      "votes": [
+        {
+          "deputy_uid": "PA718954",
+          "prenom": "Saïd",
+          "nom": "Ahamada",
+          "mandat_uid": "PM722512",
+          "position": "pour",
+          "par_delegation": null
+        },
+        {
+          "deputy_uid": "PA609726",
+          "prenom": "Julien",
+          "nom": "Aubert",
+          "mandat_uid": "PM723426",
+          "position": "abstention",
+          "par_delegation": null
+        },
+        {
+          "deputy_uid": "PA720546",
+          "prenom": "Alain",
+          "nom": "Bruneel",
+          "mandat_uid": "PM722996",
+          "position": "contre",
+          "par_delegation": null
+        }
+      ]
+    },
+    "scrutin": {
+      "uid": "VTANR5L15V4000",
+      "numero": 4000,
+      "legislature": 15,
+      "date_scrutin": "2021-10-12T00:00:00+00:00",
+      "titre": "Scrutin VTANR5L15V4000",
+      "objet": null,
+      "objet_libelle": null,
+      "objet_raw": null,
+      "sort_code": null,
+      "sort_libelle": null,
+      "sort_raw": null,
+      "is_adopted": null,
+      "official_result": null,
+      "majority_rule": "majorité simple des suffrages exprimés",
+      "majority_threshold": null,
+      "majority_explanation": "Aucune règle spéciale détectée : le scrutin relève de la majorité simple des suffrages exprimés.",
+      "type_primary": "autre",
+      "tags": [],
+      "type_vote": null,
+      "vote_mode": "vote nominal",
+      "demandeur": null,
+      "synthese": null
+    },
+    "results_global": {
+      "pour": 72,
+      "contre": 3,
+      "abstention": 5,
+      "non_votant": 0,
+      "unknown": 0,
+      "total": 80
+    },
+    "results_by_group": [
+      {
+        "groupe_uid": null,
+        "pour": 72,
+        "contre": 3,
+        "abstention": 5,
+        "non_votant": 0,
+        "unknown": 0,
+        "total": 80
+      }
+    ],
+    "include_votes": true
+  }
+}

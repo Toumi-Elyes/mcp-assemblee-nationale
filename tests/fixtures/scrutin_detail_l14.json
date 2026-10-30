@@ -1,0 +1,134 @@
+{
+  "publisher": "CIVIX.fr",
+  "api_version": "v1",
+  "retrieved_at": "2026-10-30T14:04:55.207Z",
+  "license": {
+    "name": "Open Data – Assemblée nationale",
+    "notice": "Données publiques de l'Assemblée nationale, présentées par CIVIX.fr (initiative indépendante)."
+  },
+  "schema_version": "2026-04-29",
+  "answer": "Le scrutin n°500 a abouti au résultat officiel suivant : non précisé.",
+  "canonical_url": "https://www.civix.fr/votes/VTANR5L14V500",
+  "confidence": "high",
+  "meta": {
+    "schema_version": "2026-04-29",
+    "api_version": "v1",
+    "retrieved_at": "2026-10-30T14:04:55.207Z",
+    "last_updated": "2013-04-17T00:00:00.000Z",
+    "query": {
+      "uid": "VTANR5L14V500",
+      "include_votes": false
+    },
+    "pagination": null
+  },
+  "summary": "Scrutin n°500 (législature 14) du 17 avril 2013 : Scrutin VTANR5L14V500. Le résultat officiel du scrutin est : non précisé. Résultat: 274 pour, 244 contre, 20 abstentions, 0 non-votants (total 538).",
+  "source": {
+    "type": "dataset",
+    "provider": "Assemblée nationale",
+    "via": "CIVIX.fr",
+    "source_urls": [
+      "https://www.assemblee-nationale.fr/dyn/14/scrutins/jo500"
+    ],
+    "civix_urls": {
+      "page": "https://www.civix.fr/votes/VTANR5L14V500",
+      "api": "https://www.civix.fr/api/v1/scrutins?uid=VTANR5L14V500"
+    }
+  },
+  "citation": {
+    "text": "Selon CIVIX.fr (données publiques de l'Assemblée nationale, consultées le 30 octobre 2026), le scrutin n°500 du 17 avril 2013 portant sur \"Scrutin VTANR5L14V500\" a abouti au résultat officiel suivant : non précisé. Résultat: 274 pour, 244 contre, 20 abstentions, 0 non-votants (total 538).",
+    "url": "https://www.civix.fr/votes/VTANR5L14V500"
+  },
+  "data": {
+    "type": "scrutin",
+    "attributes": {
+      "scrutin": {
+        "uid": "VTANR5L14V500",
+        "numero": 500,
+        "legislature": 14,
+        "date_scrutin": "2013-04-17T00:00:00+00:00",
+        "titre": "Scrutin VTANR5L14V500",
+        "objet": null,
+        "objet_libelle": null,
+        "objet_raw": null,
+        "sort_code": null,
+        "sort_libelle": null,
+        "sort_raw": null,
+        "is_adopted": null,
+        "official_result": null,
+        "majority_rule": "majorité simple des suffrages exprimés",
+        "majority_threshold": null,
+        "majority_explanation": "Aucune règle spéciale détectée : le scrutin relève de la majorité simple des suffrages exprimés.",
+        "type_primary": "autre",
+        "tags": [],
+        "type_vote": null,
+        "vote_mode": "vote nominal",
+        "demandeur": null,
+        "synthese": null
+      },
+      "results_global": {
+        "pour": 274,
+        "contre": 244,
+        "abstention": 20,
+        "non_votant": 0,
+        "unknown": 0,
+        "total": 538
+      },
+      "results_by_group": [
+        {
+          "groupe_uid": null,
+          "pour": 274,
+          "contre": 244,
+          "abstention": 20,
+          "non_votant": 0,
+          "unknown": 0,
+          "total": 538
+        }
+      ],
+      "include_votes": false
+    },
+    "scrutin": {
+      "uid": "VTANR5L14V500",
+      "numero": 500,
+      "legislature": 14,
+      "date_scrutin": "2013-04-17T00:00:00+00:00",
+      "titre": "Scrutin VTANR5L14V500",
+      "objet": null,
+      "objet_libelle": null,
+      "objet_raw": null,
+      "sort_code": null,
+      "sort_libelle": null,
+      "sort_raw": null,
+      "is_adopted": null,
+      "official_result": null,
+      "majority_rule": "majorité simple des suffrages exprimés",
+      "majority_threshold": null,
+      "majority_explanation": "Aucune règle spéciale détectée : le scrutin relève de la majorité simple des suffrages exprimés.",
+      "type_primary": "autre",
+      "tags": [],
+      "type_vote": null,
+      "vote_mode": "vote nominal",
+      "demandeur": null,
+      "synthese": null
+    },
+    "results_global": {
+      "pour": 274,
+      "contre": 244,
+      "abstention": 20,
+      "non_votant": 0,
+      "unknown": 0,
+      "total": 538
+    },
+    "results_by_group": [
+      {
+        "groupe_uid": null,
+        "pour": 274,
+        "contre": 244,
+        "abstention": 20,
+        "non_votant": 0,
+        "unknown": 0,
+        "total": 538
+      }
+    ],
+    "include_votes": false
+  }
+}
