@@ -75,6 +75,11 @@ export const CAPABILITY_GROUPS: readonly CapabilityGroup[] = [
         detail: "Volume de scrutins par semaine, part d'adoption par type de vote et jours les plus chargés.",
       },
       {
+        tool: "suivre_sujet",
+        question: "Qu'a voté l'Assemblée sur la retraite sous chaque législature depuis 2012 ?",
+        detail: "Par législature, le nombre de scrutins sur le sujet, adoptés et rejetés, et les derniers votes sur l'ensemble d'un texte.",
+      },
+      {
         tool: "textes_les_plus_votes",
         question: "Quels textes ont donné lieu au plus de scrutins ces dernières semaines ?",
         detail: "Compte les scrutins par texte. Ce nombre ne mesure pas l'importance du texte.",
