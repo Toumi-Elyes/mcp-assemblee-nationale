@@ -1,0 +1,37 @@
+name: Proposer une amélioration
+description: Une idée de nouvel outil, de question à couvrir ou d'amélioration de la page.
+title: "[Idée] "
+labels: ["enhancement"]
+projects: ["Toumi-Elyes/3"]
+body:
+  - type: dropdown
+    id: partie
+    attributes:
+      label: Partie concernée
+      options:
+        - Connecteur MCP
+        - Page de démo (landing)
+        - Documentation
+        - Autre
+    validations:
+      required: true
+  - type: textarea
+    id: besoin
+    attributes:
+      label: Quel besoin ou quelle question voulez-vous couvrir ?
+      description: Partez de l'usage, par exemple une question que vous aimeriez poser à votre assistant.
+      placeholder: "Je voudrais pouvoir demander « … »"
+    validations:
+      required: true
+  - type: textarea
+    id: proposition
+    attributes:
+      label: Votre proposition (facultatif)
+  - type: checkboxes
+    id: neutralite
+    attributes:
+      label: Neutralité
+      description: Le projet présente des faits sourcés, sans interprétation politique ni classement de députés.
+      options:
+        - label: Ma proposition respecte cette règle.
+          required: true

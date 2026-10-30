@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Signaler une faille de sécurité (privé)
+    url: https://github.com/Toumi-Elyes/mcp-assemblee-nationale/security/advisories/new
+    about: Ne publiez pas les failles dans une issue publique.
+  - name: Essayer le connecteur
+    url: https://landing-page-mcp-assemblee-national.vercel.app
+    about: La page de démo explique comment l'ajouter à votre assistant.

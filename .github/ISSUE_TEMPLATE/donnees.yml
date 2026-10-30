@@ -1,0 +1,30 @@
+name: Signaler une donnée incorrecte
+description: Un vote, un député ou un chiffre qui ne correspond pas à la source officielle.
+title: "[Données] "
+labels: ["donnees"]
+projects: ["Toumi-Elyes/3"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Les données viennent de l'API CIVIX, qui republie les données ouvertes de l'Assemblée nationale. Si l'erreur vient de la source, nous la signalerons à CIVIX.
+  - type: input
+    id: scrutin
+    attributes:
+      label: Scrutin ou député concerné
+      placeholder: "Scrutin n°9231, ou VTANR5L17V9231, ou nom du député"
+    validations:
+      required: true
+  - type: textarea
+    id: ecart
+    attributes:
+      label: Ce qui est affiché et ce qui devrait l'être
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Lien vers la source officielle
+      placeholder: "https://www.assemblee-nationale.fr/dyn/17/scrutins/9231"
+    validations:
+      required: true
