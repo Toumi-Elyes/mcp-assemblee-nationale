@@ -6,7 +6,7 @@ from collections.abc import Callable, Mapping
 from datetime import datetime, timedelta
 from http import HTTPStatus
 from typing import Any
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 
 import httpx
 from pydantic import ValidationError
@@ -34,6 +34,7 @@ from assemblee_mcp.civix.models import (
     SearchResponse,
     StatementsResponse,
 )
+from assemblee_mcp.civix.shared_cache import SharedCache
 from assemblee_mcp.config import (
     CONNECT_TIMEOUT_SECONDS,
     IMMUTABLE_AFTER_DAYS,
@@ -58,6 +59,22 @@ def segment(value: str) -> str:
     if value in FORBIDDEN_SEGMENTS:
         raise CivixNotFoundError
     return quote(value, safe="")
+
+
+def shared_name(key: CacheKey) -> str:
+    """Nom stable d'une requête dans le cache partagé : chemin et paramètres triés."""
+    path, params = key
+    return f"{path}?{urlencode(params)}"
+
+
+def shared_kind(path: str) -> str:
+    """Étiquette du cache partagé : détail ou votes de scrutin, sinon la ressource lue."""
+    if path.endswith(VOTES_SUFFIX):
+        return "scrutin-votes"
+    parts = path.strip("/").split("/")
+    if parts[0] == "scrutins" and len(parts) == 2:  # noqa: PLR2004
+        return "scrutin-detail"
+    return parts[0]
 
 
 def parse_response(response: httpx.Response) -> Any:
@@ -87,8 +104,12 @@ class CivixClient:
         *,
         transport: httpx.AsyncBaseTransport | None = None,
         clock: Callable[[], float] = time.monotonic,
+        shared_cache: SharedCache | None = None,
     ) -> None:
-        """Prépare le client ; `transport` et `clock` sont injectables pour les tests."""
+        """Prépare le client ; `transport`, `clock` et `shared_cache` sont injectables (tests).
+
+        Sans `shared_cache`, le second niveau est le Runtime Cache sur Vercel, inactif ailleurs.
+        """
         settings_ = settings or Settings.from_env()
         self.settings = settings_
         self._transport = transport
@@ -99,12 +120,14 @@ class CivixClient:
         self._detail_cache = TtlCache(
             settings_.detail_cache_max_entries, settings_.cache_ttl, clock
         )
+        self._shared = shared_cache if shared_cache is not None else SharedCache.from_environment()
         self._inflight: dict[CacheKey, asyncio.Future[CivixResponse[Any]]] = {}
         self._slots = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
         self.directory = DeputyDirectory(
             lambda page: self.list_deputes(page=page, page_size=CIVIX_PAGE_SIZE),
             settings_.immutable_ttl,
             clock,
+            self._shared,
         )
 
     async def aclose(self) -> None:
@@ -211,11 +234,15 @@ class CivixClient:
         cached = cache.get(key)
         if cached is not None and isinstance(cached, response_model):
             return cached
+        shared = await self._read_shared(key, response_model)
+        if shared is not None:
+            cache.set(key, *shared)
+            return shared[0]
         pending = self._inflight.get(key)
         if pending is not None:
-            shared = await pending
-            if isinstance(shared, response_model):
-                return shared
+            awaited = await pending
+            if isinstance(awaited, response_model):
+                return awaited
         parsed = await self._load_and_share(key, path, clean, response_model)
         cache.set(key, parsed, self._ttl_for(parsed))
         return parsed
@@ -239,9 +266,31 @@ class CivixClient:
             raise
         else:
             future.set_result(parsed)
+            await self._write_shared(key, path, parsed)
             return parsed
         finally:
             del self._inflight[key]
+
+    async def _read_shared[AttributesT: CivixModel](
+        self, key: CacheKey, response_model: type[CivixResponse[AttributesT]]
+    ) -> tuple[CivixResponse[AttributesT], float] | None:
+        """Réponse du cache partagé et sa durée restante ; absente, périmée ou de forme ancienne
+        (le modèle a changé sans changer la version du schéma) : `None`, on lit CIVIX.
+        """
+        found = await self._shared.get(shared_name(key))
+        if found is None:
+            return None
+        data, remaining = found
+        try:
+            return response_model.model_validate(data), remaining
+        except ValidationError:
+            return None
+
+    async def _write_shared(self, key: CacheKey, path: str, response: CivixResponse[Any]) -> None:
+        """Copie une réponse fraîche dans le cache partagé, pour la même durée qu'en mémoire."""
+        ttl = self._ttl_for(response) or self.settings.cache_ttl
+        data = response.model_dump(mode="json", by_alias=True)
+        await self._shared.put(shared_name(key), shared_kind(path), data, ttl)
 
     def _cache_for(self, path: str) -> TtlCache:
         """Cache adapté au chemin : votes et détails de scrutin ont chacun le leur."""

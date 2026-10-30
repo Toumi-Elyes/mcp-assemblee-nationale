@@ -59,3 +59,15 @@ EXACT_POOL_PAGES = 2
 MAX_RANGE_DAYS = 90
 # Législature en cours, la seule bien couverte pour les députés.
 CURRENT_LEGISLATURE = 17
+
+# Cache partagé entre instances (Runtime Cache de Vercel) : changer ce numéro invalide toutes les
+# entrées, à faire quand la forme d'un modèle CIVIX change.
+SHARED_CACHE_SCHEMA_VERSION = 1
+# Le Runtime Cache refuse un élément de plus de 2 Mo : au-delà, l'élément reste en mémoire seule.
+SHARED_CACHE_MAX_BYTES = 2_000_000
+# Un cache partagé lent ne doit jamais retarder une réponse : on lit CIVIX à la place.
+SHARED_CACHE_TIMEOUT_SECONDS = 2.0
+# Après un échec ou un délai dépassé, le cache partagé est ignoré pendant ce temps.
+SHARED_CACHE_COOLDOWN_SECONDS = 60.0
+# Accès simultanés au cache partagé (chaque accès ouvre sa propre connexion HTTP).
+SHARED_CACHE_MAX_CONCURRENT = 8
