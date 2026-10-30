@@ -48,8 +48,12 @@ export const FAQ: readonly FaqItem[] = [
       "Non. C'est un projet personnel et indépendant, sans lien avec l'Assemblée nationale ni avec CIVIX. Le code est ouvert, sous licence MIT, et chacun peut le lire.",
   },
   {
-    question: "Et le Sénat ?",
+    question: "Jusqu'où remontent les votes ?",
     answer:
-      "Pas pour l'instant : seule l'Assemblée nationale est couverte, et surtout la législature en cours, la 17e.",
+      "Jusqu'au premier scrutin de la 14e législature, le 3 juillet 2012. Les votes de chaque député sont consultables de la 14e à la 17e législature, y compris pour les anciens députés. Pour les 14e et 15e législatures (2012 à 2022), la source ne donne ni le titre ni le décompte par groupe des scrutins : l'assistant les retrouve par date ou par numéro, pas par sujet. Rien n'est disponible avant 2012.",
+  },
+  {
+    question: "Et le Sénat ?",
+    answer: "Pas pour l'instant : seule l'Assemblée nationale est couverte.",
   },
 ];

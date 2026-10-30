@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { toDay, toPosition, toResult } from "@/lib/civix/mappers";
 import {
   deputesSchema,
+  scrutinDetailResponseSchema,
   scrutinVotesSchema,
   searchSchema,
   statementsSchema,
@@ -54,6 +55,17 @@ describe("schemas tolerate real fixtures", () => {
     expect(parsed.results_global?.total).toBe(90);
     expect(parsed.results_by_group.length).toBeGreaterThan(0);
     expect(parsed.votes.length).toBeGreaterThan(0);
+  });
+
+  it("parses a 14th legislature scrutin, which has no group breakdown", () => {
+    for (const name of ["scrutin_votes_l14", "scrutin_detail_l14"]) {
+      const parsed = scrutinDetailResponseSchema.parse(fixture(name)).data.attributes;
+      expect(parsed.results_global?.total).toBe(538);
+      expect(parsed.results_by_group).toEqual([]);
+    }
+    const votes = scrutinVotesSchema.parse(fixture("scrutin_votes_l14")).data.attributes.votes;
+    expect(votes.length).toBeGreaterThan(0);
+    expect(votes.every((vote) => vote.par_delegation === false)).toBe(true);
   });
 
   it("parses statements, deputies and search hits", () => {

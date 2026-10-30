@@ -54,14 +54,25 @@ const countsShape = {
 };
 
 export const countsSchema = z.object(countsShape);
-export const groupCountsSchema = z.object({ groupe_uid: z.string(), ...countsShape });
+export const groupCountsSchema = z.object({ groupe_uid: z.string().nullish(), ...countsShape });
+
+// Pour les 14e et 15e législatures, CIVIX ne ventile pas les votes par groupe : il renvoie une seule
+// ligne `groupe_uid: null` qui reprend le décompte global. On l'écarte.
+const groupBreakdownSchema = z
+  .array(groupCountsSchema)
+  .default([])
+  .transform((rows) => rows.flatMap((row) => (row.groupe_uid ? [{ ...row, groupe_uid: row.groupe_uid }] : [])));
 
 export const voteSchema = z.object({
   deputy_uid: z.string(),
   prenom: z.string().default(""),
   nom: z.string().default(""),
   position: z.string().default("unknown"),
-  par_delegation: z.boolean().default(false),
+  // `null` pour les 14e et 15e législatures : la délégation n'y est pas précisée.
+  par_delegation: z
+    .boolean()
+    .nullish()
+    .transform((value) => value ?? false),
 });
 
 const scrutinDetailSchema = z.object({
@@ -88,7 +99,7 @@ export const scrutinVotesSchema = z.object({
     attributes: z.object({
       scrutin: scrutinDetailSchema,
       results_global: countsSchema.nullish(),
-      results_by_group: z.array(groupCountsSchema).default([]),
+      results_by_group: groupBreakdownSchema,
       votes: z.array(voteSchema).default([]),
     }),
   }),
@@ -100,7 +111,7 @@ export const scrutinDetailResponseSchema = z.object({
     attributes: z.object({
       scrutin: scrutinDetailSchema,
       results_global: countsSchema.nullish(),
-      results_by_group: z.array(groupCountsSchema).default([]),
+      results_by_group: groupBreakdownSchema,
     }),
   }),
 });
