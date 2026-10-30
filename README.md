@@ -279,7 +279,7 @@ Ce projet n'est affilié ni à l'Assemblée nationale, ni à CIVIX.
 - **Assemblée nationale uniquement** : pas de Sénat, pas de Parlement européen.
 - **Fraîcheur** : elle dépend de la publication des données par l'Assemblée et de leur reprise par CIVIX.
 - **Disponibilité** : si CIVIX est indisponible, le connecteur le dit et il faut réessayer plus tard.
-- **Couverture** : seule la législature en cours (la 17e) est bien couverte pour les députés.
+- **Couverture** : les scrutins et les votes nominatifs sont disponibles de la 14e législature (2012) à la 17e (en cours). Les députés des 14e, 15e et 16e législatures viennent d'un index tiré des données ouvertes de l'Assemblée nationale, embarqué dans le connecteur. Pour les 14e et 15e législatures, CIVIX ne fournit ni le titre, ni le résultat officiel, ni le décompte par groupe des scrutins : la recherche par mots-clés n'y fonctionne pas, il faut partir d'une période ou de l'identifiant d'un scrutin. Rien n'est disponible avant 2012.
 - **Plusieurs scrutins par texte** : un texte donne souvent plusieurs votes (amendements, articles, ensemble). Vérifiez toujours lequel est cité.
 
 ## Sécurité
@@ -457,11 +457,11 @@ Types partagés : `page` entier de 1 à 500 (défaut `1`) ; `legislature` entier
 | `rechercher` | `requete: str` (2 à 200 car., requis), `page: int = 1` | Recherche globale ; jusqu'à 8 résultats par catégorie |
 | `rechercher_scrutins` | `mots_cles: str \| None = None` (max 200), `legislature: int \| None = None`, `page: int = 1` | Scrutins par sujet ; sans mots-clés, les plus récents |
 | `obtenir_scrutin` | `uid: str` (requis) | Détail et décomptes, global et par groupe |
-| `votes_scrutin` | `uid: str` (requis), `groupe: str \| None = None`, `position: "pour" \| "contre" \| "abstention" \| "non_votant" \| None = None`, `nom: str \| None = None` (max 100) | Votes individuels ; liste limitée à 60 noms, totaux officiels toujours indiqués |
+| `votes_scrutin` | `uid: str` (requis), `groupe: str \| None = None`, `position: "pour" \| "contre" \| "abstention" \| "non_votant" \| None = None`, `nom: str \| None = None` (max 100) | Votes individuels ; liste limitée à 60 noms, totaux officiels toujours indiqués ; pour une législature close, `groupe` désigne le groupe des députés à la date du scrutin |
 | `declarations_groupes` | `uid: str` (requis) | Explications de vote publiées par les groupes |
-| `rechercher_deputes` | `nom: str \| None = None` (max 100), `groupe: str \| None = None`, `legislature: int \| None = None`, `page: int = 1` | Députés par nom, groupe ou législature |
-| `obtenir_depute` | `uid: str` (3 à 32 car. alphanumériques, requis) | Fiche d'un député |
-| `comment_a_vote` | `depute: str` (2 à 100 car., requis), `sujet: str \| None = None` (max 200), `scrutin_uid: str \| None = None` | Position d'un député ; exactement un de `sujet` ou `scrutin_uid` ; jusqu'à 5 scrutins ; nom ambigu : jusqu'à 10 candidats |
+| `rechercher_deputes` | `nom: str \| None = None` (max 100), `groupe: str \| None = None`, `legislature: int \| None = None` (17 par défaut, 14 à 17), `page: int = 1` | Députés par nom, groupe ou législature |
+| `obtenir_depute` | `uid: str` (3 à 32 car. alphanumériques) ou `nom: str`, `legislature: int \| None = None` | Fiche d'un député ; un ancien député est retrouvé par son `uid` dans sa législature la plus récente |
+| `comment_a_vote` | `depute: str` (2 à 100 car., requis), `sujet: str \| None = None` (max 200), `scrutin_uid: str \| None = None`, `legislature: int \| None = None` | Position d'un député ; exactement un de `sujet` ou `scrutin_uid` ; jusqu'à 5 scrutins ; nom ambigu : jusqu'à 10 candidats ; la législature se déduit de `scrutin_uid` |
 | `lister_groupes` | aucun | Groupes, sigles et effectifs |
 | `obtenir_groupe` | `abbr: str` (requis) | Fiche d'un groupe |
 | `search` | `query: str` (2 à 200 car., requis) | JSON `{"results": [{"id", "title", "url"}]}` ; ids `scrutin:<uid>`, `depute:<uid>`, `groupe:<sigle>`, `dossier:<DLR…>` |
@@ -469,14 +469,14 @@ Types partagés : `page` entier de 1 à 500 (défaut `1`) ; `legislature` entier
 | `dossier_legislatif` | `texte: str` (2 à 200 car., requis ; mots-clés ou référence `DLR…`) | Chronologie des scrutins d'un texte ; amendements comptés mais non listés ; si plusieurs dossiers correspondent, le plus voté est détaillé |
 | `scrutins_par_periode` | `date_debut: str` (requis), `date_fin: str` (requis, 90 jours au plus), `type: str = "tous"`, `resultat: "adopte" \| "rejete" \| "tous" = "tous"`, `page: int = 1` (1 à 100) | 20 scrutins par page, du plus récent au plus ancien |
 | `votes_serres` | `periode_jours: int = 30` (7 à 30), `max_scrutins: int = 30` (3 à 30), `ecart_max: int = 20` (0 à 100 voix), `type_scrutin: str = "texte"` | Scrutins dont l'écart entre pour et contre est faible |
-| `tendances_scrutins` | `periode_jours: int = 30` (7 à 90), `legislature: int \| None = None` | Volume par semaine, taux d'adoption par type et contexte, jours les plus chargés |
+| `tendances_scrutins` | `periode_jours: int = 30` (7 à 90), `legislature: int \| None = None` | Volume par semaine, taux d'adoption par type et contexte, jours les plus chargés ; pour une législature close, la période finit à son dernier scrutin |
 | `textes_les_plus_votes` | `periode_jours: int = 30` (7 à 90), `limite: int = 10` (1 à 30) | Dossiers classés par nombre de scrutins ; ce nombre reflète surtout celui des amendements |
 | `statistiques_assemblee` | aucun | Totaux de la législature en cours, effectifs par groupe, taux d'adoption estimé sur un échantillon |
 | `positions_groupes` | `sujet: str \| None = None`, `dossier: str \| None = None` (un seul des deux), `max_scrutins: int = 15` (3 à 30), `type_scrutin: str = "tous"` | Position majoritaire de chaque groupe, scrutin par scrutin |
 | `accords_entre_groupes` | `sujet: str \| None = None`, `periode_jours: int \| None = None` (7 à 30), `max_scrutins: int = 30` (3 à 30), `type_scrutin: str = "tous"` | Taux d'accord entre groupes, deux à deux ; un seul de `sujet` ou `periode_jours` |
 | `cohesion_groupes` | `sujet: str \| None = None`, `periode_jours: int \| None = None` (7 à 30), `max_scrutins: int = 30` (3 à 30), `type_scrutin: str = "tous"` | Part des votes conformes à la position majoritaire du groupe ; un seul de `sujet` ou `periode_jours` |
-| `bilan_depute` | `depute: str` (2 à 100 car., requis), `sujet: str \| None = None`, `periode_jours: int \| None = None` (7 à 30), `max_scrutins: int = 30` (3 à 30) | Répartition des positions d'UN député et alignement sur son groupe ; un seul de `sujet` ou `periode_jours` |
-| `comparer_deputes` | `depute_a: str` (requis), `depute_b: str` (requis), `sujet: str \| None = None`, `periode_jours: int \| None = None` (7 à 30), `max_scrutins: int = 30` (3 à 30) | Part de positions identiques sur les scrutins où les deux ont voté ; un seul de `sujet` ou `periode_jours` |
+| `bilan_depute` | `depute: str` (2 à 100 car., requis), `sujet: str \| None = None`, `periode_jours: int \| None = None` (7 à 30), `max_scrutins: int = 30` (3 à 30), `legislature: int \| None = None` | Répartition des positions d'UN député et alignement sur son groupe ; un seul de `sujet` ou `periode_jours` ; pour une législature close, la période finit à son dernier scrutin |
+| `comparer_deputes` | `depute_a: str` (requis), `depute_b: str` (requis), `sujet: str \| None = None`, `periode_jours: int \| None = None` (7 à 30), `max_scrutins: int = 30` (3 à 30), `legislature: int \| None = None` | Part de positions identiques sur les scrutins où les deux ont voté ; un seul de `sujet` ou `periode_jours` |
 | `exporter_scrutins` | `date_debut: str \| None = None`, `date_fin: str \| None = None` (90 jours au plus), `sujet: str \| None = None` (max 200), `format: "csv" \| "json" = "csv"`, `max_lignes: int = 500` (1 à 1000) | Export de scrutins ; par sujet, 100 scrutins au plus ; les cellules CSV commençant par `=`, `+`, `-` ou `@` sont neutralisées |
 | `exporter_votes` | `scrutin_uid: str` (requis), `format: "csv" \| "json" = "csv"` | Votes nominatifs d'un scrutin |
 

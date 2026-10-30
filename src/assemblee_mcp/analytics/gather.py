@@ -19,6 +19,7 @@ from assemblee_mcp.civix.search import search_scrutin_pool
 from assemblee_mcp.limits import (
     BATCH_PAGES,
     CIVIX_PAGE_SIZE,
+    CURRENT_LEGISLATURE,
     DOSSIER_MAX_PAGES,
     MAX_LIST_PAGES,
     SAMPLE_MAX_PAGES,
@@ -54,6 +55,19 @@ def current_day() -> date:
 def period_start(end: date, days: int) -> date:
     """Premier jour d'une période de `days` jours calendaires se terminant à `end` inclus."""
     return end - timedelta(days=days - 1)
+
+
+async def period_end(client: CivixClient, legislature: int | None) -> date:
+    """Fin d'une période d'analyse : aujourd'hui, ou le dernier scrutin d'une législature close.
+
+    Les `n` derniers jours d'une législature terminée seraient vides : on les compte depuis son
+    dernier scrutin.
+    """
+    if legislature is None or legislature == CURRENT_LEGISLATURE:
+        return current_day()
+    first = await client.list_scrutins(legislature=legislature, page=1, page_size=CIVIX_PAGE_SIZE)
+    days = page_days(first)
+    return max(days) if days else current_day()
 
 
 def last_days(days: int) -> tuple[date, date]:
@@ -159,19 +173,27 @@ async def sample_from_period(
     *,
     today: date,
     kind: str | None = None,
+    legislature: int | None = None,
 ) -> tuple[Sample, Listing]:
     """Échantillon régulier de `count` scrutins parmi ceux des `days` derniers jours."""
     start = period_start(today, days)
-    listing = await fetch_period(client, start, today, max_pages=SAMPLE_MAX_PAGES)
+    listing = await fetch_period(
+        client, start, today, legislature=legislature, max_pages=SAMPLE_MAX_PAGES
+    )
     pool = select_kind(listing.items, kind)
     return Sample(evenly_spaced(pool, count), len(pool), listing.truncated), listing
 
 
 async def sample_from_query(
-    client: CivixClient, query: str, count: int, *, kind: str | None = None
+    client: CivixClient,
+    query: str,
+    count: int,
+    *,
+    kind: str | None = None,
+    legislature: int | None = None,
 ) -> Sample:
     """Les `count` scrutins les plus récents d'une recherche par mots-clés ou dossier."""
-    pool = await search_scrutin_pool(client, query)
+    pool = await search_scrutin_pool(client, query, legislature=legislature)
     items = select_kind(pool.items, kind)
     return Sample(items[:count], len(items), pool.truncated or len(items) > count, pool.note)
 

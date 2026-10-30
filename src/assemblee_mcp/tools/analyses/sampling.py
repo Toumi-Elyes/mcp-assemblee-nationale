@@ -40,12 +40,13 @@ def sample_notes(sample: gather.Sample, count: int, *, regular: bool) -> list[st
 
 
 async def sample_period(
-    client: CivixClient, days: int, count: int, kind: KindName
+    client: CivixClient, days: int, count: int, kind: KindName, legislature: int | None = None
 ) -> tuple[gather.Sample, date, date]:
     """Échantillon régulier de scrutins des `days` derniers jours, avec les bornes de la période."""
-    start, end = gather.last_days(days)
+    end = await gather.period_end(client, legislature)
+    start = gather.period_start(end, days)
     sample, _ = await gather.sample_from_period(
-        client, days, count, today=end, kind=KIND_VALUES[kind]
+        client, days, count, today=end, kind=KIND_VALUES[kind], legislature=legislature
     )
     return sample, start, end
 
@@ -65,12 +66,16 @@ async def select_sample(
     days: int | None,
     count: int,
     kind: KindName,
+    *,
+    legislature: int | None = None,
 ) -> SelectedSample:
     """Échantillon des scrutins d'un sujet (les plus récents) ou d'une période (régulier)."""
     require_subject_or_period(subject, days)
     if days is not None:
-        sample, start, end = await sample_period(client, days, count, kind)
+        sample, start, end = await sample_period(client, days, count, kind, legislature)
         notes = sample_notes(sample, count, regular=True)
         return SelectedSample(sample, describe_period(start, end), notes)
-    sample = await gather.sample_from_query(client, str(subject), count, kind=KIND_VALUES[kind])
+    sample = await gather.sample_from_query(
+        client, str(subject), count, kind=KIND_VALUES[kind], legislature=legislature
+    )
     return SelectedSample(sample, None, sample_notes(sample, count, regular=False))

@@ -11,11 +11,12 @@ from assemblee_mcp.formatting import (
     finish,
     source_line,
 )
+from assemblee_mcp.limits import CURRENT_LEGISLATURE
 
 SOURCE_CIVIX = "https://www.civix.fr/api/v1/scrutins"
 
 
-SOURCE_ASSEMBLEE = "https://www.assemblee-nationale.fr/dyn/17/scrutins"
+SOURCE_ASSEMBLEE = "https://www.assemblee-nationale.fr/dyn/{legislature}/scrutins"
 
 
 NO_DATA = "n/d"
@@ -86,7 +87,8 @@ def warning_block(method: Method) -> str:
 
 def finish_analysis(body: str, method: Method) -> str:
     """Avertissements, corps, méthode, ligne « Source : » et pied de page CIVIX."""
-    source = source_line(SOURCE_CIVIX, SOURCE_ASSEMBLEE)
+    assemblee = SOURCE_ASSEMBLEE.format(legislature=method.legislature or CURRENT_LEGISLATURE)
+    source = source_line(SOURCE_CIVIX, assemblee)
     return finish(f"{warning_block(method)}{body}\n\n{method_block(method)}", source)
 
 

@@ -4,6 +4,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
 
+from assemblee_mcp.civix.archive import ARCHIVED_LEGISLATURES, covered_legislatures
 from assemblee_mcp.civix.models import (
     CivixResponse,
     Depute,
@@ -24,6 +25,16 @@ from assemblee_mcp.links import (
 )
 
 
+def depute_page_url(depute: Depute) -> str:
+    """Page CIVIX d'un député en cours de mandat ; page Assemblée pour une législature close.
+
+    CIVIX n'a pas de fiche pour les députés des législatures closes (`/deputes/<uid>` : 404).
+    """
+    if depute.legislature in ARCHIVED_LEGISLATURES:
+        return depute_assemblee_url(depute)
+    return depute_civix_url(depute)
+
+
 def depute_line(depute: Depute) -> str:
     """Ligne de liste pour un député."""
     where = []
@@ -37,8 +48,14 @@ def depute_line(depute: Depute) -> str:
         f"- **{field_text(depute.full_name)}**"
         + (f" — {place}" if place else "")
         + f"\n  uid : `{depute.uid}`"
-        f" · {depute_civix_url(depute)}"
+        f" · {depute_page_url(depute)}"
     )
+
+
+ARCHIVE_CARD_NOTE = (
+    "- Député de la {legislature}e législature (données ouvertes de l'Assemblée nationale) : "
+    "le groupe indiqué est son dernier groupe dans cette législature."
+)
 
 
 def format_deputes(deputes: Sequence[Depute], title: str, hint: str = "") -> str:
@@ -46,7 +63,8 @@ def format_deputes(deputes: Sequence[Depute], title: str, hint: str = "") -> str
     if not deputes:
         body = (
             f"{title} : aucun député trouvé. Vérifiez l'orthographe du nom ; "
-            "seuls les députés de la législature en cours sont couverts."
+            f"seuls les députés des législatures {covered_legislatures()} sont couverts."
+            + (f"\n\n{hint}" if hint else "")
         )
         return finish(body, source_line("https://www.civix.fr/deputes", None))
     lines = "\n".join(depute_line(depute) for depute in deputes)
@@ -56,8 +74,12 @@ def format_deputes(deputes: Sequence[Depute], title: str, hint: str = "") -> str
 
 
 def format_depute(response: CivixResponse[DeputeDetail]) -> str:
-    """Fiche d'un député."""
-    depute = response.attributes.deputy
+    """Fiche d'un député de la législature en cours, d'après la réponse CIVIX."""
+    return format_depute_card(response.attributes.deputy)
+
+
+def format_depute_card(depute: Depute) -> str:
+    """Fiche d'un député ; pour une législature close, précise ce que l'index ne contient pas."""
     lines = [f"## {field_text(depute.full_name)}", ""]
     if depute.groupe_libelle or depute.groupe_abrev:
         lines.append(
@@ -70,7 +92,10 @@ def format_depute(response: CivixResponse[DeputeDetail]) -> str:
     if depute.legislature is not None:
         lines.append(f"- Législature : {depute.legislature}")
     lines.append(f"- Identifiant : `{depute.uid}`")
-    source = source_line(depute_civix_url(depute), depute_assemblee_url(depute))
+    if depute.legislature in ARCHIVED_LEGISLATURES:
+        lines.append(ARCHIVE_CARD_NOTE.format(legislature=depute.legislature))
+    civix = None if depute.legislature in ARCHIVED_LEGISLATURES else depute_civix_url(depute)
+    source = source_line(civix, depute_assemblee_url(depute))
     return finish("\n".join(lines), source)
 
 
@@ -163,9 +188,9 @@ def format_depute_candidates(query: str, candidates: Sequence[Depute], limit: in
     return finish(body, source_line("https://www.civix.fr/deputes", None))
 
 
-def format_no_scrutin(subject: str) -> str:
-    """Aucun scrutin ne correspond au sujet demandé."""
-    body = (
+def format_no_scrutin(subject: str, note: str | None = None) -> str:
+    """Aucun scrutin ne correspond au sujet ; `note` en donne la raison si elle est connue."""
+    body = note or (
         f"Aucun scrutin trouvé pour « {subject} ». Essayez des mots-clés plus courts, au "
         "singulier, avec les accents français."
     )

@@ -7,6 +7,7 @@ import pytest
 from fastmcp import Client
 
 from assemblee_mcp.civix import lookup
+from assemblee_mcp.civix.archive import load_archive
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.civix.search import search_scrutins
 from assemblee_mcp.civix.shared_cache import SharedCache
@@ -197,3 +198,49 @@ async def test_live_responses_roundtrip_through_the_shared_cache() -> None:
     assert await second.get_scrutin(uid) == detail
     assert await second.get_votes(uid) == votes
     assert await second.directory.load() == directory
+
+
+@pytest.mark.parametrize(
+    ("legislature", "numbers"),
+    [(14, (1, 500, 1354)), (15, (1, 2000, 4419)), (16, (1, 2000, 4105))],
+)
+async def test_live_every_voter_of_a_closed_legislature_is_in_its_index(
+    live_client: CivixClient, legislature: int, numbers: tuple[int, ...]
+) -> None:
+    archive = load_archive(legislature)
+    assert archive is not None
+    known = {depute.uid for depute in archive.deputes}
+    for number in numbers:
+        votes = await live_client.get_votes(f"VTANR5L{legislature}V{number}")
+        voters = {vote.deputy_uid for vote in votes.attributes.votes}
+        assert voters
+        assert voters <= known
+
+
+@pytest.mark.parametrize("uid", ["VTANR5L14V500", "VTANR5L15V4000"])
+async def test_live_untitled_scrutins_are_readable(live_mcp_client: Client[Any], uid: str) -> None:
+    async with live_mcp_client as connected:
+        detail = await connected.call_tool("obtenir_scrutin", {"uid": uid})
+        votes = await connected.call_tool("votes_scrutin", {"uid": uid, "position": "contre"})
+    assert "ni le décompte par groupe" in str(detail.content[0].text)
+    assert "### Contre" in str(votes.content[0].text)
+
+
+async def test_live_former_deputy_of_the_14th_votes(live_mcp_client: Client[Any]) -> None:
+    async with live_mcp_client as connected:
+        result = await connected.call_tool(
+            "comment_a_vote", {"depute": "Bernard Accoyer", "scrutin_uid": "VTANR5L14V500"}
+        )
+    assert "A voté : **Contre**." in str(result.content[0].text)
+
+
+async def test_live_group_filter_uses_the_group_at_the_vote_date(
+    live_mcp_client: Client[Any],
+) -> None:
+    async with live_mcp_client as connected:
+        result = await connected.call_tool(
+            "votes_scrutin", {"uid": "VTANR5L16V1000", "groupe": "SOC"}
+        )
+    text = str(result.content[0].text)
+    assert "groupe à la date du scrutin" in text
+    assert "Valérie Rabault" in text

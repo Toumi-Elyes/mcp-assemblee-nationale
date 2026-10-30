@@ -11,9 +11,10 @@ from urllib.parse import quote, urlencode
 import httpx
 from pydantic import ValidationError
 
+from assemblee_mcp.civix.archive import covered_legislatures, load_archive
 from assemblee_mcp.civix.budget import CivixBudgetError, charge_call
 from assemblee_mcp.civix.cache import CacheKey, TtlCache
-from assemblee_mcp.civix.directory import DeputyDirectory
+from assemblee_mcp.civix.directory import ArchivedDirectory, DeputyDirectory, Directory
 from assemblee_mcp.civix.errors import (
     UNEXPECTED_MESSAGE,
     CivixError,
@@ -44,7 +45,7 @@ from assemblee_mcp.config import (
     POOL_TIMEOUT_SECONDS,
     Settings,
 )
-from assemblee_mcp.limits import CIVIX_PAGE_SIZE
+from assemblee_mcp.limits import CIVIX_PAGE_SIZE, CURRENT_LEGISLATURE
 
 QueryParams = Mapping[str, str | int | bool | None]
 MAX_ATTEMPTS = 2
@@ -52,6 +53,14 @@ FORBIDDEN_SEGMENTS = frozenset({"", ".", ".."})
 RETRYABLE_STATUSES = frozenset({HTTPStatus.BAD_GATEWAY, HTTPStatus.GATEWAY_TIMEOUT})
 VOTES_SUFFIX = "/votes"
 DETAIL_PATH_SLASHES = 2
+
+
+def unsupported_legislature_message(legislature: int) -> str:
+    """Message français pour une législature dont les députés ne sont pas disponibles."""
+    return (
+        f"La {legislature}e législature n'est pas couverte pour les députés "
+        f"(législatures disponibles : {covered_legislatures()})."
+    )
 
 
 def segment(value: str) -> str:
@@ -129,6 +138,18 @@ class CivixClient:
             clock,
             self._shared,
         )
+
+    def directory_for(self, legislature: int) -> Directory:
+        """Annuaire des députés d'une législature : API pour la 17e, index embarqué pour la 16e.
+
+        Lève `CivixNotFoundError` pour une législature qu'aucune source ne couvre.
+        """
+        if legislature == CURRENT_LEGISLATURE:
+            return self.directory
+        archive = load_archive(legislature)
+        if archive is None:
+            raise CivixNotFoundError(unsupported_legislature_message(legislature))
+        return ArchivedDirectory(archive.deputes)
 
     async def aclose(self) -> None:
         """Ferme la connexion HTTP sous-jacente."""

@@ -30,6 +30,14 @@ LegislatureNumber = Annotated[
     int,
     Field(description="Numéro de législature (la législature en cours est la 17e).", ge=1, le=30),
 ]
+DeputeLegislature = Annotated[
+    int | None,
+    Field(
+        description="Législature : 17 par défaut ; les 14e, 15e et 16e sont aussi couvertes.",
+        ge=1,
+        le=30,
+    ),
+]
 ScrutinUid = Annotated[
     str,
     Field(

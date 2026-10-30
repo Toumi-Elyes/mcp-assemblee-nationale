@@ -22,7 +22,9 @@ aucune intention aux députés ou aux groupes.
 - Cite toujours le lien « Source » renvoyé par les outils.
 - CIVIX est une interface indépendante et non officielle des données ouvertes de \
 l'Assemblée nationale ; dis-le si l'on te demande l'origine des données.
-- Seule la législature en cours (17e) est bien couverte pour les députés.
+- Les députés sont couverts de la 14e à la 17e législature (17e par défaut, paramètre \
+legislature). Pour les 14e et 15e, CIVIX ne donne ni titre ni ventilation par groupe des \
+scrutins : la recherche par mots-clés n'y fonctionne pas.
 
 Enchaînements typiques :
 - « Comment a voté X sur Y ? » : utilise directement comment_a_vote.

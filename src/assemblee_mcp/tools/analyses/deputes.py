@@ -11,6 +11,7 @@ from assemblee_mcp.analytics.models import Method
 from assemblee_mcp.analytics.stats import spread_order
 from assemblee_mcp.analytics.stats.deputes import both_expressed, deputy_present
 from assemblee_mcp.civix import lookup
+from assemblee_mcp.civix.archive import ARCHIVED_LEGISLATURES, UNTITLED_LEGISLATURES
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.civix.models import Depute
 from assemblee_mcp.limits import (
@@ -30,7 +31,7 @@ from assemblee_mcp.tools.analyses.sampling import (
     select_sample,
     small_sample_warnings,
 )
-from assemblee_mcp.tools.common import ToolFunction, ToolSet, limited
+from assemblee_mcp.tools.common import DeputeLegislature, ToolFunction, ToolSet, limited
 from assemblee_mcp.tools.resolution import resolve_depute
 
 analytics_tool = limited(ANALYTICS_MAX_CALLS, ANALYTICS_DEADLINE_SECONDS)
@@ -65,6 +66,7 @@ def depute_method(
     noun: str,
     counted: str,
     limits: list[str],
+    legislature: int | None = None,
 ) -> Method:
     """Méthode d'une analyse de député(s) sur un échantillon de scrutins."""
     sample = selection.sample
@@ -78,10 +80,28 @@ def depute_method(
         limits=limits,
         notes=[*selection.notes, *notes],
         warnings=warnings,
+        legislature=legislature,
     )
 
 
-def bilan_method(selection: SelectedSample, scan: gather.VotesScan) -> Method:
+def group_limits(legislature: int | None) -> list[str]:
+    """Limites sur le groupe retenu pour comparer le député à la position de son groupe."""
+    if legislature in UNTITLED_LEGISLATURES:
+        return [
+            f"pour la {legislature}e législature, CIVIX ne fournit pas le décompte par groupe : "
+            "l'alignement sur le groupe n'est pas calculable ;"
+        ]
+    if legislature in ARCHIVED_LEGISLATURES:
+        return [
+            f"le groupe retenu est le dernier groupe connu du député dans la {legislature}e "
+            "législature (il a pu changer de groupe en cours de route) ;"
+        ]
+    return ["le groupe retenu est le groupe actuel du député ;"]
+
+
+def bilan_method(
+    selection: SelectedSample, scan: gather.VotesScan, legislature: int | None
+) -> Method:
     """Méthode de `bilan_depute`."""
     return depute_method(
         selection,
@@ -96,13 +116,16 @@ def bilan_method(selection: SelectedSample, scan: gather.VotesScan) -> Method:
             "l'absence d'un vote enregistré ne dit rien de l'intérêt du député pour le sujet "
             "(liste CIVIX tirée des données ouvertes de l'Assemblée) ;",
             "un vote par délégation est enregistré au nom du député ;",
-            "le groupe retenu est le groupe actuel du député ;",
+            *group_limits(legislature),
             "échantillon borné : ne pas généraliser à l'ensemble de l'activité du député.",
         ],
+        legislature=legislature,
     )
 
 
-def comparison_method(selection: SelectedSample, scan: gather.VotesScan) -> Method:
+def comparison_method(
+    selection: SelectedSample, scan: gather.VotesScan, legislature: int | None
+) -> Method:
     """Méthode de `comparer_deputes`."""
     return depute_method(
         selection,
@@ -117,6 +140,7 @@ def comparison_method(selection: SelectedSample, scan: gather.VotesScan) -> Meth
             "un accord sur un amendement ou un article n'est pas un accord sur un texte ;",
             "échantillon borné, sans valeur de classement.",
         ],
+        legislature=legislature,
     )
 
 
@@ -141,6 +165,7 @@ class DeputeAnalyses(ToolSet):
         sujet: OptionalSubject = None,
         periode_jours: OptionalSamplePeriodDays = None,
         max_scrutins: MaxScrutins = MAX_ANALYSED_SCRUTINS,
+        legislature: DeputeLegislature = None,
     ) -> str:
         """Répartition des votes d'UN député sur un échantillon et alignement sur son groupe.
 
@@ -149,10 +174,12 @@ class DeputeAnalyses(ToolSet):
         Indiquer `sujet` ou `periode_jours`. Sert à décrire, jamais à classer ou juger un député.
         """
         require_subject_or_period(sujet, periode_jours)
-        found = await resolve_depute(self.client, depute)
+        found = await resolve_depute(self.client, depute, legislature)
         if isinstance(found, str):
             return found
-        selection = await select_sample(self.client, sujet, periode_jours, max_scrutins, "tous")
+        selection = await select_sample(
+            self.client, sujet, periode_jours, max_scrutins, "tous", legislature=legislature
+        )
         scan, abbreviations = await asyncio.gather(
             gather.scan_votes(
                 self.client,
@@ -160,13 +187,13 @@ class DeputeAnalyses(ToolSet):
                 lambda votes: deputy_present(votes, found.uid),
                 TARGET_USABLE_SCRUTINS,
             ),
-            lookup.groupe_abbreviations(self.client),
+            lookup.groupe_abbreviations(self.client, found.legislature),
         )
-        group_uid = group_uid_of(abbreviations, found.groupe_abrev)
+        group_uid = found.groupe_uid or group_uid_of(abbreviations, found.groupe_abrev)
         result = stats.depute_bilan(
             found.full_name, found.uid, group_uid, found.groupe_abrev, scan.votes
         )
-        method = bilan_method(selection, scan)
+        method = bilan_method(selection, scan, found.legislature)
         return render.render_bilan(result, method)
 
     @analytics_tool
@@ -174,9 +201,11 @@ class DeputeAnalyses(ToolSet):
         self,
         depute_a: DeputeNameA,
         depute_b: DeputeNameB,
+        *,
         sujet: OptionalSubject = None,
         periode_jours: OptionalSamplePeriodDays = None,
         max_scrutins: MaxScrutins = MAX_ANALYSED_SCRUTINS,
+        legislature: DeputeLegislature = None,
     ) -> str:
         """Compare les votes de DEUX députés nommés : part de scrutins votés de la même façon.
 
@@ -186,13 +215,16 @@ class DeputeAnalyses(ToolSet):
         """
         require_subject_or_period(sujet, periode_jours)
         first, second = await asyncio.gather(
-            resolve_depute(self.client, depute_a), resolve_depute(self.client, depute_b)
+            resolve_depute(self.client, depute_a, legislature),
+            resolve_depute(self.client, depute_b, legislature),
         )
         if not isinstance(first, Depute):
             return first
         if not isinstance(second, Depute):
             return second
-        selection = await select_sample(self.client, sujet, periode_jours, max_scrutins, "tous")
+        selection = await select_sample(
+            self.client, sujet, periode_jours, max_scrutins, "tous", legislature=legislature
+        )
         scan = await gather.scan_votes(
             self.client,
             spread_order(selection.sample.chosen),
@@ -202,7 +234,7 @@ class DeputeAnalyses(ToolSet):
         result = stats.compare_deputes(
             first.full_name, first.uid, second.full_name, second.uid, scan.votes
         )
-        method = comparison_method(selection, scan)
+        method = comparison_method(selection, scan, legislature)
         return render.render_comparison(result, method)
 
 

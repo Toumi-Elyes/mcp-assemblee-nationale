@@ -32,6 +32,7 @@ class Method(ResultModel):
     truncated: bool = False
     notes: list[str] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
+    legislature: int | None = None
 
 
 class Rate(ResultModel):

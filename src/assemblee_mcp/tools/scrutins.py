@@ -7,6 +7,7 @@ from fastmcp import FastMCP
 from pydantic import Field
 
 from assemblee_mcp.civix import lookup
+from assemblee_mcp.civix.archive import ARCHIVED_LEGISLATURES
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.civix.errors import CivixError
 from assemblee_mcp.civix.models import Position, ScrutinVotesResponse
@@ -123,7 +124,9 @@ class ScrutinTools(ToolSet):
         selected = select_votes(
             response.attributes.votes, member_uids=member_uids, position=wanted, nom=nom
         )
-        return format_votes(response, selected, VoteFilters(group_abbr, wanted, nom))
+        at_date = response.attributes.scrutin.legislature in ARCHIVED_LEGISLATURES
+        filters = VoteFilters(group_abbr, wanted, nom, groupe_at_date=at_date)
+        return format_votes(response, selected, filters)
 
     @civix_tool
     async def declarations_groupes(self, uid: ScrutinUid) -> str:
@@ -145,14 +148,31 @@ class ScrutinTools(ToolSet):
     async def _votes_of_group(
         self, uid: str, groupe: str | None
     ) -> tuple[ScrutinVotesResponse, str | None, set[str] | None]:
-        """Votes d'un scrutin et, si `groupe` est donné, sigle officiel et membres du groupe."""
+        """Votes d'un scrutin et, si `groupe` est donné, sigle officiel et membres du groupe.
+
+        Pour une législature close, les membres sont ceux du groupe à la date du scrutin.
+        """
         if groupe is None:
             return await self.client.get_votes(uid), None, None
+        legislature = lookup.legislature_of_scrutin(uid)
+        if legislature in ARCHIVED_LEGISLATURES:
+            return await self._archived_votes_of_group(uid, groupe, legislature)
         abbr = await lookup.resolve_groupe(self.client, groupe)
         response, members = await asyncio.gather(
             self.client.get_votes(uid), lookup.groupe_member_uids(self.client, abbr)
         )
         return response, abbr, members
+
+    async def _archived_votes_of_group(
+        self, uid: str, groupe: str, legislature: int
+    ) -> tuple[ScrutinVotesResponse, str, set[str]]:
+        """Votes d'un scrutin d'une législature close et membres du groupe ce jour-là."""
+        abbr = await lookup.resolve_groupe(self.client, groupe, legislature)
+        response = await self.client.get_votes(uid)
+        day = response.attributes.scrutin.date_scrutin
+        if day is None:
+            return response, abbr, set()
+        return response, abbr, lookup.archived_member_uids(legislature, abbr, day.date())
 
 
 def register(mcp: FastMCP, client: CivixClient) -> None:

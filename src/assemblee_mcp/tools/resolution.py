@@ -16,11 +16,14 @@ def pick_depute(candidates: list[Depute], query: str) -> Depute | None:
     return exact[0] if len(exact) == 1 else None
 
 
-async def resolve_depute(client: CivixClient, name: str) -> Depute | str:
+async def resolve_depute(
+    client: CivixClient, name: str, legislature: int | None = None
+) -> Depute | str:
     """Député visé, ou texte de réponse si le nom est introuvable ou ambigu."""
-    candidates = await lookup.find_deputes(client, name)
+    candidates = await lookup.find_deputes(client, name, legislature=legislature)
     if not candidates:
-        return format_deputes([], f"Député « {name} »")
+        hint = lookup.archived_name_hint(name) if legislature is None else ""
+        return format_deputes([], f"Député « {name} »", hint)
     chosen = pick_depute(candidates, name)
     if chosen is None:
         return format_depute_candidates(name, candidates, MAX_CANDIDATES)

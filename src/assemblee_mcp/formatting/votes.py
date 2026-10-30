@@ -50,12 +50,15 @@ class VoteFilters:
     groupe: str | None = None
     position: Position | None = None
     nom: str | None = None
+    groupe_at_date: bool = False
+    """Vrai si le groupe est celui des députés à la date du scrutin (législature close)."""
 
     def describe(self) -> str | None:
         """Phrase décrivant les filtres actifs."""
         parts = []
         if self.groupe:
-            parts.append(f"groupe {self.groupe} (groupe actuel des députés)")
+            when = "à la date du scrutin" if self.groupe_at_date else "actuel"
+            parts.append(f"groupe {self.groupe} (groupe {when} des députés)")
         if self.position:
             parts.append(f"position « {self.position.label} »")
         if self.nom:

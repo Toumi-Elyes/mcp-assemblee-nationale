@@ -4,6 +4,7 @@ import asyncio
 import math
 from dataclasses import dataclass
 
+from assemblee_mcp.civix.archive import untitled_search_note
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.civix.models import (
     Pagination,
@@ -28,7 +29,8 @@ from assemblee_mcp.limits import (
 class ScrutinSearch:
     """Résultat d'une recherche de scrutins, éventuellement élargie."""
 
-    response: ScrutinListResponse
+    response: ScrutinListResponse | None
+    """`None` quand la recherche n'a pas interrogé CIVIX (législature sans titres)."""
     results: list[ScrutinSummary]
     pagination: Pagination | None
     note: str | None = None
@@ -49,6 +51,9 @@ async def search_scrutins(
     page_size: int = 10,
 ) -> ScrutinSearch:
     """Cherche des scrutins (au plus 3 appels CIVIX)."""
+    untitled = untitled_search_note(legislature) if query else None
+    if untitled is not None:
+        return ScrutinSearch(None, [], None, untitled)
     exact = await client.list_scrutins(
         query, legislature=legislature, page=page, page_size=page_size
     )
@@ -117,6 +122,9 @@ async def search_scrutin_pool(
     client: CivixClient, query: str, *, legislature: int | None = None
 ) -> ScrutinPool:
     """Rassemble les scrutins d'une recherche (au plus 7 appels CIVIX), sans pagination."""
+    untitled = untitled_search_note(legislature)
+    if untitled is not None:
+        return ScrutinPool([], 0, False, untitled)
     first = await client.list_scrutins(
         query, legislature=legislature, page=1, page_size=CIVIX_PAGE_SIZE
     )

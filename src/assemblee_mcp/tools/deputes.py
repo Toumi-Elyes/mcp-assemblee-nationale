@@ -8,25 +8,27 @@ from fastmcp.exceptions import ToolError
 from pydantic import Field
 
 from assemblee_mcp.civix import lookup
+from assemblee_mcp.civix.archive import ARCHIVED_LEGISLATURES
 from assemblee_mcp.civix.client import CivixClient
-from assemblee_mcp.civix.errors import CivixError
+from assemblee_mcp.civix.errors import CivixError, CivixNotFoundError
 from assemblee_mcp.civix.models import Depute, ScrutinSummary
 from assemblee_mcp.civix.search import search_scrutins
 from assemblee_mcp.formatting import (
     ScrutinPosition,
     format_comment_a_vote,
     format_depute,
+    format_depute_card,
     format_deputes,
     format_no_scrutin,
     pagination_hint,
     position_from_votes,
     position_unavailable,
 )
-from assemblee_mcp.limits import COMMENT_MAX_CALLS, DEFAULT_PAGE_SIZE
+from assemblee_mcp.limits import COMMENT_MAX_CALLS, CURRENT_LEGISLATURE, DEFAULT_PAGE_SIZE
 from assemblee_mcp.pagination import paginate
 from assemblee_mcp.tools.common import (
+    DeputeLegislature,
     GroupeAbbreviation,
-    LegislatureNumber,
     Page,
     ScrutinUid,
     ToolFunction,
@@ -71,19 +73,22 @@ class DeputeTools(ToolSet):
         groupe: Annotated[
             GroupeAbbreviation | None, Field(description="Sigle du groupe, par exemple « RN ».")
         ] = None,
-        legislature: LegislatureNumber | None = None,
+        legislature: DeputeLegislature = None,
         page: Page = 1,
     ) -> str:
-        """Cherche des députés par nom, groupe ou législature.
+        """Cherche des députés par nom, groupe ou législature (17e par défaut, 14e à 16e aussi).
 
         À utiliser pour retrouver l'identifiant (`uid`) d'un député avant d'appeler
-        obtenir_depute. Sans `nom`, liste les députés (filtrables par groupe).
+        obtenir_depute. Sans `nom`, liste les députés (filtrables par groupe). Pour une
+        législature close, le groupe indiqué est le dernier du député dans cette législature.
         """
         if nom is None:
             return await self._list_deputes(groupe, legislature, page)
         found = await lookup.find_deputes(self.client, nom, groupe=groupe, legislature=legislature)
         shown, pagination = paginate(found, page, DEFAULT_PAGE_SIZE)
         hint = pagination_hint(pagination, len(shown), "député(s)")
+        if not found and legislature is None:
+            hint = lookup.archived_name_hint(nom)
         return format_deputes(shown, f"Députés correspondant à « {nom} »", hint)
 
     @civix_tool
@@ -100,19 +105,22 @@ class DeputeTools(ToolSet):
                 max_length=100,
             ),
         ] = None,
+        legislature: DeputeLegislature = None,
     ) -> str:
         """Fiche d'un député : groupe, circonscription, législature, liens officiels.
 
-        Indiquer `uid` ou `nom` (si le nom est ambigu, les candidats sont listés).
+        Indiquer `uid` ou `nom` (si le nom est ambigu, les candidats sont listés). La
+        législature vaut 17 par défaut ; un ancien député (14e à 16e législature) est retrouvé
+        automatiquement par son `uid`, dans sa législature la plus récente.
         """
         if (uid is None) == (nom is None):
             raise ToolError("Indiquez soit `uid`, soit `nom` (un seul des deux).")
         if uid is not None:
-            return format_depute(await self.client.get_depute(uid.upper()))
-        resolved = await resolve_depute(self.client, str(nom))
+            return await self._card_for_uid(uid.upper(), legislature)
+        resolved = await resolve_depute(self.client, str(nom), legislature)
         if isinstance(resolved, str):
             return resolved
-        return format_depute(await self.client.get_depute(resolved.uid))
+        return await self._card_for_uid(resolved.uid, resolved.legislature)
 
     @limited(COMMENT_MAX_CALLS)
     async def comment_a_vote(
@@ -136,6 +144,7 @@ class DeputeTools(ToolSet):
             ScrutinUid | None,
             Field(description="Identifiant d'un scrutin précis, à la place de `sujet`."),
         ] = None,
+        legislature: DeputeLegislature = None,
     ) -> str:
         """Répond à « Comment a voté le député X sur le sujet Y ? ».
 
@@ -143,26 +152,61 @@ class DeputeTools(ToolSet):
         ambigu, liste les candidats pour que l'utilisateur choisisse), puis donne sa position
         (pour, contre, abstention, non-votant) sur les 5 premiers scrutins correspondant au
         sujet, avec les liens sources. Un sujet donne souvent plusieurs scrutins (amendements,
-        articles, ensemble du texte) : citer le titre de chacun. Aucune interprétation.
+        articles, ensemble du texte) : citer le titre de chacun. Aucune interprétation. La
+        législature vaut 17 par défaut ; elle se déduit de `scrutin_uid` s'il est donné
+        (14e à 17e législature).
         """
         if (sujet is None) == (scrutin_uid is None):
             raise ToolError(SINGLE_TARGET_MESSAGE)
-        resolved = await resolve_depute(self.client, depute)
+        number = legislature or lookup.legislature_of_scrutin(str(scrutin_uid))
+        resolved = await resolve_depute(self.client, depute, number)
         if isinstance(resolved, str):
             return resolved
         if scrutin_uid is not None:
             return await self._answer_for_scrutin(resolved, scrutin_uid)
-        return await self._answer_for_subject(resolved, str(sujet))
+        return await self._answer_for_subject(resolved, str(sujet), number)
 
     async def _list_deputes(self, groupe: str | None, legislature: int | None, page: int) -> str:
-        """Liste paginée des députés, filtrée par groupe et législature."""
-        abbr = await lookup.resolve_groupe(self.client, groupe) if groupe is not None else None
+        """Liste paginée des députés d'une législature, filtrée par groupe."""
+        number = legislature or CURRENT_LEGISLATURE
+        abbr = await lookup.resolve_groupe(self.client, groupe, number) if groupe else None
+        if number != CURRENT_LEGISLATURE:
+            return await self._list_archived_deputes(number, abbr, page)
         response = await self.client.list_deputes(
-            groupe=abbr, legislature=legislature, page=page, page_size=DEFAULT_PAGE_SIZE
+            groupe=abbr, legislature=number, page=page, page_size=DEFAULT_PAGE_SIZE
         )
         deputes = list(response.attributes.results)
         hint = pagination_hint(response.pagination, len(deputes), "député(s)")
         return format_deputes(deputes, "Députés", hint)
+
+    async def _list_archived_deputes(self, legislature: int, abbr: str | None, page: int) -> str:
+        """Liste paginée des députés d'une législature close (index embarqué)."""
+        everyone = await self.client.directory_for(legislature).load()
+        wanted = [d for d in everyone if abbr is None or d.groupe_abrev == abbr]
+        shown, pagination = paginate(wanted, page, DEFAULT_PAGE_SIZE)
+        hint = pagination_hint(pagination, len(shown), "député(s)")
+        return format_deputes(shown, f"Députés de la {legislature}e législature", hint)
+
+    async def _card_for_uid(self, uid: str, legislature: int | None) -> str:
+        """Fiche d'un député ; un identifiant inconnu de la 17e est cherché dans les archives."""
+        number = legislature or CURRENT_LEGISLATURE
+        if number != CURRENT_LEGISLATURE:
+            return format_depute_card(await lookup.find_depute_by_uid(self.client, uid, number))
+        try:
+            return format_depute(await self.client.get_depute(uid))
+        except CivixNotFoundError:
+            if legislature is not None:
+                raise
+            return await self._card_from_archives(uid)
+
+    async def _card_from_archives(self, uid: str) -> str:
+        """Fiche d'un ancien député retrouvé dans l'index d'une législature close."""
+        for number in ARCHIVED_LEGISLATURES:
+            try:
+                return format_depute_card(await lookup.find_depute_by_uid(self.client, uid, number))
+            except CivixNotFoundError:
+                continue
+        raise CivixNotFoundError
 
     async def _answer_for_scrutin(self, depute: Depute, scrutin_uid: str) -> str:
         """Position du député sur un scrutin précis."""
@@ -170,12 +214,16 @@ class DeputeTools(ToolSet):
         entry = position_from_votes(response, depute.uid)
         return format_comment_a_vote(depute, [entry], "Scrutin demandé.")
 
-    async def _answer_for_subject(self, depute: Depute, subject: str) -> str:
+    async def _answer_for_subject(
+        self, depute: Depute, subject: str, legislature: int | None
+    ) -> str:
         """Position du député sur les premiers scrutins correspondant au sujet."""
-        found = await search_scrutins(self.client, subject, page_size=MAX_SCRUTINS_PER_SUBJECT)
+        found = await search_scrutins(
+            self.client, subject, legislature=legislature, page_size=MAX_SCRUTINS_PER_SUBJECT
+        )
         summaries = found.results[:MAX_SCRUTINS_PER_SUBJECT]
         if not summaries:
-            return format_no_scrutin(subject)
+            return format_no_scrutin(subject, found.note if found.response is None else None)
         entries = await asyncio.gather(
             *(self._position_on(depute.uid, summary) for summary in summaries)
         )
