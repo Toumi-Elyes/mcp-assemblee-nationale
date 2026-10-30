@@ -35,6 +35,7 @@ from assemblee_mcp.civix.models import (
     SearchResponse,
     StatementsResponse,
 )
+from assemblee_mcp.civix.scrutin_archive import complete_list, complete_response
 from assemblee_mcp.civix.shared_cache import SharedCache
 from assemblee_mcp.config import (
     CONNECT_TIMEOUT_SECONDS,
@@ -188,22 +189,26 @@ class CivixClient:
         page: int = 1,
         page_size: int = 10,
     ) -> ScrutinListResponse:
-        """Liste de scrutins, filtrée par mots-clés et législature."""
+        """Liste de scrutins, filtrée par mots-clés et législature.
+
+        Les scrutins des 14e et 15e législatures sont complétés par l'archive de l'Assemblée.
+        """
         params: QueryParams = {
             "search": search,
             "legislature": legislature,
             "page": page,
             "page_size": page_size,
         }
-        return await self._get("/scrutins", params, ScrutinListResponse)
+        return complete_list(await self._get("/scrutins", params, ScrutinListResponse))
 
     async def get_scrutin(self, uid: str) -> ScrutinResponse:
-        """Détail d'un scrutin avec décomptes."""
-        return await self._get(f"/scrutins/{segment(uid)}", {}, ScrutinResponse)
+        """Détail d'un scrutin avec décomptes (complété par l'archive pour les 14e et 15e)."""
+        return complete_response(await self._get(f"/scrutins/{segment(uid)}", {}, ScrutinResponse))
 
     async def get_votes(self, uid: str) -> ScrutinVotesResponse:
-        """Votes individuels d'un scrutin."""
-        return await self._get(f"/scrutins/{segment(uid)}/votes", {}, ScrutinVotesResponse)
+        """Votes individuels (décomptes complétés par l'archive pour les 14e et 15e)."""
+        path = f"/scrutins/{segment(uid)}/votes"
+        return complete_response(await self._get(path, {}, ScrutinVotesResponse))
 
     async def get_statements(self, uid: str) -> StatementsResponse:
         """Déclarations publiques des groupes sur un scrutin."""

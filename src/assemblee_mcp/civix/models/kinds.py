@@ -33,3 +33,25 @@ def classify_scrutin(civix_type: str | None, title: str) -> str:
     if civix_type == CIVIX_TYPE_TEXTE and WHOLE_TEXT_TITLE.match(folded):
         return KIND_ENSEMBLE
     return KIND_AUTRE
+
+
+CIVIX_TYPE_AUTRE = "scrutin"
+# « amende?ment » couvre aussi la coquille « sous-amendment » présente dans les archives.
+AMENDEMENT_TITLE = re.compile(r"^(l['’]|les |le )?(sous-)?amende?ments?\b")
+ARTICLE_TITLE = re.compile(r"^(l['’]|les )articles?\b")
+
+
+def type_from_title(title: str) -> str:
+    """Type CIVIX déduit du titre, pour les scrutins que CIVIX publie sans type (14e et 15e).
+
+    Reprend le découpage de CIVIX : `amendement` (sous-amendements compris), `article`, `texte`
+    (votes sur l'ensemble et motions, que `classify_scrutin` sépare ensuite) et `scrutin`.
+    """
+    folded = title.strip().casefold()
+    if AMENDEMENT_TITLE.match(folded):
+        return KIND_AMENDEMENT
+    if ARTICLE_TITLE.match(folded):
+        return KIND_ARTICLE
+    if WHOLE_TEXT_TITLE.match(folded) or PROCEDURE_TITLE.match(folded):
+        return CIVIX_TYPE_TEXTE
+    return CIVIX_TYPE_AUTRE

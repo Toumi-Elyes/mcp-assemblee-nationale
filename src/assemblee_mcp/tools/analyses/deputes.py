@@ -1,6 +1,8 @@
 """Outils d'analyse de députés nommés : répartition des votes et comparaison."""
 
 import asyncio
+from collections.abc import Callable
+from dataclasses import replace
 from typing import Annotated
 
 from fastmcp import FastMCP
@@ -11,9 +13,9 @@ from assemblee_mcp.analytics.models import Method
 from assemblee_mcp.analytics.stats import spread_order
 from assemblee_mcp.analytics.stats.deputes import both_expressed, deputy_present
 from assemblee_mcp.civix import lookup
-from assemblee_mcp.civix.archive import ARCHIVED_LEGISLATURES, UNTITLED_LEGISLATURES
+from assemblee_mcp.civix.archive import ARCHIVED_LEGISLATURES, load_archive
 from assemblee_mcp.civix.client import CivixClient
-from assemblee_mcp.civix.models import Depute
+from assemblee_mcp.civix.models import Depute, ScrutinVotes
 from assemblee_mcp.limits import (
     ANALYTICS_DEADLINE_SECONDS,
     ANALYTICS_MAX_CALLS,
@@ -84,17 +86,54 @@ def depute_method(
     )
 
 
+PARTIAL_LISTS_NOTE = (
+    "{count} scrutin(s) écarté(s) : l'Assemblée n'y a publié que les noms des députés ayant voté "
+    "autrement que leur groupe (14e législature, jusqu'en février 2014), l'absence d'un nom n'y "
+    "dit donc rien."
+)
+
+
+def complete_list_of_votes(votes: ScrutinVotes) -> bool:
+    """Vrai si la liste des votes du scrutin nomme tous les votants."""
+    return not votes.dissidents_only
+
+
+def without_partial_lists(scan: gather.VotesScan) -> tuple[gather.VotesScan, int]:
+    """Lecture privée des scrutins à liste partielle, et leur nombre."""
+    kept = [votes for votes in scan.votes if complete_list_of_votes(votes)]
+    return replace(scan, votes=kept), len(scan.votes) - len(kept)
+
+
+def with_partial_note(method: Method, partial: int) -> Method:
+    """Ajoute à la méthode la note sur les scrutins à liste partielle écartés, s'il y en a."""
+    if not partial:
+        return method
+    notes = [*method.notes, PARTIAL_LISTS_NOTE.format(count=partial)]
+    return method.model_copy(update={"notes": notes})
+
+
+def group_at_vote(depute: Depute) -> Callable[[ScrutinVotes], str | None] | None:
+    """Groupe du député à la date de chaque scrutin, pour une législature close ; sinon `None`."""
+    archive = load_archive(depute.legislature) if depute.legislature else None
+    if archive is None:
+        return None
+
+    def group_of(votes: ScrutinVotes) -> str | None:
+        day = votes.scrutin.date_scrutin
+        if day is None:
+            return depute.groupe_uid
+        published = {row.groupe_uid for row in votes.results_by_group}
+        return archive.groups_for_vote(depute.uid, day.date(), published)
+
+    return group_of
+
+
 def group_limits(legislature: int | None) -> list[str]:
     """Limites sur le groupe retenu pour comparer le député à la position de son groupe."""
-    if legislature in UNTITLED_LEGISLATURES:
-        return [
-            f"pour la {legislature}e législature, CIVIX ne fournit pas le décompte par groupe : "
-            "l'alignement sur le groupe n'est pas calculable ;"
-        ]
     if legislature in ARCHIVED_LEGISLATURES:
         return [
-            f"le groupe retenu est le dernier groupe connu du député dans la {legislature}e "
-            "législature (il a pu changer de groupe en cours de route) ;"
+            "le groupe retenu est celui du député à la date de chaque scrutin (données ouvertes "
+            "de l'Assemblée) ;"
         ]
     return ["le groupe retenu est le groupe actuel du député ;"]
 
@@ -184,16 +223,23 @@ class DeputeAnalyses(ToolSet):
             gather.scan_votes(
                 self.client,
                 spread_order(selection.sample.chosen),
-                lambda votes: deputy_present(votes, found.uid),
+                lambda votes: complete_list_of_votes(votes) and deputy_present(votes, found.uid),
                 TARGET_USABLE_SCRUTINS,
             ),
             lookup.groupe_abbreviations(self.client, found.legislature),
         )
+        scan, partial = without_partial_lists(scan)
         group_uid = found.groupe_uid or group_uid_of(abbreviations, found.groupe_abrev)
         result = stats.depute_bilan(
-            found.full_name, found.uid, group_uid, found.groupe_abrev, scan.votes
+            found.full_name,
+            found.uid,
+            group_uid,
+            found.groupe_abrev,
+            scan.votes,
+            group_of=group_at_vote(found),
         )
         method = bilan_method(selection, scan, found.legislature)
+        method = with_partial_note(method, partial)
         return render.render_bilan(result, method)
 
     @analytics_tool
@@ -228,13 +274,16 @@ class DeputeAnalyses(ToolSet):
         scan = await gather.scan_votes(
             self.client,
             spread_order(selection.sample.chosen),
-            lambda votes: both_expressed(votes, first.uid, second.uid),
+            lambda votes: (
+                complete_list_of_votes(votes) and both_expressed(votes, first.uid, second.uid)
+            ),
             TARGET_USABLE_SCRUTINS,
         )
+        scan, partial = without_partial_lists(scan)
         result = stats.compare_deputes(
             first.full_name, first.uid, second.full_name, second.uid, scan.votes
         )
-        method = comparison_method(selection, scan, legislature)
+        method = with_partial_note(comparison_method(selection, scan, legislature), partial)
         return render.render_comparison(result, method)
 
 

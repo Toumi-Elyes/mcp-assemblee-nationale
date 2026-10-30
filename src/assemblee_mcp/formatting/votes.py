@@ -15,6 +15,11 @@ from assemblee_mcp.formatting.text import field_text
 from assemblee_mcp.textutils import fold
 
 MAX_VOTE_NAMES = 60
+DISSIDENTS_ONLY_NOTE = (
+    "Pour ce scrutin, l'Assemblée n'a publié que les noms des députés ayant voté autrement que "
+    "la position de leur groupe : la liste ci-dessous n'est pas complète, et l'absence d'un nom "
+    "ne dit pas comment le député a voté."
+)
 
 POSITION_ORDER = (
     Position.POUR,
@@ -95,6 +100,8 @@ def format_votes(
         )
     else:
         lines.append(f"{recorded} votes individuels enregistrés.")
+    if attributes.dissidents_only:
+        lines.append(DISSIDENTS_ONLY_NOTE)
     budget = limit
     for position in POSITION_ORDER:
         group = [vote for vote in selected if vote.position == position]

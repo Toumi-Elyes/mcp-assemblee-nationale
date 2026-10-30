@@ -1,5 +1,6 @@
 import json
 import os
+from collections import Counter
 from typing import Any
 
 import httpx
@@ -9,6 +10,8 @@ from fastmcp import Client
 from assemblee_mcp.civix import lookup
 from assemblee_mcp.civix.archive import load_archive
 from assemblee_mcp.civix.client import CivixClient
+from assemblee_mcp.civix.models import Position
+from assemblee_mcp.civix.scrutin_archive import load_scrutins
 from assemblee_mcp.civix.search import search_scrutins
 from assemblee_mcp.civix.shared_cache import SharedCache
 from assemblee_mcp.config import Settings
@@ -218,11 +221,14 @@ async def test_live_every_voter_of_a_closed_legislature_is_in_its_index(
 
 
 @pytest.mark.parametrize("uid", ["VTANR5L14V500", "VTANR5L15V4000"])
-async def test_live_untitled_scrutins_are_readable(live_mcp_client: Client[Any], uid: str) -> None:
+async def test_live_scrutins_of_14th_and_15th_are_completed(
+    live_mcp_client: Client[Any], uid: str
+) -> None:
     async with live_mcp_client as connected:
         detail = await connected.call_tool("obtenir_scrutin", {"uid": uid})
         votes = await connected.call_tool("votes_scrutin", {"uid": uid, "position": "contre"})
-    assert "ni le décompte par groupe" in str(detail.content[0].text)
+    assert "### Décompte par groupe" in str(detail.content[0].text)
+    assert "archive des scrutins de l'Assemblée nationale" in str(detail.content[0].text)
     assert "### Contre" in str(votes.content[0].text)
 
 
@@ -244,3 +250,32 @@ async def test_live_group_filter_uses_the_group_at_the_vote_date(
     text = str(result.content[0].text)
     assert "groupe à la date du scrutin" in text
     assert "Valérie Rabault" in text
+
+
+@pytest.mark.parametrize("legislature", [14, 15])
+async def test_live_archive_totals_match_civix_on_fully_published_scrutins(
+    live_client: CivixClient, legislature: int
+) -> None:
+    scrutins = load_scrutins(legislature)
+    assert scrutins is not None
+    complete = [item for item in scrutins.values() if not item.dissidents_only]
+    for item in complete[:: len(complete) // 8]:
+        votes = await live_client.get_votes(item.uid)
+        positions = Counter(vote.position for vote in votes.attributes.votes)
+        assert (positions[Position.POUR], positions[Position.CONTRE]) == (
+            item.totals.pour,
+            item.totals.contre,
+        )
+        assert votes.attributes.scrutin.date_scrutin is not None
+        assert votes.attributes.scrutin.date_scrutin.date() == item.day
+
+
+async def test_live_subject_search_in_the_14th(live_mcp_client: Client[Any]) -> None:
+    async with live_mcp_client as connected:
+        result = await connected.call_tool(
+            "comment_a_vote",
+            {"depute": "Bernard Accoyer", "sujet": "mariage aux couples", "legislature": 14},
+        )
+    text = str(result.content[0].text)
+    assert "VTANR5L14V511" in text or "n°511" in text
+    assert "A voté : **Contre**." in text

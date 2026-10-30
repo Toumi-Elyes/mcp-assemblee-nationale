@@ -1,7 +1,7 @@
 """Calculs sur les votes de députés nommés : répartition, alignement sur le groupe, comparaison."""
 
 from collections import Counter
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 
 from assemblee_mcp.analytics.models import (
     DeputeBilan,
@@ -64,8 +64,14 @@ def depute_bilan(
     group_uid: str | None,
     group_abbr: str | None,
     sample: Sequence[ScrutinVotes],
+    *,
+    group_of: Callable[[ScrutinVotes], str | None] | None = None,
 ) -> DeputeBilan:
-    """Positions d'un député et alignement sur la position majoritaire de son groupe."""
+    """Positions d'un député et alignement sur la position majoritaire de son groupe.
+
+    `group_of` donne, s'il est fourni, le groupe du député pour chaque scrutin (législature close,
+    où il a pu changer de groupe) ; sinon `group_uid` vaut pour tous les scrutins.
+    """
     counts: Counter[Position] = Counter()
     absent = delegated = comparable = aligned = 0
     for votes in sample:
@@ -76,7 +82,8 @@ def depute_bilan(
         position, by_delegation = found
         counts[position] += 1
         delegated += 1 if by_delegation else 0
-        match = stance_matches(position, group_stance_of(votes, group_uid))
+        group = group_of(votes) if group_of is not None else group_uid
+        match = stance_matches(position, group_stance_of(votes, group))
         if match is not None:
             comparable += 1
             aligned += 1 if match else 0
