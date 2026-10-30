@@ -1,0 +1,153 @@
+name: Déploiement
+
+# Les déploiements automatiques de l'intégration Git de Vercel sont coupés (`git.deploymentEnabled`
+# dans vercel.json et web/vercel.json) : chaque push de PR redéployait les deux projets et
+# épuisait le quota du plan Hobby (100 déploiements par jour). Ce workflow les remplace :
+# - production : après la CI verte d'un push sur main, pour le projet concerné ;
+# - preview : en posant le label « preview » sur une PR (projets touchés par la PR) ;
+# - à la demande : bouton « Run workflow » (projet et environnement au choix).
+
+on:
+  workflow_run:
+    workflows: [CI, Web]
+    types: [completed]
+    branches: [main]
+  pull_request:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      projet:
+        description: Projet à déployer
+        type: choice
+        options: [les deux, connecteur, landing]
+        default: les deux
+      environnement:
+        description: Environnement (la production n'est possible que depuis main)
+        type: choice
+        options: [preview, production]
+        default: preview
+
+permissions:
+  contents: read
+
+env:
+  VERCEL_CLI: vercel@64.3.1
+  VERCEL_SCOPE: mcp-assemblee-nationale
+  VERCEL_TELEMETRY_DISABLED: "1"
+  CONNECTEUR: mcp-assemblee-nationale
+  LANDING: landing-page-mcp-assemblee-nationale
+
+jobs:
+  production:
+    if: >-
+      github.event_name == 'workflow_run'
+      && github.event.workflow_run.conclusion == 'success'
+      && github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: production-${{ github.event.workflow_run.name }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Vérifier que le commit est encore le dernier de main
+        id: latest
+        env:
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          if [ "$(git rev-parse origin/main)" = "$HEAD_SHA" ]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Un commit plus récent est sur main : son propre déploiement prendra le relais."
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        if: steps.latest.outputs.deploy == 'true'
+        with:
+          node-version: 22
+      - name: Déployer en production
+        if: steps.latest.outputs.deploy == 'true'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          WORKFLOW: ${{ github.event.workflow_run.name }}
+        run: |
+          project="$CONNECTEUR"
+          if [ "$WORKFLOW" = Web ]; then project="$LANDING"; fi
+          url=$(.github/scripts/vercel-deploy.sh "$project" production)
+          echo "### $project : $url" >> "$GITHUB_STEP_SUMMARY"
+
+  preview:
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || (github.event_name == 'pull_request'
+          && github.event.label.name == 'preview'
+          && github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    concurrency:
+      group: preview-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Choisir les projets et l'environnement
+        id: plan
+        env:
+          EVENT: ${{ github.event_name }}
+          PROJET: ${{ inputs.projet }}
+          ENVIRONNEMENT: ${{ inputs.environnement }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          target=preview
+          projects=""
+          if [ "$EVENT" = workflow_dispatch ]; then
+            target="$ENVIRONNEMENT"
+            if [ "$target" = production ] && [ "$GITHUB_REF" != refs/heads/main ]; then
+              echo "::error::La production ne se déploie que depuis main."
+              exit 1
+            fi
+            case "$PROJET" in
+              connecteur) projects="$CONNECTEUR" ;;
+              landing) projects="$LANDING" ;;
+              *) projects="$CONNECTEUR $LANDING" ;;
+            esac
+          else
+            changed=$(git diff --name-only "$BASE_SHA" HEAD)
+            if echo "$changed" | grep -qv '^web/'; then projects="$CONNECTEUR"; fi
+            if echo "$changed" | grep -q '^web/'; then projects="$projects $LANDING"; fi
+          fi
+          echo "target=$target" >> "$GITHUB_OUTPUT"
+          echo "projects=$projects" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      - name: Déployer
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          TARGET: ${{ steps.plan.outputs.target }}
+          PROJECTS: ${{ steps.plan.outputs.projects }}
+        run: |
+          report="report.md"
+          echo "Déploiement **$TARGET** du commit \`$(git rev-parse --short HEAD)\` :" > "$report"
+          for project in $PROJECTS; do
+            url=$(.github/scripts/vercel-deploy.sh "$project" "$TARGET")
+            echo "- $project : $url" >> "$report"
+          done
+          cat "$report" >> "$GITHUB_STEP_SUMMARY"
+      - name: Commenter la PR
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          echo "" >> report.md
+          echo "_Pour redéployer après de nouveaux commits, retirez puis remettez le label « preview »._" >> report.md
+          gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file report.md
