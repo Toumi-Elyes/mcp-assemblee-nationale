@@ -6,9 +6,12 @@ leurs groupes. On en garde un index compact tiré des données ouvertes de l'Ass
 pour chaque député, identifiant, prénom, nom, département, circonscription et périodes
 d'appartenance aux groupes ; pour chaque groupe, sigle et nom.
 
+Le script ne tourne jamais en production : il sert à reproduire ou à mettre à jour les fichiers
+embarqués, qui sont versionnés.
+
 Usage : python scripts/build_legislature_data.py AMO_JSON_DIR SORTIE_DIR [LÉGISLATURE...]
 - AMO_JSON_DIR : dossier `json` de l'archive « AMO30 tous acteurs, tous mandats, tous organes,
-  historique » (data.assemblee-nationale.fr), qui contient `acteur/` et `organe/` ;
+  historique » (`ARCHIVE_URL`, environ 14 Mo), qui contient `acteur/` et `organe/` ;
 - SORTIE_DIR : dossier où écrire les fichiers (`src/assemblee_mcp/data`) ;
 - LÉGISLATURE : numéros à construire (14 15 16 par défaut).
 """
@@ -18,6 +21,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
+ARCHIVE_URL = (
+    "https://data.assemblee-nationale.fr/static/openData/repository/17/amo/"
+    "tous_acteurs_mandats_organes_xi_legislature/"
+    "AMO30_tous_acteurs_tous_mandats_tous_organes_historique.json.zip"
+)
 DEFAULT_LEGISLATURES = (14, 15, 16)
 ASSEMBLY_TYPE = "ASSEMBLEE"
 GROUP_TYPE = "GP"
@@ -94,16 +102,18 @@ def main(arguments: list[str]) -> None:
     amo_dir, output_dir = Path(arguments[0]), Path(arguments[1])
     legislatures = [int(number) for number in arguments[2:]] or list(DEFAULT_LEGISLATURES)
     for legislature in legislatures:
+        groupes = read_groups(amo_dir / "organe", legislature)
+        deputes = read_deputes(amo_dir / "acteur", legislature)
         document = {
             "legislature": legislature,
             "source": SOURCE,
-            "groupes": read_groups(amo_dir / "organe", legislature),
-            "deputes": read_deputes(amo_dir / "acteur", legislature),
+            "groupes": groupes,
+            "deputes": deputes,
         }
         path = output_dir / f"legislature_{legislature}.json"
         text = json.dumps(document, ensure_ascii=False, separators=(",", ":"))
         path.write_text(text + "\n", encoding="utf-8")
-        print(f"{path} : {len(document['deputes'])} députés, {len(document['groupes'])} groupes")
+        print(f"{path} : {len(deputes)} députés, {len(groupes)} groupes")
 
 
 if __name__ == "__main__":
