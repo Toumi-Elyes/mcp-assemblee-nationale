@@ -142,6 +142,10 @@ class Scrutin(CivixModel):
     scrutin: ScrutinDetail
     results_global: VoteCounts | None = None
     results_by_group: list[GroupVoteCounts] = Field(default_factory=list)
+    archived: bool = False
+    """Vrai si titre, résultat et décomptes viennent de l'archive de l'Assemblée (14e et 15e)."""
+    dissidents_only: bool = False
+    """Vrai si seuls les députés ayant voté autrement que leur groupe sont nommés (14e, 2012-14)."""
 
     @field_validator("results_by_group", mode="before")
     @classmethod

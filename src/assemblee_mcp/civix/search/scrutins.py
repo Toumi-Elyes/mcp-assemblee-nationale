@@ -4,13 +4,13 @@ import asyncio
 import math
 from dataclasses import dataclass
 
-from assemblee_mcp.civix.archive import untitled_search_note
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.civix.models import (
     Pagination,
     ScrutinListResponse,
     ScrutinSummary,
 )
+from assemblee_mcp.civix.scrutin_archive import COMPLETED_LEGISLATURES, search_archive
 from assemblee_mcp.civix.search.broaden import (
     BroadQuery,
     broad_note,
@@ -23,6 +23,7 @@ from assemblee_mcp.limits import (
     CIVIX_PAGE_SIZE,
     EXACT_POOL_PAGES,
 )
+from assemblee_mcp.textutils import fold
 
 
 @dataclass(frozen=True)
@@ -30,10 +31,27 @@ class ScrutinSearch:
     """Résultat d'une recherche de scrutins, éventuellement élargie."""
 
     response: ScrutinListResponse | None
-    """`None` quand la recherche n'a pas interrogé CIVIX (législature sans titres)."""
+    """`None` quand la recherche a porté sur l'archive embarquée (14e et 15e législatures)."""
     results: list[ScrutinSummary]
     pagination: Pagination | None
     note: str | None = None
+
+
+ARCHIVE_POOL_SIZE = CIVIX_PAGE_SIZE * EXACT_POOL_PAGES
+"""Taille d'un lot tiré de l'archive : celle d'un lot de recherche exacte chez CIVIX."""
+
+
+def archive_matches(legislature: int, query: str) -> tuple[list[ScrutinSummary], str | None]:
+    """Scrutins archivés d'une recherche : expression exacte, sinon tous les mots utiles.
+
+    Même logique que chez CIVIX, sur les titres de l'archive de l'Assemblée, sans appel réseau.
+    """
+    exact = search_archive(legislature, (fold(query.strip()),))
+    broad = broaden(query)
+    if exact or broad is None:
+        return exact, None
+    matches = search_archive(legislature, broad.required)
+    return matches, broad_note(query, broad, truncated=False) if matches else None
 
 
 def scrutins_empty(response: ScrutinListResponse) -> bool:
@@ -50,10 +68,17 @@ async def search_scrutins(
     page: int = 1,
     page_size: int = 10,
 ) -> ScrutinSearch:
-    """Cherche des scrutins (au plus 3 appels CIVIX)."""
-    untitled = untitled_search_note(legislature) if query else None
-    if untitled is not None:
-        return ScrutinSearch(None, [], None, untitled)
+    """Cherche des scrutins (au plus 3 appels CIVIX ; aucun pour les 14e et 15e législatures)."""
+    if query and legislature in COMPLETED_LEGISLATURES:
+        items, note = archive_matches(legislature, query)
+        start = (page - 1) * page_size
+        pagination = Pagination(
+            page=page,
+            page_size=page_size,
+            next_page=page + 1 if start + page_size < len(items) else None,
+            count_total=len(items),
+        )
+        return ScrutinSearch(None, items[start : start + page_size], pagination, note)
     exact = await client.list_scrutins(
         query, legislature=legislature, page=page, page_size=page_size
     )
@@ -122,9 +147,11 @@ async def search_scrutin_pool(
     client: CivixClient, query: str, *, legislature: int | None = None
 ) -> ScrutinPool:
     """Rassemble les scrutins d'une recherche (au plus 7 appels CIVIX), sans pagination."""
-    untitled = untitled_search_note(legislature)
-    if untitled is not None:
-        return ScrutinPool([], 0, False, untitled)
+    if legislature in COMPLETED_LEGISLATURES:
+        items, note = archive_matches(legislature, query)
+        return ScrutinPool(
+            items[:ARCHIVE_POOL_SIZE], len(items), len(items) > ARCHIVE_POOL_SIZE, note
+        )
     first = await client.list_scrutins(
         query, legislature=legislature, page=1, page_size=CIVIX_PAGE_SIZE
     )

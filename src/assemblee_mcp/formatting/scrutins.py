@@ -2,7 +2,6 @@
 
 from collections.abc import Mapping, Sequence
 
-from assemblee_mcp.civix.archive import UNTITLED_LEGISLATURES
 from assemblee_mcp.civix.models import (
     CivixResponse,
     GroupVoteCounts,
@@ -11,6 +10,7 @@ from assemblee_mcp.civix.models import (
     ScrutinSummary,
     VoteCounts,
 )
+from assemblee_mcp.civix.scrutin_archive import ARCHIVE_SOURCE
 from assemblee_mcp.civix.search import ScrutinSearch
 from assemblee_mcp.formatting.sources import (
     finish,
@@ -22,9 +22,9 @@ from assemblee_mcp.formatting.sources import (
 from assemblee_mcp.formatting.text import field_text, format_date, truncate
 
 UNTITLED = "(titre non fourni par CIVIX)"
-NO_GROUP_BREAKDOWN = (
-    "CIVIX ne fournit ni le titre, ni le résultat officiel, ni le décompte par groupe des "
-    "scrutins de la {legislature}e législature ; les votes individuels sont disponibles."
+ARCHIVED_NOTE = (
+    "_Titre, résultat et décomptes : archive des scrutins de l'Assemblée nationale ({url}), "
+    "CIVIX ne les publiant pas pour cette législature._"
 )
 
 
@@ -64,9 +64,11 @@ def format_scrutin_list(search: ScrutinSearch, query: str | None) -> str:
     """Liste de scrutins, avec la mention d'une éventuelle recherche élargie."""
     results = search.results
     subject = f" pour « {query} »" if query else ""
-    if search.response is None:
-        return finish(str(search.note), source_line("https://www.civix.fr/api", None))
-    source = response_source_line(search.response)
+    source = (
+        response_source_line(search.response)
+        if search.response is not None
+        else source_line(None, ARCHIVE_SOURCE)
+    )
     note = f"_{search.note}_\n\n" if search.note else ""
     if not results:
         body = (
@@ -140,7 +142,7 @@ def format_scrutin(
     if attributes.results_by_group:
         lines += ["", "### Décompte par groupe", ""]
         lines.append(group_counts_table(attributes.results_by_group, abbreviations or {}))
-    elif scrutin.legislature in UNTITLED_LEGISLATURES:
-        lines += ["", NO_GROUP_BREAKDOWN.format(legislature=scrutin.legislature)]
+    if attributes.archived:
+        lines += ["", ARCHIVED_NOTE.format(url=ARCHIVE_SOURCE)]
     lines += ["", "Pour savoir qui a voté quoi, utilisez `votes_scrutin` avec cet identifiant."]
     return finish("\n".join(lines), scrutin_source_line(scrutin))

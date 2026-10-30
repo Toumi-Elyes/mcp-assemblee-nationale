@@ -50,7 +50,7 @@ export const FAQ: readonly FaqItem[] = [
   {
     question: "Jusqu'où remontent les votes ?",
     answer:
-      "Jusqu'au premier scrutin de la 14e législature, le 3 juillet 2012. Les votes de chaque député sont consultables de la 14e à la 17e législature, y compris pour les anciens députés. Pour les 14e et 15e législatures (2012 à 2022), la source ne donne ni le titre ni le décompte par groupe des scrutins : l'assistant les retrouve par date ou par numéro, pas par sujet. Rien n'est disponible avant 2012.",
+      "Jusqu'au premier scrutin de la 14e législature, le 3 juillet 2012. Les votes de chaque député sont consultables de la 14e à la 17e législature, y compris pour les anciens députés. Pour 2012 à 2014, l'Assemblée n'a publié pour beaucoup de scrutins que les noms des députés ayant voté autrement que leur groupe : l'assistant le précise quand c'est le cas. Rien n'est disponible avant 2012.",
   },
   {
     question: "Et le Sénat ?",

@@ -223,7 +223,7 @@ class DeputeTools(ToolSet):
         )
         summaries = found.results[:MAX_SCRUTINS_PER_SUBJECT]
         if not summaries:
-            return format_no_scrutin(subject, found.note if found.response is None else None)
+            return format_no_scrutin(subject)
         entries = await asyncio.gather(
             *(self._position_on(depute.uid, summary) for summary in summaries)
         )

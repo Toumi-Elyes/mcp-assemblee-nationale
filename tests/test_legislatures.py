@@ -17,6 +17,8 @@ from tests.conftest import CivixStub, McpClient, Payload, call, load_fixture
 
 L14_SCRUTIN = "VTANR5L14V500"
 L15_SCRUTIN = "VTANR5L15V4000"
+DISSIDENTS_SCRUTIN = "VTANR5L14V14"  # seuls les votes contraires à la position du groupe
+DISSIDENTS_FIXTURE = "scrutin_votes_l14_dissidents"
 ACCOYER = "PA230"  # 14e seulement
 BRUNEEL = "PA720546"  # 15e seulement
 ABAD = "PA605036"  # 14e, 15e, 16e et 17e
@@ -126,14 +128,19 @@ def test_votes_without_group_breakdown_parse(tag: str) -> None:
 # Outils
 
 
-async def test_obtenir_scrutin_14e_explains_missing_breakdown(
+async def test_obtenir_scrutin_15e_is_completed_by_the_archive(
     mcp_client: McpClient, archived: CivixStub
 ) -> None:
-    text = await call(mcp_client, "obtenir_scrutin", uid=L14_SCRUTIN)
-    assert "274 pour, 244 contre, 20 abstention(s)" in text
-    assert "ni le décompte par groupe des scrutins de la 14e législature" in text
+    text = await call(mcp_client, "obtenir_scrutin", uid=L15_SCRUTIN)
+    assert "l'amendement n° 2106 de M. Barrot après l'article 3" in text
+    assert "- Résultat officiel : adopté" in text
+    assert "- Règle de majorité : majorité absolue des suffrages exprimés" in text
+    assert "72 pour, 3 contre, 5 abstention(s), 2 non-votant(s) (total 82)" in text
+    assert "| LAREM | 39 | 0 | 0 | 1 | 40 |" in text
+    assert "| GDR | 0 | 1 | 0 | 0 | 1 |" in text
+    assert "archive des scrutins de l'Assemblée nationale" in text
     assert "None" not in text
-    assert "https://www.assemblee-nationale.fr/dyn/14/scrutins/500" in text
+    assert "https://www.assemblee-nationale.fr/dyn/15/scrutins/4000" in text
 
 
 async def test_votes_scrutin_15e_filters_by_group_at_the_vote_date(
@@ -162,32 +169,68 @@ async def test_comment_a_vote_14e_deduces_legislature_from_scrutin(
     assert deputy_calls(archived) == []
 
 
-async def test_comment_a_vote_by_subject_in_15e_explains_missing_titles(
+async def test_comment_a_vote_by_subject_in_15e_searches_the_archive(
     mcp_client: McpClient, archived: CivixStub
 ) -> None:
     text = await call(
-        mcp_client, "comment_a_vote", depute="Bruneel", sujet="retraites", legislature=15
+        mcp_client,
+        "comment_a_vote",
+        depute="Bruneel",
+        sujet="amendement n° 2106 de M. Barrot",
+        legislature=15,
     )
-    assert "CIVIX ne fournit pas les titres des scrutins de la 15e législature" in text
-    assert archived.requests == []
+    assert "### Scrutin n°4000 — 12 octobre 2021" in text
+    assert "A voté : **Contre**." in text
+    assert archived.paths() == [f"/scrutins/{L15_SCRUTIN}/votes"]
 
 
-async def test_rechercher_scrutins_by_keyword_in_14e_skips_civix(
+async def test_rechercher_scrutins_by_keyword_in_14e_reads_the_archive(
     mcp_client: McpClient, archived: CivixStub
 ) -> None:
-    text = await call(mcp_client, "rechercher_scrutins", mots_cles="mariage", legislature=14)
-    assert "CIVIX ne fournit pas les titres des scrutins de la 14e législature" in text
-    assert "Essayez d'autres mots-clés" not in text
+    text = await call(
+        mcp_client, "rechercher_scrutins", mots_cles="mariage pour les couples", legislature=14
+    )
+    assert "Recherche élargie" in text
+    assert "`VTANR5L14V511`" in text
+    assert "l'ensemble du projet de loi ouvrant le mariage aux couples de personnes" in text
+    assert "Source : Assemblée nationale https://data.assemblee-nationale.fr" in text
     assert archived.requests == []
 
 
-async def test_rechercher_scrutins_lists_untitled_scrutins(
+async def test_rechercher_scrutins_paginates_the_archive(
+    mcp_client: McpClient, archived: CivixStub
+) -> None:
+    text = await call(
+        mcp_client, "rechercher_scrutins", mots_cles="mariage", legislature=14, page=2
+    )
+    assert "sur 184 (page 2)" in text
+    assert archived.requests == []
+
+
+async def test_rechercher_scrutins_lists_completed_scrutins(
     mcp_client: McpClient, archived: CivixStub
 ) -> None:
     archived.add("/scrutins", l15_listing(), legislature="15", page="1")
     text = await call(mcp_client, "rechercher_scrutins", legislature=15)
-    assert "(titre non fourni par CIVIX)" in text
+    assert "(titre non fourni par CIVIX)" not in text
     assert "`VTANR5L15V4419`" in text
+    assert "résultat non précisé" not in text
+
+
+async def test_dissidents_only_scrutin_never_says_the_deputy_did_not_vote(
+    mcp_client: McpClient, archived: CivixStub
+) -> None:
+    archived.add(f"/scrutins/{DISSIDENTS_SCRUTIN}/votes", load_fixture(DISSIDENTS_FIXTURE))
+    votes = await call(mcp_client, "votes_scrutin", uid=DISSIDENTS_SCRUTIN)
+    assert "Décompte officiel : 38 pour, 127 contre, 0 abstention(s)" in votes
+    assert "la liste ci-dessous n'est pas complète" in votes
+    assert "Gilbert Collard" in votes
+    answer = await call(
+        mcp_client, "comment_a_vote", depute="Accoyer", scrutin_uid=DISSIDENTS_SCRUTIN
+    )
+    assert "Son vote individuel n'est pas connu." in answer
+    assert "Aucun vote enregistré" not in answer
+    assert "civix.fr/deputes/" not in answer
 
 
 async def test_rechercher_deputes_by_name_in_each_closed_legislature(
@@ -261,11 +304,26 @@ async def test_bilan_depute_15e_never_reports_a_false_alignment(
     text = await call(mcp_client, "bilan_depute", depute="Bruneel", periode_jours=7, legislature=15)
     assert "## Votes de Alain Bruneel (GDR)" in text
     assert "| 0 | 3 | 0 | 0 | 0 |" in text
-    assert "0 sur 0 votes comparables (non calculable" in text
-    assert "0 %" not in text
+    assert "non calculable" not in text
     assert "du 2022-02-18 au 2022-02-24" in text
-    assert "CIVIX ne fournit pas le décompte par groupe" in text
+    assert "celui du député à la date de chaque scrutin" in text
     assert "https://www.assemblee-nationale.fr/dyn/15/scrutins" in text
+
+
+async def test_bilan_depute_skips_dissidents_only_scrutins(
+    mcp_client: McpClient, archived: CivixStub
+) -> None:
+    listing = load_fixture("scrutins_l15")
+    item = listing["data"]["attributes"]["results"][0]
+    item.update(uid=DISSIDENTS_SCRUTIN, legislature=14, numero=14)
+    item["date_scrutin"] = "2012-07-24T00:00:00+00:00"
+    listing["data"]["attributes"]["results"] = [item]
+    listing["meta"]["pagination"].update(next_page=None, count_total=1)
+    archived.add("/scrutins", listing, legislature="14", page="1")
+    archived.add(f"/scrutins/{DISSIDENTS_SCRUTIN}/votes", load_fixture(DISSIDENTS_FIXTURE))
+    text = await call(mcp_client, "bilan_depute", depute="Accoyer", periode_jours=7, legislature=14)
+    assert "| 0 | 0 | 0 | 0 | 0 |" in text
+    assert "1 scrutin(s) écarté(s) : l'Assemblée n'y a publié que les noms" in text
 
 
 async def test_tendances_of_a_closed_legislature_end_at_its_last_scrutin(

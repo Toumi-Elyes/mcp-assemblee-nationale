@@ -18,7 +18,6 @@ from assemblee_mcp.formatting.sources import finish, source_line
 from assemblee_mcp.formatting.text import field_text, format_date, truncate
 from assemblee_mcp.links import (
     assemblee_scrutin_url,
-    civix_depute_url,
     civix_scrutin_url,
     depute_assemblee_url,
     depute_civix_url,
@@ -33,6 +32,12 @@ def depute_page_url(depute: Depute) -> str:
     if depute.legislature in ARCHIVED_LEGISLATURES:
         return depute_assemblee_url(depute)
     return depute_civix_url(depute)
+
+
+def depute_source_line(depute: Depute) -> str:
+    """Ligne « Source : » d'un député, sans lien CIVIX pour une législature close."""
+    civix = None if depute.legislature in ARCHIVED_LEGISLATURES else depute_civix_url(depute)
+    return source_line(civix, depute_assemblee_url(depute))
 
 
 def depute_line(depute: Depute) -> str:
@@ -94,9 +99,7 @@ def format_depute_card(depute: Depute) -> str:
     lines.append(f"- Identifiant : `{depute.uid}`")
     if depute.legislature in ARCHIVED_LEGISLATURES:
         lines.append(ARCHIVE_CARD_NOTE.format(legislature=depute.legislature))
-    civix = None if depute.legislature in ARCHIVED_LEGISLATURES else depute_civix_url(depute)
-    source = source_line(civix, depute_assemblee_url(depute))
-    return finish("\n".join(lines), source)
+    return finish("\n".join(lines), depute_source_line(depute))
 
 
 @dataclass(frozen=True)
@@ -111,6 +114,7 @@ class ScrutinPosition:
     vote: Vote | None
     assemblee_url: str | None = None
     unavailable: bool = False
+    dissidents_only: bool = False
 
 
 def position_from_votes(response: CivixResponse[ScrutinVotes], depute_uid: str) -> ScrutinPosition:
@@ -125,6 +129,7 @@ def position_from_votes(response: CivixResponse[ScrutinVotes], depute_uid: str) 
         result=result_label(scrutin),
         vote=vote,
         assemblee_url=assemblee_scrutin_url(scrutin.legislature, scrutin.numero),
+        dissidents_only=response.attributes.dissidents_only,
     )
 
 
@@ -145,6 +150,11 @@ def position_sentence(entry: ScrutinPosition) -> str:
     """Position du député sur un scrutin, en une phrase neutre."""
     if entry.unavailable:
         return "Votes de ce scrutin momentanément indisponibles."
+    if entry.vote is None and entry.dissidents_only:
+        return (
+            "Son nom n'apparaît pas : pour ce scrutin, l'Assemblée n'a publié que les noms des "
+            "députés ayant voté autrement que leur groupe. Son vote individuel n'est pas connu."
+        )
     if entry.vote is None:
         return "Aucun vote enregistré pour ce député sur ce scrutin."
     delegation = " (par délégation)" if entry.vote.par_delegation else ""
@@ -172,7 +182,7 @@ def format_comment_a_vote(depute: Depute, entries: Sequence[ScrutinPosition], po
         + (f" ({depute.groupe_abrev})" if depute.groupe_abrev else "")
         + f"\n\n{pool}\n\n{blocks}"
     )
-    return finish(body, source_line(civix_depute_url(depute.uid), depute_assemblee_url(depute)))
+    return finish(body, depute_source_line(depute))
 
 
 def format_depute_candidates(query: str, candidates: Sequence[Depute], limit: int) -> str:
@@ -188,9 +198,9 @@ def format_depute_candidates(query: str, candidates: Sequence[Depute], limit: in
     return finish(body, source_line("https://www.civix.fr/deputes", None))
 
 
-def format_no_scrutin(subject: str, note: str | None = None) -> str:
-    """Aucun scrutin ne correspond au sujet ; `note` en donne la raison si elle est connue."""
-    body = note or (
+def format_no_scrutin(subject: str) -> str:
+    """Aucun scrutin ne correspond au sujet demandé."""
+    body = (
         f"Aucun scrutin trouvé pour « {subject} ». Essayez des mots-clés plus courts, au "
         "singulier, avec les accents français."
     )

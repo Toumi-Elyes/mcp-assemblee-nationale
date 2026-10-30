@@ -21,27 +21,12 @@ DATA_PACKAGE = "assemblee_mcp.data"
 DATA_FILE_PATTERN = "legislature_{number}.json"
 ARCHIVED_LEGISLATURES = (16, 15, 14)
 """Législatures closes couvertes, de la plus récente à la plus ancienne."""
-UNTITLED_LEGISLATURES = (15, 14)
-"""Législatures dont CIVIX publie les scrutins sans titre, résultat ni ventilation par groupe."""
-UNTITLED_SEARCH_NOTE = (
-    "CIVIX ne fournit pas les titres des scrutins de la {legislature}e législature : la "
-    "recherche par mots-clés n'y trouve rien. Listez les scrutins sans mots-clés (du plus "
-    "récent au plus ancien), analysez une période, ou partez de l'identifiant d'un scrutin "
-    "(`VTANR5L{legislature}V…`)."
-)
 
 
 def covered_legislatures() -> str:
     """Législatures couvertes pour les députés, en toutes lettres (« 14e, 15e, 16e et 17e »)."""
     names = [f"{number}e" for number in sorted((*ARCHIVED_LEGISLATURES, CURRENT_LEGISLATURE))]
     return ", ".join(names[:-1]) + f" et {names[-1]}"
-
-
-def untitled_search_note(legislature: int | None) -> str | None:
-    """Explication d'une recherche par mots-clés impossible faute de titres, sinon `None`."""
-    if legislature not in UNTITLED_LEGISLATURES:
-        return None
-    return UNTITLED_SEARCH_NOTE.format(legislature=legislature)
 
 
 @dataclass(frozen=True)
@@ -74,6 +59,19 @@ class Archive:
         """Groupe du député ce jour-là (le plus récent en cas de changement le jour même)."""
         covering = [item for item in self.memberships.get(uid, ()) if item.covers(day)]
         return covering[-1].groupe_uid if covering else None
+
+    def groups_for_vote(self, uid: str, day: date, published: set[str]) -> str | None:
+        """Groupe du député à retenir pour un scrutin dont la ventilation cite `published`.
+
+        D'abord son groupe ce jour-là ; s'il n'est pas dans la ventilation (CIVIX garde l'ancien
+        identifiant d'un groupe renommé, comme les socialistes de la 16e en 2023), son groupe le
+        plus récent qui y figure.
+        """
+        current = self.group_at(uid, day)
+        if current in published:
+            return current
+        others = [item.groupe_uid for item in reversed(self.memberships.get(uid, ()))]
+        return next((groupe for groupe in others if groupe in published), None)
 
     def members_at(self, groupe_uid: str, day: date) -> set[str]:
         """Identifiants des députés membres du groupe ce jour-là."""

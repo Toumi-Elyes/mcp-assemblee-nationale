@@ -1,0 +1,168 @@
+{
+  "publisher": "CIVIX.fr",
+  "api_version": "v1",
+  "retrieved_at": "2026-10-30T14:41:11.446Z",
+  "license": {
+    "name": "Open Data – Assemblée nationale",
+    "notice": "Données publiques de l'Assemblée nationale, présentées par CIVIX.fr (initiative indépendante)."
+  },
+  "schema_version": "2026-04-29",
+  "answer": "Le scrutin n°14 a abouti au résultat officiel suivant : non précisé.",
+  "canonical_url": "https://www.civix.fr/votes/VTANR5L14V14",
+  "confidence": "high",
+  "meta": {
+    "schema_version": "2026-04-29",
+    "api_version": "v1",
+    "retrieved_at": "2026-10-30T14:41:11.446Z",
+    "last_updated": "2012-07-24T00:00:00.000Z",
+    "query": {
+      "uid": "VTANR5L14V14",
+      "include_votes": true
+    },
+    "pagination": null
+  },
+  "summary": "Scrutin n°14 (législature 14) du 24 juillet 2012 : Scrutin VTANR5L14V14. Le résultat officiel du scrutin est : non précisé. Résultat: 1 pour, 3 contre, 0 abstentions, 0 non-votants (total 4).",
+  "source": {
+    "type": "dataset",
+    "provider": "Assemblée nationale",
+    "via": "CIVIX.fr",
+    "source_urls": [
+      "https://www.assemblee-nationale.fr/dyn/14/scrutins/jo14"
+    ],
+    "civix_urls": {
+      "page": "https://www.civix.fr/votes/VTANR5L14V14",
+      "api": "https://www.civix.fr/api/v1/scrutins?uid=VTANR5L14V14"
+    }
+  },
+  "citation": {
+    "text": "Selon CIVIX.fr (données publiques de l'Assemblée nationale, consultées le 30 octobre 2026), le scrutin n°14 du 24 juillet 2012 portant sur \"Scrutin VTANR5L14V14\" a abouti au résultat officiel suivant : non précisé. Résultat: 1 pour, 3 contre, 0 abstentions, 0 non-votants (total 4).",
+    "url": "https://www.civix.fr/votes/VTANR5L14V14"
+  },
+  "data": {
+    "type": "scrutin",
+    "attributes": {
+      "scrutin": {
+        "uid": "VTANR5L14V14",
+        "numero": 14,
+        "legislature": 14,
+        "date_scrutin": "2012-07-24T00:00:00+00:00",
+        "titre": "Scrutin VTANR5L14V14",
+        "objet": null,
+        "objet_libelle": null,
+        "objet_raw": null,
+        "sort_code": null,
+        "sort_libelle": null,
+        "sort_raw": null,
+        "is_adopted": null,
+        "official_result": null,
+        "majority_rule": "majorité simple des suffrages exprimés",
+        "majority_threshold": null,
+        "majority_explanation": "Aucune règle spéciale détectée : le scrutin relève de la majorité simple des suffrages exprimés.",
+        "type_primary": "autre",
+        "tags": [],
+        "type_vote": null,
+        "vote_mode": "vote nominal",
+        "demandeur": null,
+        "synthese": null
+      },
+      "results_global": {
+        "pour": 1,
+        "contre": 3,
+        "abstention": 0,
+        "non_votant": 0,
+        "unknown": 0,
+        "total": 4
+      },
+      "results_by_group": [
+        {
+          "groupe_uid": null,
+          "pour": 1,
+          "contre": 3,
+          "abstention": 0,
+          "non_votant": 0,
+          "unknown": 0,
+          "total": 4
+        }
+      ],
+      "include_votes": true,
+      "votes": [
+        {
+          "deputy_uid": "PA606212",
+          "prenom": "Gilbert",
+          "nom": "Collard",
+          "mandat_uid": "PM645330",
+          "position": "pour",
+          "par_delegation": null
+        },
+        {
+          "deputy_uid": "PA606375",
+          "prenom": "Émilienne",
+          "nom": "Poumirol",
+          "mandat_uid": "PM676790",
+          "position": "contre",
+          "par_delegation": null
+        },
+        {
+          "deputy_uid": "PA610804",
+          "prenom": "Jonas",
+          "nom": "Tahuaitu",
+          "mandat_uid": "PM645313",
+          "position": "contre",
+          "par_delegation": null
+        },
+        {
+          "deputy_uid": "PA2800",
+          "prenom": "Gérard",
+          "nom": "Terrier",
+          "mandat_uid": "PM676804",
+          "position": "contre",
+          "par_delegation": null
+        }
+      ]
+    },
+    "scrutin": {
+      "uid": "VTANR5L14V14",
+      "numero": 14,
+      "legislature": 14,
+      "date_scrutin": "2012-07-24T00:00:00+00:00",
+      "titre": "Scrutin VTANR5L14V14",
+      "objet": null,
+      "objet_libelle": null,
+      "objet_raw": null,
+      "sort_code": null,
+      "sort_libelle": null,
+      "sort_raw": null,
+      "is_adopted": null,
+      "official_result": null,
+      "majority_rule": "majorité simple des suffrages exprimés",
+      "majority_threshold": null,
+      "majority_explanation": "Aucune règle spéciale détectée : le scrutin relève de la majorité simple des suffrages exprimés.",
+      "type_primary": "autre",
+      "tags": [],
+      "type_vote": null,
+      "vote_mode": "vote nominal",
+      "demandeur": null,
+      "synthese": null
+    },
+    "results_global": {
+      "pour": 1,
+      "contre": 3,
+      "abstention": 0,
+      "non_votant": 0,
+      "unknown": 0,
+      "total": 4
+    },
+    "results_by_group": [
+      {
+        "groupe_uid": null,
+        "pour": 1,
+        "contre": 3,
+        "abstention": 0,
+        "non_votant": 0,
+        "unknown": 0,
+        "total": 4
+      }
+    ],
+    "include_votes": true
+  }
+}
