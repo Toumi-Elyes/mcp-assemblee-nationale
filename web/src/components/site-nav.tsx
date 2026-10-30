@@ -13,6 +13,7 @@ const ITEMS: readonly NavItem[] = [
   { href: "/#en-direct", label: "Cette semaine" },
   { href: "/#demo", label: "Essayer" },
   { href: "/#installer", label: "Installer" },
+  { href: "/nouveautes", label: "Nouveautés" },
   { href: "/#faq", label: "Questions" },
 ];
 
@@ -65,7 +66,11 @@ export const SiteNav: React.FC = () => {
             <ul className="-mx-1 flex items-center gap-x-4 overflow-x-auto sm:flex-wrap sm:gap-x-5">
               {ITEMS.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className={linkClass}>
+                  <Link
+                    href={item.href}
+                    aria-current={pathname === item.href ? "page" : undefined}
+                    className={cn(linkClass, pathname === item.href ? "border-rule" : undefined)}
+                  >
                     {item.label}
                   </Link>
                 </li>

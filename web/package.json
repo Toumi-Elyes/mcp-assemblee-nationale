@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "changelog": "UPDATE_CHANGELOG=1 vitest run test/changelog.test.ts"
   },
   "dependencies": {
     "@fontsource/barlow-semi-condensed": "^5.3.0",

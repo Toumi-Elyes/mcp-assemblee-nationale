@@ -11,3 +11,4 @@ Closes #
 - [ ] Neutralité respectée : faits sourcés, aucune interprétation politique ni classement de députés
 - [ ] Aucun secret, aucune ressource externe ajoutée sans raison (CSP)
 - [ ] Documentation mise à jour si besoin (README, CONTRIBUTING, web/README)
+- [ ] Journal des nouveautés complété si la PR change ce que le connecteur sait faire (`web/src/content/changelog.ts`, puis `pnpm changelog`)
