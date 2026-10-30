@@ -271,7 +271,7 @@ Ce projet n'est affilié ni à l'Assemblée nationale, ni à CIVIX.
 - Le connecteur ne reçoit que la recherche envoyée par l'IA (par exemple « retraites » ou un nom de député), jamais votre conversation.
 - Ces mots-clés sont transmis à l'API CIVIX pour faire la recherche.
 - Il n'enregistre pas les conversations, n'utilise aucun cookie et ne demande aucun compte.
-- Les réponses de CIVIX sont gardées 10 minutes en mémoire, puis oubliées.
+- Les réponses de CIVIX (données publiques, jamais votre question) sont gardées 10 minutes, ou 24 h pour un scrutin ancien, en mémoire et dans le cache partagé de Vercel, puis oubliées.
 - Votre assistant applique sa propre politique de confidentialité. L'hébergeur (Vercel) peut tenir des journaux techniques d'accès : ce code n'y écrit pas vos questions.
 
 **Limites**
@@ -506,12 +506,29 @@ Le serveur expose aussi `GET /health`, qui répond `{"status": "ok"}`.
 | `CIVIX_CACHE_TTL` | `600` | Durée du cache, en secondes |
 | `CIVIX_CACHE_MAX_ENTRIES` | `500` | Nombre max de réponses gardées en cache |
 | `CIVIX_USER_AGENT` | `mcp-assemblee-nationale (+https://github.com/Toumi-Elyes/mcp-assemblee-nationale)` | En-tête `User-Agent` envoyé à CIVIX |
+| `CIVIX_SHARED_CACHE` | actif sur Vercel | `off` coupe le cache partagé entre instances (Runtime Cache de Vercel) |
 | `HOST` | `127.0.0.1` | Hôte d'écoute en mode `--http` |
 | `PORT` | `8000` | Port d'écoute en mode `--http` |
 
 En cas d'échec réseau ou d'erreur 5xx, le client refait un seul essai après 0,3 s. Il limite aussi les appels simultanés vers CIVIX (4 au maximum).
 
 Caches : réponses gardées `CIVIX_CACHE_TTL` secondes (10 minutes par défaut). Le détail et les votes d'un scrutin vieux de plus de 2 jours, qui ne change plus, sont gardés 24 h. Ces durées et les tailles des caches de votes et de détails ne sont pas réglables par variable d'environnement.
+
+Deux niveaux de cache, lus dans cet ordre :
+
+| Niveau | Où | Durées | Rôle |
+|---|---|---|---|
+| L1 | mémoire de chaque instance (`civix/cache.py`, LRU) | listes et recherches 10 min ; détail et votes d'un scrutin de plus de 2 jours, annuaire des députés : 24 h | réponse immédiate, aucune copie sérialisée |
+| L2 | [Runtime Cache de Vercel](https://vercel.com/docs/runtime-cache) (`civix/shared_cache.py`) | mêmes durées qu'en L1 | une instance froide relit L2 au lieu de CIVIX ; persistant entre instances et déploiements |
+
+Lecture : L1, puis L2 si L1 est vide, puis CIVIX ; une réponse venue de CIVIX est écrite dans L1 et dans L2. Une réponse lue dans L2 ne coûte aucun appel du budget, comme en L1. Précautions :
+
+- L2 n'existe que sur Vercel (variables `RUNTIME_CACHE_ENDPOINT` et `RUNTIME_CACHE_HEADERS` posées par la plateforme) ; ailleurs, il est inactif. `CIVIX_SHARED_CACHE=off` le coupe.
+- Une panne ou un délai (2 s) de L2 n'échoue jamais une demande : on lit CIVIX, et L2 est ignoré 60 s.
+- Les clés sont préfixées par `SHARED_CACHE_SCHEMA_VERSION` (`limits.py`) : le changer après une modification de modèle ignore toutes les anciennes entrées. Une entrée de forme ancienne est aussi ignorée à la lecture.
+- Chaque élément porte les étiquettes `civix` et `civix:<ressource>` (`scrutin-detail`, `scrutin-votes`, `scrutins`, `deputes`, `directory`…) pour une expiration ciblée.
+- Un élément de plus de 2 Mo (limite du Runtime Cache) reste en mémoire seule. En pratique : l'annuaire fait environ 260 Ko, une liste de 50 scrutins 50 Ko, les votes d'un scrutin 45 Ko.
+- Le SDK `vercel-cache` envoie de la télémétrie à Vercel ; elle est coupée par défaut (`VERCEL_TELEMETRY_DISABLED=1`, sauf si vous la définissez autrement).
 
 </details>
 
@@ -557,7 +574,7 @@ A connector (an [MCP](https://modelcontextprotocol.io) server) that lets Claude,
 - **Local**: `uvx --from git+https://github.com/Toumi-Elyes/mcp-assemblee-nationale mcp-assemblee-nationale` (stdio), or `--http` for streamable HTTP.
 - **Tools**: 25 read-only tools and 6 prompts (vote tracking, trends, group agreement and cohesion, per-deputy summary, CSV/JSON exports). Every analysis ends with a « Méthode » block (period, sample, limits) and nothing ranks deputies. Outputs are in French.
 - **Scope**: National Assembly only (no Senate).
-- **Privacy**: only the tool query is received; no conversation history, no cookies; CIVIX responses are cached for 10 minutes.
+- **Privacy**: only the tool query is received; no conversation history, no cookies; CIVIX responses are cached for 10 minutes (24 h for settled votes), in memory and in Vercel's shared Runtime Cache.
 - **Security**: per-call CIVIX request cap, rate limiting at the hosting firewall, third-party text quoted and marked, links allow-listed. Report vulnerabilities via [SECURITY.md](SECURITY.md).
 - **Stack**: Python 3.14+, FastMCP 4, Pydantic v2, httpx, Poetry, hosted on Vercel (Paris).
 - **Not official**: independent project, not affiliated with the Assemblée nationale or CIVIX.

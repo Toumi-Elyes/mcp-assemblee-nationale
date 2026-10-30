@@ -9,21 +9,37 @@ import asyncio
 import math
 from collections.abc import Awaitable, Callable
 
+from pydantic import TypeAdapter, ValidationError
+
 from assemblee_mcp.civix.budget import unbudgeted
 from assemblee_mcp.civix.models import Depute, DeputeListResponse
+from assemblee_mcp.civix.shared_cache import SharedCache
 from assemblee_mcp.limits import CIVIX_PAGE_SIZE, MAX_DIRECTORY_PAGES
 
 type PageFetcher = Callable[[int], Awaitable[DeputeListResponse]]
+
+SHARED_NAME = "directory"
+DEPUTES_ADAPTER = TypeAdapter(list[Depute])
 
 
 class DeputyDirectory:
     """Liste de tous les députés, chargée à la demande et partagée entre les appels."""
 
-    def __init__(self, fetch_page: PageFetcher, ttl: float, clock: Callable[[], float]) -> None:
-        """Prépare l'annuaire ; `fetch_page(n)` lit la page `n` de `/deputes` (50 députés)."""
+    def __init__(
+        self,
+        fetch_page: PageFetcher,
+        ttl: float,
+        clock: Callable[[], float],
+        shared: SharedCache | None = None,
+    ) -> None:
+        """Prépare l'annuaire ; `fetch_page(n)` lit la page `n` de `/deputes` (50 députés).
+
+        `shared` est le cache partagé entre instances, essayé avant de relire les 15 pages.
+        """
         self._fetch_page = fetch_page
         self._ttl = ttl
         self._clock = clock
+        self._shared = shared if shared is not None else SharedCache()
         self._entry: tuple[float, list[Depute]] | None = None
         self._lock = asyncio.Lock()
 
@@ -39,10 +55,28 @@ class DeputyDirectory:
             cached = self.cached()
             if cached is not None:
                 return cached
-            with unbudgeted():
-                deputes = await self._read_all_pages()
-            self._entry = (self._clock() + self._ttl, deputes)
+            deputes, ttl = await self._read_shared() or await self._read_remote()
+            self._entry = (self._clock() + ttl, deputes)
             return deputes
+
+    async def _read_shared(self) -> tuple[list[Depute], float] | None:
+        """Annuaire du cache partagé et sa durée restante, ou `None` s'il est absent ou ancien."""
+        found = await self._shared.get(SHARED_NAME)
+        if found is None:
+            return None
+        data, remaining = found
+        try:
+            return DEPUTES_ADAPTER.validate_python(data), remaining
+        except ValidationError:
+            return None
+
+    async def _read_remote(self) -> tuple[list[Depute], float]:
+        """Lit CIVIX (hors budget d'appels), puis copie l'annuaire dans le cache partagé."""
+        with unbudgeted():
+            deputes = await self._read_all_pages()
+        data = DEPUTES_ADAPTER.dump_python(deputes, mode="json", by_alias=True)
+        await self._shared.put(SHARED_NAME, SHARED_NAME, data, self._ttl)
+        return deputes, self._ttl
 
     async def _read_all_pages(self) -> list[Depute]:
         """Lit la première page, puis les suivantes en parallèle."""

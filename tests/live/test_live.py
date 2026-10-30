@@ -9,8 +9,10 @@ from fastmcp import Client
 from assemblee_mcp.civix import lookup
 from assemblee_mcp.civix.client import CivixClient
 from assemblee_mcp.civix.search import search_scrutins
+from assemblee_mcp.civix.shared_cache import SharedCache
 from assemblee_mcp.config import Settings
 from assemblee_mcp.server import create_server
+from tests.fakes import FakeBackend
 
 pytestmark = pytest.mark.skipif(
     os.environ.get("CIVIX_LIVE") != "1", reason="Tests réseau : définir CIVIX_LIVE=1"
@@ -180,3 +182,18 @@ async def test_live_search_then_fetch_a_dossier(live_mcp_client: Client[Any]) ->
     async with httpx.AsyncClient(follow_redirects=True, timeout=20) as http:
         response = await http.get(dossier["url"], headers={"User-Agent": "Mozilla/5.0"})
     assert response.status_code == 200
+
+
+async def test_live_responses_roundtrip_through_the_shared_cache() -> None:
+    backend = FakeBackend()
+    first = CivixClient(Settings.from_env(), shared_cache=SharedCache(backend))
+    listing = await first.list_scrutins(page_size=5)
+    uid = listing.attributes.results[0].uid
+    detail = await first.get_scrutin(uid)
+    votes = await first.get_votes(uid)
+    directory = await first.directory.load()
+    second = CivixClient(Settings.from_env(), shared_cache=SharedCache(backend))
+    assert await second.list_scrutins(page_size=5) == listing
+    assert await second.get_scrutin(uid) == detail
+    assert await second.get_votes(uid) == votes
+    assert await second.directory.load() == directory
