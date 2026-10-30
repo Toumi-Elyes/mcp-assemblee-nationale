@@ -13,6 +13,9 @@ vercel() {
 }
 
 vercel link --yes --project "$project" >&2
+# `vercel link` télécharge les variables du projet (dont un jeton OIDC) dans .env.local :
+# inutile ici, et à ne jamais envoyer avec les sources.
+rm -f .env.local
 if [ "$target" = production ]; then
   vercel deploy --yes --prod
 else
