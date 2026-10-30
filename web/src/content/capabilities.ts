@@ -137,6 +137,11 @@ export const CAPABILITY_GROUPS: readonly CapabilityGroup[] = [
         detail: "Pour, contre, abstentions et absences, et part de votes conformes à la position de son groupe. Décrit, ne classe jamais.",
       },
       {
+        tool: "accords_entre_deputes",
+        question: "Sur le budget, à quel point ces quatre députés de ma région votent pareil ?",
+        detail: "Taux de votes identiques pour chaque paire, de 3 à 5 députés nommés, avec le nombre de scrutins comparés.",
+      },
+      {
         tool: "comparer_deputes",
         question: "Sur le budget, quel est le taux de votes identiques entre deux députés ?",
         detail: "Part de scrutins votés de la même façon par deux députés nommés, sur un échantillon borné.",

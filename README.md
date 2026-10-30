@@ -240,6 +240,7 @@ flowchart LR
 | Voir la fiche d'un groupe | `obtenir_groupe` |
 | Résumer les votes d'UN député et son alignement avec son groupe, avec les limites | `bilan_depute` |
 | Comparer deux députés : part de votes identiques | `comparer_deputes` |
+| Comparer de 3 à 5 députés, deux à deux | `accords_entre_deputes` |
 
 ### Récupérer les données
 
@@ -449,7 +450,7 @@ Budgets par appel d'outil (`limits.py`) : nombre maximal d'appels réseau vers C
 | Recherche et fiches | 10 | 25 s | `rechercher`, `rechercher_scrutins`, `obtenir_scrutin`, `votes_scrutin`, `declarations_groupes`, `obtenir_depute`, `comment_a_vote`, `lister_groupes`, `obtenir_groupe`, `search`, `fetch` |
 | Annuaire | 20 | 25 s | `rechercher_deputes` |
 | Analyses sur listes | 30 | 45 s | `tendances_scrutins`, `textes_les_plus_votes`, `dossier_legislatif`, `scrutins_par_periode`, `statistiques_assemblee`, `exporter_scrutins`, `exporter_votes` |
-| Analyses sur détails de scrutins | 45 | 45 s | `positions_groupes`, `accords_entre_groupes`, `cohesion_groupes`, `votes_serres`, `bilan_depute`, `comparer_deputes`, `suivre_sujet` |
+| Analyses sur détails de scrutins | 45 | 45 s | `positions_groupes`, `accords_entre_groupes`, `cohesion_groupes`, `votes_serres`, `bilan_depute`, `comparer_deputes`, `accords_entre_deputes`, `suivre_sujet` |
 
 Types partagés : `page` entier de 1 à 500 (défaut `1`) ; `legislature` entier de 1 à 30 ; `uid` de scrutin : 3 à 64 caractères `[A-Za-z0-9_-]` ; `groupe` / `abbr` : sigle de 1 à 32 caractères ; `position` : `pour`, `contre`, `abstention` ou `non_votant` ; `type_scrutin` / `type` : `tous`, `texte`, `article`, `amendement` ou `autre` ; dates au format `AAAA-MM-JJ` ; `dossier` : référence `DLR…` (3 à 30 caractères alphanumériques après `DLR`).
 
@@ -479,6 +480,7 @@ Types partagés : `page` entier de 1 à 500 (défaut `1`) ; `legislature` entier
 | `cohesion_groupes` | `sujet: str \| None = None`, `periode_jours: int \| None = None` (7 à 30), `max_scrutins: int = 30` (3 à 30), `type_scrutin: str = "tous"`, `legislature: int \| None = None` (14 à 17) | Part des votes conformes à la position majoritaire du groupe ; un seul de `sujet` ou `periode_jours` |
 | `bilan_depute` | `depute: str` (2 à 100 car., requis), `sujet: str \| None = None`, `periode_jours: int \| None = None` (7 à 30), `max_scrutins: int = 30` (3 à 30), `legislature: int \| None = None` | Répartition des positions d'UN député et alignement sur son groupe ; un seul de `sujet` ou `periode_jours` ; pour une législature close, la période finit à son dernier scrutin |
 | `comparer_deputes` | `depute_a: str` (requis), `depute_b: str` (requis), `sujet: str \| None = None`, `periode_jours: int \| None = None` (7 à 30), `max_scrutins: int = 30` (3 à 30), `legislature: int \| None = None` | Part de positions identiques sur les scrutins où les deux ont voté ; un seul de `sujet` ou `periode_jours` |
+| `accords_entre_deputes` | `deputes: list[str]` (3 à 5 noms ou `uid`, distincts, requis), `sujet: str \| None = None`, `periode_jours: int \| None = None` (7 à 30), `max_scrutins: int = 30` (3 à 30), `legislature: int \| None = None` | Matrice d'accord deux à deux entre plusieurs députés, avec le nombre de scrutins communs de chaque paire ; un seul de `sujet` ou `periode_jours` |
 | `exporter_scrutins` | `date_debut: str \| None = None`, `date_fin: str \| None = None` (90 jours au plus), `sujet: str \| None = None` (max 200), `format: "csv" \| "json" = "csv"`, `max_lignes: int = 500` (1 à 1000) | Export de scrutins ; par sujet, 100 scrutins au plus ; les cellules CSV commençant par `=`, `+`, `-` ou `@` sont neutralisées |
 | `exporter_votes` | `scrutin_uid: str` (requis), `format: "csv" \| "json" = "csv"` | Votes nominatifs d'un scrutin |
 
