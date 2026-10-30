@@ -1,5 +1,7 @@
 """Construction des liens publics vers CIVIX et l'Assemblée nationale."""
 
+import re
+
 from assemblee_mcp.civix.models import Depute, Groupe
 from assemblee_mcp.urls import safe_url
 
@@ -32,6 +34,21 @@ def assemblee_scrutin_url(legislature: int | None, numero: int | None) -> str | 
     if legislature is None or numero is None:
         return None
     return f"{ASSEMBLEE_SCRUTINS}/{legislature}/scrutins/{numero}"
+
+
+DOSSIER_REFERENCE = re.compile(r"^DLR5L(\d{1,2})N\d{3,8}$")
+
+
+def assemblee_dossier_url(reference: str) -> str | None:
+    """Page d'un dossier législatif sur le site de l'Assemblée nationale.
+
+    La référence `DLR5L17N54629` contient la législature (17) ; la page existe en
+    `.../dyn/17/dossiers/DLR5L17N54629`. Une référence d'une autre forme n'a pas d'adresse.
+    """
+    found = DOSSIER_REFERENCE.match(reference)
+    if found is None:
+        return None
+    return f"{ASSEMBLEE_SCRUTINS}/{found.group(1)}/dossiers/{reference}"
 
 
 def assemblee_depute_url(uid: str) -> str:

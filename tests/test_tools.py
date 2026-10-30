@@ -296,9 +296,10 @@ async def test_search_returns_chatgpt_json(mcp_client: McpClient) -> None:
     payload = json.loads(await call(mcp_client, "search", query="retraites"))
     results = payload["results"]
     assert results
-    assert set(results[0]) == {"id", "title", "url"}
-    assert results[0]["id"].startswith("scrutin:")
-    assert results[0]["url"].startswith("https://www.civix.fr/votes/")
+    assert all(set(result) == {"id", "title", "url"} for result in results)
+    scrutins = [result for result in results if result["id"].startswith("scrutin:")]
+    assert scrutins
+    assert scrutins[0]["url"].startswith("https://www.civix.fr/votes/")
 
 
 async def test_search_includes_deputes_and_groups(

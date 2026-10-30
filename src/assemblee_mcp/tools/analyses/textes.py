@@ -6,9 +6,9 @@ from fastmcp import FastMCP
 from pydantic import Field
 
 from assemblee_mcp.analytics import gather, render, stats
-from assemblee_mcp.analytics.models import Method, TextActivity
+from assemblee_mcp.analytics.dossier import analyse_dossier
+from assemblee_mcp.analytics.models import Method
 from assemblee_mcp.civix.client import CivixClient
-from assemblee_mcp.civix.search import ScrutinPool, search_scrutin_pool
 from assemblee_mcp.formatting import format_no_scrutin
 from assemblee_mcp.limits import (
     ANALYTICS_DEADLINE_SECONDS,
@@ -27,26 +27,6 @@ from assemblee_mcp.tools.periods import describe_period
 
 listing_tool = limited(LISTING_MAX_CALLS, ANALYTICS_DEADLINE_SECONDS)
 analytics_tool = limited(ANALYTICS_MAX_CALLS, ANALYTICS_DEADLINE_SECONDS)
-
-
-def choose_dossier(ranked: list[TextActivity], query: str) -> TextActivity:
-    """Dossier détaillé : celui dont la référence est `query`, sinon le plus voté."""
-    return next((row for row in ranked if row.dossier_ref == query), ranked[0])
-
-
-def timeline_method(total: int, shown: int, pool: ScrutinPool) -> Method:
-    """Méthode de `dossier_legislatif`."""
-    return Method(
-        analysed=shown,
-        matching=total,
-        truncated=total > shown,
-        counted=(
-            "tous les scrutins publics rattachés au dossier ; amendements comptés, autres "
-            "scrutins listés du plus ancien au plus récent."
-        ),
-        limits=["les votes sur l'ensemble sont ceux de type « texte » dans CIVIX."],
-        notes=[f"Recherche du dossier. {pool.note}"] if pool.note else [],
-    )
 
 
 class TexteTools(ToolSet):
@@ -75,17 +55,10 @@ class TexteTools(ToolSet):
         un. Accepte des mots-clés ou une référence de dossier (DLR…). Si plusieurs dossiers
         correspondent, le plus voté est détaillé et les autres sont proposés.
         """
-        pool = await search_scrutin_pool(self.client, texte)
-        if not pool.items:
+        analysis = await analyse_dossier(self.client, texte)
+        if analysis is None:
             return format_no_scrutin(texte)
-        ranked = stats.rank_texts(pool.items)
-        chosen = choose_dossier(ranked, texte)
-        others = [row for row in ranked if row.dossier_ref != chosen.dossier_ref]
-        items, total = await gather.fetch_dossier_scrutins(
-            self.client, chosen.dossier_ref, chosen.libelle, pool.items
-        )
-        timeline = stats.dossier_timeline(items, others)
-        return render.render_timeline(timeline, timeline_method(total, len(items), pool))
+        return render.render_timeline(analysis.timeline, analysis.method)
 
     @analytics_tool
     async def votes_serres(

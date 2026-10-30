@@ -30,10 +30,10 @@ class ChatGPTTools(ToolSet):
             ),
         ],
     ) -> str:
-        """Cherche des scrutins, députés et groupes de l'Assemblée nationale (données CIVIX).
+        """Cherche scrutins, dossiers législatifs, députés et groupes (données CIVIX).
 
         Renvoie un JSON `{"results": [{"id", "title", "url"}]}` ; les identifiants
-        (`scrutin:<uid>`, `depute:<uid>`, `groupe:<sigle>`) se passent à `fetch`.
+        (`scrutin:<uid>`, `depute:<uid>`, `groupe:<sigle>`, `dossier:<DLR…>`) se passent à `fetch`.
         """
         found = await search_everything(self.client, query)
         return SearchPayload(results=search_items(found.results)).model_dump_json()
@@ -46,15 +46,16 @@ class ChatGPTTools(ToolSet):
             Field(
                 description=(
                     "Identifiant renvoyé par `search` : "
-                    "scrutin:<uid>, depute:<uid> ou groupe:<sigle>."
+                    "scrutin:<uid>, depute:<uid>, groupe:<sigle> ou dossier:<DLR…>."
                 ),
                 min_length=3,
                 max_length=100,
             ),
         ],
     ) -> str:
-        """Récupère le contenu complet d'un résultat de `search` (scrutin, député ou groupe).
+        """Récupère le contenu complet d'un résultat de `search`.
 
+        Un scrutin, un député, un groupe ou un dossier législatif (chronologie de ses scrutins).
         Renvoie un JSON `{"id", "title", "text", "url", "metadata"}` ; `text` est du markdown
         français avec décomptes, sources et liens.
         """
