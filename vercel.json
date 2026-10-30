@@ -15,5 +15,8 @@
       "maxDuration": 60,
       "excludeFiles": "{web/**,tests/**,scripts/**,.claude/**,.github/**}"
     }
+  },
+  "git": {
+    "deploymentEnabled": false
   }
 }

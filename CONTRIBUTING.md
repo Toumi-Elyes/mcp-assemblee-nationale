@@ -53,4 +53,10 @@ Dans une pull request, indiquez `Closes #<numéro>` : la carte du tableau passe 
 
 ## Déploiement
 
-Il n'y a aucun déploiement manuel. Le serveur MCP et la page de démo sont déployés automatiquement par l'intégration GitHub de Vercel quand une pull request est fusionnée sur `main`, après revue et CI verte. Les pull requests ont un déploiement de prévisualisation privé.
+Les déploiements passent par GitHub Actions (`.github/workflows/deploy.yml`), pas par l'intégration Git de Vercel, coupée dans `vercel.json` et `web/vercel.json` : elle redéployait les deux projets à chaque push de PR et épuisait le quota du plan Hobby (100 déploiements par jour).
+
+- **Production** : automatique après la fusion sur `main`, une fois la CI verte. Le serveur MCP est redéployé à la fin du workflow « CI », la landing à la fin du workflow « Web » (qui ne tourne que si `web/` change). Si un commit plus récent est déjà sur `main`, c'est lui qui est déployé.
+- **Prévisualisation d'une PR** : posez le label `preview` sur la PR. Seuls les projets touchés par la PR sont déployés, et les adresses sont publiées en commentaire. Pour redéployer après de nouveaux commits, retirez puis remettez le label.
+- **À la demande** : onglet **Actions → Déploiement → Run workflow**, en choisissant le projet (connecteur, landing ou les deux), l'environnement et la branche. La production n'est possible que depuis `main`.
+
+Le workflow utilise le secret `VERCEL_TOKEN` (jeton Vercel limité à l'équipe `mcp-assemblee-nationale`) et la CLI Vercel épinglée dans `VERCEL_CLI`.
