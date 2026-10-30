@@ -27,8 +27,8 @@ class SujetTools(ToolSet):
             str,
             Field(
                 description=(
-                    "Mots-clés du sujet, au singulier et avec les accents français "
-                    "(« retraite », « mariage », « assurance chômage »)."
+                    "Mots-clés du sujet, avec les accents français (« retraite », « mariage », "
+                    "« assurance chômage ») ; un pluriel est aussi cherché au singulier."
                 ),
                 min_length=2,
                 max_length=200,

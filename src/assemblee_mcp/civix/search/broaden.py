@@ -58,6 +58,40 @@ WORD = re.compile(r"\w+")
 BROAD_POOL = CIVIX_PAGE_SIZE * BROAD_POOL_PAGES
 
 
+MIN_STEM_LENGTH = 5
+"""Les mots plus courts (« loi », « prix », « voix ») sont gardés tels quels."""
+
+
+def stem(word: str) -> str:
+    """Racine d'un mot pour une recherche par sous-chaîne : sans marque du pluriel.
+
+    CIVIX et l'archive cherchent une suite de lettres : « retraite » trouve « retraite » et
+    « retraites », « hôpita » trouve « hôpital » et « hôpitaux ». Les accents sont gardés.
+    """
+    if len(word) < MIN_STEM_LENGTH:
+        return word
+    folded = word.casefold()
+    if folded.endswith("aux"):
+        return word[:-2]
+    if folded.endswith(("s", "x")):
+        return word[:-1]
+    return word
+
+
+def stem_query(query: str) -> str | None:
+    """La requête avec chaque mot réduit à sa racine, ou `None` si rien ne change."""
+    stemmed = WORD.sub(lambda match: stem(match.group(0)), query)
+    return stemmed if stemmed != query else None
+
+
+def stem_note(query: str, stemmed: str) -> str:
+    """Phrase expliquant qu'une recherche au singulier a été utilisée."""
+    return (
+        f"Aucun résultat pour l'expression exacte « {query} » ; résultats pour « {stemmed} » "
+        "(singulier et pluriel confondus)."
+    )
+
+
 @dataclass(frozen=True)
 class BroadQuery:
     """Requête élargie : mot interrogé chez CIVIX et mots exigés localement."""
