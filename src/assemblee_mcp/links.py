@@ -36,6 +36,23 @@ def assemblee_scrutin_url(legislature: int | None, numero: int | None) -> str | 
     return f"{ASSEMBLEE_SCRUTINS}/{legislature}/scrutins/{numero}"
 
 
+SCRUTIN_UID = re.compile(r"^VTANR5L(\d{1,2})V(\d{1,6})$")
+
+
+def scrutin_page_url(uid: str, legislature: int | None = None, numero: int | None = None) -> str:
+    """Lien à citer pour un scrutin : sa page à l'Assemblée nationale, sinon sa page CIVIX.
+
+    L'identifiant `VTANR5L17V9231` contient la législature (17) et le numéro (9231) : il suffit
+    quand l'un des deux manque. Chaque scrutin cité dans une réponse porte ce lien, pour que
+    l'assistant n'ait jamais à construire une adresse lui-même.
+    """
+    if legislature is None or numero is None:
+        found = SCRUTIN_UID.match(uid)
+        if found is not None:
+            legislature, numero = int(found.group(1)), int(found.group(2))
+    return assemblee_scrutin_url(legislature, numero) or civix_scrutin_url(uid)
+
+
 DOSSIER_REFERENCE = re.compile(r"^DLR5L(\d{1,2})N\d{3,8}$")
 
 

@@ -7,6 +7,7 @@ from assemblee_mcp.civix.models import ScrutinSearchHit, SearchResultsByKind
 from assemblee_mcp.civix.search import GlobalSearch
 from assemblee_mcp.formatting.sources import finish, response_source_line
 from assemblee_mcp.formatting.text import format_date, truncate
+from assemblee_mcp.links import assemblee_dossier_url, scrutin_page_url
 
 HIT_TITLE_LENGTH = 180
 type SectionBuilder = Callable[[SearchResultsByKind], str | None]
@@ -19,7 +20,7 @@ def scrutin_section(results: SearchResultsByKind) -> str | None:
     newest_first = sorted(results.scrutins, key=scrutin_sort_key, reverse=True)
     lines = "\n".join(
         f"- {format_date(hit.date_scrutin)} · {truncate(hit.titre, HIT_TITLE_LENGTH)} "
-        f"· uid `{hit.uid}`"
+        f"· uid `{hit.uid}` · {scrutin_page_url(hit.uid, numero=hit.numero)}"
         for hit in newest_first
     )
     return f"### Scrutins (du plus récent au plus ancien)\n{lines}"
@@ -53,6 +54,7 @@ def dossier_section(results: SearchResultsByKind) -> str | None:
     lines = "\n".join(
         f"- {truncate(hit.titre, HIT_TITLE_LENGTH)} · dossier `{hit.uid}`"
         + (f" ({hit.procedure_label})" if hit.procedure_label else "")
+        + (f" · {link}" if (link := assemblee_dossier_url(hit.uid)) else "")
         for hit in results.dossiers
     )
     hint = "Réutilisez la référence `DLR…` avec `dossier_legislatif` ou `positions_groupes`."

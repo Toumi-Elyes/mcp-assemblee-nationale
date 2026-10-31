@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from collections import Counter
 from typing import Any
 
@@ -288,3 +289,29 @@ async def test_live_suivre_sujet_covers_every_legislature(live_mcp_client: Clien
     for legislature in ("17e", "16e", "15e", "14e"):
         assert f"### {legislature} législature" in text
     assert "Aucun scrutin trouvé de 2012" not in text
+
+
+ASSEMBLEE_SCRUTIN_LINK = re.compile(
+    r"https://www\.assemblee-nationale\.fr/dyn/(\d+)/scrutins/(\d+)"
+)
+BROWSER_HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; mcp-assemblee-nationale tests)"}
+
+
+@pytest.mark.parametrize("legislature", [17, 16, 15, 14])
+async def test_live_listed_scrutin_links_open_the_right_page(
+    live_mcp_client: Client[Any], legislature: int
+) -> None:
+    async with live_mcp_client as connected:
+        result = await connected.call_tool(
+            "rechercher_scrutins", {"mots_cles": "retraite", "legislature": legislature}
+        )
+    links = ASSEMBLEE_SCRUTIN_LINK.findall(str(result.content[0].text))[:5]
+    assert links
+    async with httpx.AsyncClient(headers=BROWSER_HEADERS, follow_redirects=True) as http:
+        for number_of_legislature, numero in links:
+            url = (
+                f"https://www.assemblee-nationale.fr/dyn/{number_of_legislature}/scrutins/{numero}"
+            )
+            page = await http.get(url, timeout=30)
+            # Une page absente répond aussi par un titre générique : on vérifie le numéro affiché.
+            assert f"Analyse du scrutin n°{numero} " in page.text, url
