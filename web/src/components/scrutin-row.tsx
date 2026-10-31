@@ -1,5 +1,6 @@
 import type { Counts, VoteResult } from "@/lib/civix/types";
 import { formatNumber, formatShortDay, pluralize } from "@/lib/format";
+import { plainTitle } from "@/lib/plain-title";
 import { PositionBar } from "./position-bar";
 import { ResultBadge } from "./result-badge";
 
@@ -14,7 +15,7 @@ export const BoardHead: React.FC = () => {
       className={`hidden border-b border-line pb-1.5 font-display text-sm font-semibold uppercase tracking-wide text-muted ${BOARD_COLUMNS}`}
     >
       <span>Date</span>
-      <span>Scrutin</span>
+      <span>Vote</span>
       <span className="text-right">Résultat</span>
     </div>
   );
@@ -23,6 +24,8 @@ export const BoardHead: React.FC = () => {
 type ScrutinRowProps = { scrutin: ScrutinRowData; counts: Counts | undefined; dossier?: string | null };
 
 export const ScrutinRow: React.FC<ScrutinRowProps> = ({ scrutin, counts, dossier = null }) => {
+  const plain = plainTitle(scrutin.title);
+  const subject = plain.about ?? dossier ?? scrutin.title;
   return (
     <li className={`flex flex-col gap-2 border-b border-line py-3.5 ${BOARD_COLUMNS} sm:items-start`}>
       <span className="flex items-center justify-between gap-3 sm:contents">
@@ -38,13 +41,13 @@ export const ScrutinRow: React.FC<ScrutinRowProps> = ({ scrutin, counts, dossier
         </span>
       </span>
       <span className="flex min-w-0 flex-col gap-1.5 sm:order-2">
-        {dossier !== null ? <span className="line-clamp-1 text-sm text-muted">{dossier}</span> : null}
+        <span className="text-sm text-muted">{plain.what}</span>
         <a
           href={`/scrutins/${scrutin.uid}`}
-          title={scrutin.title}
+          title={`Titre officiel : ${scrutin.title}`}
           className="line-clamp-2 text-base font-medium leading-6 text-ink underline decoration-line hover:text-accent hover:decoration-accent"
         >
-          {scrutin.title}
+          {subject}
         </a>
         {counts !== undefined ? (
           <span className="flex flex-col gap-1.5">

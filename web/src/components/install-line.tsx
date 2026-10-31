@@ -11,7 +11,7 @@ const STOPS = [
   },
   {
     title: "Collez l'adresse dans votre assistant",
-    text: "Dans les réglages des connecteurs de Claude ou de ChatGPT, ajoutez un connecteur personnalisé.",
+    text: "Dans les réglages de Claude (même gratuit) ou de ChatGPT (Pro, Business, Enterprise), ajoutez un connecteur personnalisé.",
   },
   {
     title: "Posez votre question",
