@@ -16,7 +16,7 @@ type VideoVersion = {
   frameClassName: string;
 };
 
-const MUSIC_CREDIT = "Musique : Sascha Ende, ende.app (CC BY 4.0)";
+const MUSIC_CREDIT = "Musique : Sascha Ende, ende.app (CC BY 4.0), extrait mis en boucle";
 
 const VERSIONS: readonly VideoVersion[] = [
   {

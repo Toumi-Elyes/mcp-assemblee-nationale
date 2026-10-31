@@ -13,7 +13,7 @@ export const EN_CLAIR: readonly FaqItem[] = [
   {
     question: "À quoi ça sert ?",
     answer:
-      "À savoir qui a voté quoi. Comment a voté votre député sur un texte, ce que l'Assemblée a décidé sur un sujet, quels groupes ont voté pour ou contre. Chaque réponse donne le lien vers la page officielle du vote, pour vérifier vous même.",
+      "À savoir qui a voté quoi. Comment a voté votre député sur un texte, ce que l'Assemblée a décidé sur un sujet, quels groupes ont voté pour ou contre. Chaque réponse donne le lien vers la page officielle du vote, pour que vous puissiez vérifier.",
   },
   {
     question: "Combien ça coûte ?",
@@ -23,7 +23,7 @@ export const EN_CLAIR: readonly FaqItem[] = [
   {
     question: "Il faut s'y connaître en informatique ?",
     answer:
-      "Non. Vous copiez une adresse, vous la collez une seule fois dans les réglages de votre assistant, et c'est tout. Comptez deux minutes. Ensuite, vous posez vos questions en français, comme à n'importe qui.",
+      "Non. Vous copiez une adresse et vous la collez dans les réglages de votre assistant : comptez deux minutes. Ensuite, vous activez le connecteur dans la conversation et vous posez vos questions en français, comme à n'importe qui.",
   },
   {
     question: "Ça marche avec quel assistant ?",
