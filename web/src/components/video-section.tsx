@@ -16,7 +16,18 @@ type VideoVersion = {
   frameClassName: string;
 };
 
-const MUSIC_CREDIT = "Musique : Sascha Ende, ende.app (CC BY 4.0), extrait mis en boucle";
+const SUMMARY =
+  "Sans voix, avec une musique originale. La vidéo explique le problème d'un assistant qui répond de mémoire, montre un exemple de réponse sur un vrai vote du 29 octobre 2026 avec sa source, puis les trois étapes pour ajouter le connecteur.";
+
+const TRANSCRIPT = [
+  "Qui a voté quoi ? Les votes des députés, dans votre assistant IA.",
+  "Seul, un assistant IA répond de mémoire. Il peut se tromper sur un vote, et ne donne pas de lien pour vérifier.",
+  "Avec ce connecteur gratuit, il va chercher les vrais votes de l'Assemblée nationale. Pour Claude et ChatGPT.",
+  "Exemple : « Comment l'Assemblée a voté sur les accompagnants d'élèves en situation de handicap ? » Le texte a été adopté le 29 octobre 2026 (scrutin n° 9203) : 166 pour, 16 contre, 123 abstentions. Source : assemblee-nationale.fr. Il va chercher le vrai vote, et donne le lien pour vérifier.",
+  "Comment l'ajouter : 1. Copiez l'adresse. 2. Collez l'adresse dans les réglages de Claude, ou de ChatGPT en formule payante. 3. Activez le connecteur, puis posez votre question en français.",
+  "Gratuit. Sans inscription. Chaque réponse avec sa source. Aucun classement de députés, aucun commentaire politique.",
+  "MCP Assemblée nationale. Projet indépendant et non officiel.",
+] as const;
 
 const VERSIONS: readonly VideoVersion[] = [
   {
@@ -27,20 +38,10 @@ const VERSIONS: readonly VideoVersion[] = [
     descriptions: "/video/presentation.descriptions.fr.vtt",
     width: 1920,
     height: 1080,
-    duration: "50 secondes",
-    label: "Présentation du connecteur MCP Assemblée nationale, 50 secondes",
-    summary:
-      "Sans voix, avec une musique. On y voit le nombre de votes enregistrés depuis 2024, les votes de la semaine, un exemple de réponse d'un assistant sur un vote du 29 octobre 2026, puis l'adresse à copier.",
-    transcript: [
-      "8 741 scrutins enregistrés sous la 17e législature.",
-      "Demandez à Claude, ChatGPT ou Gemini comment ont voté les députés.",
-      "Un connecteur gratuit : votre assistant lit les vrais scrutins et donne le lien.",
-      "Cette semaine à l'Assemblée : 15 scrutins.",
-      "Exemple : le texte a été adopté le 29 octobre 2026 (scrutin n° 9203), 166 pour, 16 contre, 123 abstentions. Sources : assemblee-nationale.fr, civix.fr.",
-      "Gratuit. Sans compte. Sans clé. Copier l'adresse.",
-      "25 outils en lecture seule, chaque réponse sourcée.",
-      "MCP Assemblée nationale, projet indépendant et non officiel.",
-    ],
+    duration: "57 secondes",
+    label: "Présentation du connecteur MCP Assemblée nationale, 57 secondes",
+    summary: SUMMARY,
+    transcript: TRANSCRIPT,
     className: "hidden md:grid",
     frameClassName: "aspect-video",
   },
@@ -52,19 +53,10 @@ const VERSIONS: readonly VideoVersion[] = [
     descriptions: "/video/presentation-verticale.descriptions.fr.vtt",
     width: 1080,
     height: 1920,
-    duration: "47 secondes",
-    label: "Présentation du connecteur MCP Assemblée nationale, 47 secondes, format vertical",
-    summary:
-      "Sans voix, avec une musique. On y voit la question « Qui a voté quoi ? », les votes de la semaine, un exemple de réponse d'un assistant sur un vote du 29 octobre 2026, puis l'adresse à copier.",
-    transcript: [
-      "Qui a voté quoi ?",
-      "Les votes des députés à l'Assemblée nationale, scrutin par scrutin.",
-      "Cette semaine à l'Assemblée : 15 scrutins.",
-      "Exemple : le texte a été adopté le 29 octobre 2026 (scrutin n° 9203), 166 pour, 16 contre, 123 abstentions, sources citées.",
-      "Les données brutes, source à l'appui. Comprenez. Vérifiez. Faites-vous votre propre avis.",
-      "Gratuit. Sans compte. Sans clé. Copier l'adresse, puis la coller dans Claude, ChatGPT ou Gemini.",
-      "MCP Assemblée nationale. Vérifiez par vous-même.",
-    ],
+    duration: "57 secondes",
+    label: "Présentation du connecteur MCP Assemblée nationale, 57 secondes, format vertical",
+    summary: SUMMARY,
+    transcript: TRANSCRIPT,
     className: "grid md:hidden",
     frameClassName: "mx-auto aspect-[9/16] w-full max-w-sm",
   },
@@ -107,7 +99,7 @@ const Player: React.FC<{ version: VideoVersion }> = ({ version }) => {
           </ol>
         </div>
         <p className="text-sm text-muted">
-          {version.duration}. Données réelles lues le 30 octobre 2026 ; la réponse d'assistant est un exemple. {MUSIC_CREDIT}.
+          {version.duration}. Vote réel lu le 31 octobre 2026 ; la conversation est un exemple. Musique originale composée pour la vidéo.
         </p>
       </div>
     </div>
