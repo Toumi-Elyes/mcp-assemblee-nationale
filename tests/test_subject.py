@@ -52,6 +52,7 @@ async def test_suivre_sujet_gives_group_stances_on_whole_text_votes(
     assert "Position majoritaire des groupes sur ces votes :" in section
     assert "| Vote | ECOLO | GDR | NI | RRDP | SRC | UDI | UMP |" in section
     # La fixture réutilise le détail du scrutin n°500 : seule la date diffère du vrai n°511.
-    assert "| n°511 (17 avril 2013) | P | P | C | P | P | C | C |" in section
+    link = "https://www.assemblee-nationale.fr/dyn/14/scrutins/511"
+    assert f"| n°511 (17 avril 2013) {link} | P | P | C | P | P | C | C |" in section
     assert "Légende : P = pour, C = contre" in text
     assert "elle ne dit rien des votes minoritaires" in text

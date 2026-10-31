@@ -29,6 +29,7 @@ from assemblee_mcp.civix.models.kinds import KIND_ENSEMBLE
 from assemblee_mcp.civix.scrutin_archive import ARCHIVE_SOURCE
 from assemblee_mcp.civix.search import ScrutinPool, search_scrutin_pool
 from assemblee_mcp.formatting import field_text, finish, format_date, source_line, truncate
+from assemblee_mcp.links import scrutin_page_url
 
 FOLLOWED_LEGISLATURES = (17, 16, 15, 14)
 """Législatures suivies, de la plus récente à la plus ancienne."""
@@ -110,7 +111,8 @@ def stances_table(rows: list[GroupStances]) -> str:
     groups = sorted({name for row in rows for name in row.stances})
     body = [
         [
-            f"n°{row.scrutin.numero} ({format_date(row.scrutin.day)})",
+            f"n°{row.scrutin.numero} ({format_date(row.scrutin.day)}) "
+            f"{scrutin_page_url(row.scrutin.uid, numero=row.scrutin.numero)}",
             *[
                 STANCE_SYMBOLS[stance] if (stance := row.stances.get(group)) else "–"
                 for group in groups
@@ -165,7 +167,8 @@ def highlight_line(item: ScrutinSummary) -> str:
     """Ligne d'un scrutin cité : date, résultat, titre et identifiant."""
     result = "adopté" if item.adopted else "rejeté" if item.adopted is False else "résultat inconnu"
     when = format_date(item.date_scrutin.date() if item.date_scrutin else None)
-    return f"- {when} · {result} · {truncate(item.titre, 200)} (`{item.uid}`)"
+    link = scrutin_page_url(item.uid, item.legislature, item.numero)
+    return f"- {when} · {result} · {truncate(item.titre, 200)} (`{item.uid}`) · {link}"
 
 
 def legislature_section(row: LegislatureSubject) -> str:

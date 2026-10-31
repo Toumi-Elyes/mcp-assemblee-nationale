@@ -20,6 +20,7 @@ from assemblee_mcp.formatting.sources import (
     source_line,
 )
 from assemblee_mcp.formatting.text import field_text, format_date, truncate
+from assemblee_mcp.links import scrutin_page_url
 
 UNTITLED = "(titre non fourni par CIVIX)"
 ARCHIVED_NOTE = (
@@ -57,7 +58,8 @@ def scrutin_line(scrutin: ScrutinSummary) -> str:
         part for part in (format_date(scrutin.date_scrutin), number, result_label(scrutin)) if part
     )
     title = truncate(scrutin.titre) or UNTITLED
-    return f"- {head}\n  {title}\n  uid : `{scrutin.uid}`"
+    link = scrutin_page_url(scrutin.uid, scrutin.legislature, scrutin.numero)
+    return f"- {head}\n  {title}\n  uid : `{scrutin.uid}` · {link}"
 
 
 def format_scrutin_list(search: ScrutinSearch, query: str | None) -> str:

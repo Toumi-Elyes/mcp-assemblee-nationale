@@ -16,6 +16,7 @@ from assemblee_mcp.formatting import (
     format_date,
     truncate,
 )
+from assemblee_mcp.links import scrutin_page_url
 
 STANCE_SYMBOLS = {
     Stance.POUR: "P",
@@ -36,7 +37,8 @@ def render_positions(rows: Sequence[GroupStances], groups: Sequence[str], method
     body_rows = [
         [
             f"{format_date(row.scrutin.day)} n°{row.scrutin.numero} — "
-            f"{truncate(row.scrutin.title, 70)} ({row.scrutin.result})",
+            f"{truncate(row.scrutin.title, 70)} ({row.scrutin.result}) "
+            f"{scrutin_page_url(row.scrutin.uid, numero=row.scrutin.numero)}",
             *[
                 STANCE_SYMBOLS[stance] if (stance := row.stances.get(group)) else "–"
                 for group in groups
@@ -116,7 +118,8 @@ def render_close_votes(
                 str(row.contre),
                 str(row.abstention),
                 format_date(row.scrutin.day),
-                f"n°{row.scrutin.numero} — {truncate(row.scrutin.title, 80)} (`{row.scrutin.uid}`)",
+                f"n°{row.scrutin.numero} — {truncate(row.scrutin.title, 80)} (`{row.scrutin.uid}`) "
+                f"{scrutin_page_url(row.scrutin.uid, numero=row.scrutin.numero)}",
                 field_text(row.scrutin.result),
             ]
             for row in rows
