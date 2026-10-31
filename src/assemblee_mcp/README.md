@@ -42,3 +42,6 @@ outil MCP (tools/)
   de personnes. Chaque analyse annonce sa méthode et la taille de son échantillon.
 - Les contenus venant de CIVIX sont tiers : ils passent par `formatting.text` (nettoyage,
   plafonds) et les liens par `urls.safe_url`.
+- Chaque scrutin cité porte son lien exact, construit par `links.scrutin_page_url` (page de
+  l'Assemblée nationale, sinon de CIVIX) : l'assistant ne doit jamais avoir à fabriquer une
+  adresse. `tests/test_links.py` le vérifie pour les outils qui listent des scrutins.

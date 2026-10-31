@@ -31,7 +31,7 @@ La branche `main` est protégée : on ne pousse pas dessus directement.
 1. Forkez le dépôt (ou créez une branche si vous avez les droits), puis travaillez sur une branche dédiée.
 2. Ouvrez une pull request vers `main`.
 3. La CI doit être verte (lint, format, typage, tests) avant la fusion.
-4. Si la PR change ce que le connecteur sait faire (nouvel outil, amélioration visible, correction), ajoutez une entrée datée au journal des nouveautés dans `web/src/content/changelog.ts`, puis lancez `pnpm changelog` dans `web/` pour régénérer [CHANGELOG.md](CHANGELOG.md). La landing l'affiche dans sa section « Nouveautés » et sur `/nouveautes` ; un test vérifie que les deux restent identiques.
+4. Si la PR change ce que le connecteur sait faire ou ce que voit le visiteur de la landing (nouvel outil, amélioration visible, correction), ajoutez une entrée datée au journal des nouveautés dans `web/src/content/changelog.ts`, puis lancez `pnpm changelog` dans `web/` pour régénérer [CHANGELOG.md](CHANGELOG.md). La landing l'affiche dans sa section « Nouveautés » et sur `/nouveautes` ; un test vérifie que les deux restent identiques.
 
 Une faille de sécurité ne s'ouvre pas en issue : voir [SECURITY.md](SECURITY.md).
 
@@ -40,6 +40,8 @@ Une faille de sécurité ne s'ouvre pas en issue : voir [SECURITY.md](SECURITY.m
 - Typage complet, pas de `Any` hors de la frontière JSON brute.
 - Les réponses de CIVIX sont lues par des modèles Pydantic (`src/assemblee_mcp/civix/models/`) ; la mise en forme est dans `formatting/` et `analytics/render/`, sans appel réseau. Le plan du code est dans `src/assemblee_mcp/README.md`.
 - Un nouvel outil : un module dans `src/assemblee_mcp/tools/`, une description en français rédigée pour qu'un modèle choisisse le bon outil, les annotations en lecture seule, et des tests avec les fixtures de `tests/fixtures/`.
+- Tout scrutin cité dans une réponse porte son lien exact (`links.scrutin_page_url`) : un assistant qui doit deviner une adresse tombe souvent sur une page d'erreur. `tests/test_links.py` le vérifie.
+- Les skills Claude Code personnels restent dans `~/.claude/skills` : `.claude/skills/` est ignoré par git. La charte du site est `web/DESIGN.md`.
 
 ## Règle de neutralité
 
