@@ -1,5 +1,13 @@
 import { cn } from "@/lib/cn";
 
+// Les fichiers de /video sont servis avec un cache d'un an marqué immuable : changer cette
+// version à chaque nouveau montage donne une nouvelle adresse, que les navigateurs rechargent.
+const VIDEO_VERSION = "2026-10-31";
+
+function videoFile(name: string): string {
+  return `/video/${name}?v=${VIDEO_VERSION}`;
+}
+
 type VideoVersion = {
   id: string;
   src: string;
@@ -32,10 +40,10 @@ const TRANSCRIPT = [
 const VERSIONS: readonly VideoVersion[] = [
   {
     id: "video-paysage",
-    src: "/video/presentation.mp4",
-    poster: "/video/presentation.jpg",
-    captions: "/video/presentation.fr.vtt",
-    descriptions: "/video/presentation.descriptions.fr.vtt",
+    src: videoFile("presentation.mp4"),
+    poster: videoFile("presentation.jpg"),
+    captions: videoFile("presentation.fr.vtt"),
+    descriptions: videoFile("presentation.descriptions.fr.vtt"),
     width: 1920,
     height: 1080,
     duration: "57 secondes",
@@ -47,10 +55,10 @@ const VERSIONS: readonly VideoVersion[] = [
   },
   {
     id: "video-portrait",
-    src: "/video/presentation-verticale.mp4",
-    poster: "/video/presentation-verticale.jpg",
-    captions: "/video/presentation-verticale.fr.vtt",
-    descriptions: "/video/presentation-verticale.descriptions.fr.vtt",
+    src: videoFile("presentation-verticale.mp4"),
+    poster: videoFile("presentation-verticale.jpg"),
+    captions: videoFile("presentation-verticale.fr.vtt"),
+    descriptions: videoFile("presentation-verticale.descriptions.fr.vtt"),
     width: 1080,
     height: 1920,
     duration: "57 secondes",
