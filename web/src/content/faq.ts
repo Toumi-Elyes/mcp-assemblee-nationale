@@ -32,6 +32,13 @@ export const EN_CLAIR: readonly FaqItem[] = [
   },
 ];
 
+export const EXAMPLE_QUESTIONS: readonly string[] = [
+  "Comment a voté [nom de votre député] sur le budget ?",
+  "Quels textes l'Assemblée a votés cette semaine, et avec quel résultat ?",
+  "Comment les groupes ont voté sur la proposition de loi sur l'aide à mourir ?",
+  "Quels votes récents se sont joués à quelques voix ?",
+];
+
 export const GLOSSARY: readonly GlossaryItem[] = [
   { term: "Scrutin", definition: "Un vote à l'Assemblée. Un même texte de loi est souvent voté plusieurs fois : article par article, puis en entier." },
   { term: "Législature", definition: "La période entre deux élections législatives, cinq ans au plus. L'actuelle, la 17e, a commencé en 2024." },
@@ -41,6 +48,11 @@ export const GLOSSARY: readonly GlossaryItem[] = [
 ];
 
 export const FAQ: readonly FaqItem[] = [
+  {
+    question: "Je ne trouve pas l'option dans les réglages de mon assistant",
+    answer:
+      "Sur ChatGPT, l'ajout d'un connecteur demande une formule payante et se fait depuis le site chatgpt.com, pas depuis l'application, après avoir activé le « Mode développeur ». Sur Claude, passez par claude.ai, rubrique Connecteurs des paramètres ; sur un compte d'équipe, seul l'administrateur peut l'ajouter. Les menus changent parfois de nom : si vous êtes bloqué, ouvrez un signalement sur GitHub et les étapes seront mises à jour.",
+  },
 
 
   {
