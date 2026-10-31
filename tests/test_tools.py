@@ -374,3 +374,31 @@ async def test_comment_a_vote_uses_broadened_subject(
     )
     assert "Recherche élargie" in text
     assert "Aucun vote enregistré" in text
+
+
+async def test_rechercher_deputes_by_departement_ignores_accents_and_hyphens(
+    mcp_client: McpClient,
+) -> None:
+    text = await call(mcp_client, "rechercher_deputes", departement="ariege")
+    assert "Députés du département « Ariège » (17e législature)" in text
+    assert "Audrey Abadie-Amiel" in text
+    assert "Michel Castellani" not in text
+    folded = await call(mcp_client, "rechercher_deputes", departement="seine saint denis")
+    assert "Abomangoli" in folded
+    assert "vos-deputes" in folded
+
+
+async def test_rechercher_deputes_by_departement_suggests_close_names(
+    mcp_client: McpClient,
+) -> None:
+    text = await call(mcp_client, "rechercher_deputes", departement="Arriège")
+    assert "Aucun département « Arriège »" in text
+    assert "« Ariège »" in text
+
+
+async def test_rechercher_deputes_by_departement_in_a_closed_legislature(
+    mcp_client: McpClient,
+) -> None:
+    text = await call(mcp_client, "rechercher_deputes", departement="Pas-de-Calais", legislature=16)
+    assert "Députés du département « Pas-de-Calais » (16e législature)" in text
+    assert "Emmanuel Blairy" in text

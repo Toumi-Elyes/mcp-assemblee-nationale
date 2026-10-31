@@ -33,6 +33,9 @@ Enchaînements typiques :
 - Résumer un vote : rechercher_scrutins, puis obtenir_scrutin (décomptes par groupe).
 - Qui a voté quoi : rechercher_scrutins, puis votes_scrutin (filtres groupe, position, nom).
 - Identifier un député ou un groupe : rechercher_deputes, lister_groupes.
+- « Qui est mon député ? » : rechercher_deputes avec le département de la personne (une ville \
+→ son département). Ne devine pas la circonscription d'une adresse : présente les députés du \
+département et laisse la personne choisir.
 Un même texte donne plusieurs scrutins (amendements, articles, vote sur l'ensemble) : précise \
 lequel tu cites. Utilise les accents français dans les mots-clés.
 

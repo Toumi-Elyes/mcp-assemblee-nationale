@@ -234,7 +234,7 @@ flowchart LR
 
 | Vous voulez… | Fonction |
 |---|---|
-| Trouver un député par nom, groupe ou législature | `rechercher_deputes` |
+| Trouver un député par nom, groupe, département ou législature | `rechercher_deputes` |
 | Voir la fiche d'un député : groupe, circonscription, liens officiels | `obtenir_depute` |
 | Connaître les groupes parlementaires : sigles, effectifs | `lister_groupes` |
 | Voir la fiche d'un groupe | `obtenir_groupe` |
@@ -461,7 +461,7 @@ Types partagés : `page` entier de 1 à 500 (défaut `1`) ; `legislature` entier
 | `obtenir_scrutin` | `uid: str` (requis) | Détail et décomptes, global et par groupe |
 | `votes_scrutin` | `uid: str` (requis), `groupe: str \| None = None`, `position: "pour" \| "contre" \| "abstention" \| "non_votant" \| None = None`, `nom: str \| None = None` (max 100) | Votes individuels ; liste limitée à 60 noms, totaux officiels toujours indiqués ; pour une législature close, `groupe` désigne le groupe des députés à la date du scrutin |
 | `declarations_groupes` | `uid: str` (requis) | Explications de vote publiées par les groupes |
-| `rechercher_deputes` | `nom: str \| None = None` (max 100), `groupe: str \| None = None`, `legislature: int \| None = None` (17 par défaut, 14 à 17), `page: int = 1` | Députés par nom, groupe ou législature |
+| `rechercher_deputes` | `nom: str \| None = None` (max 100), `groupe: str \| None = None`, `departement: str \| None = None` (2 à 60 car., nom en toutes lettres), `legislature: int \| None = None` (17 par défaut, 14 à 17), `page: int = 1` | Députés par nom, groupe, département ou législature ; par département, triés par circonscription, avec des suggestions si le nom est mal orthographié |
 | `obtenir_depute` | `uid: str` (3 à 32 car. alphanumériques) ou `nom: str`, `legislature: int \| None = None` | Fiche d'un député ; un ancien député est retrouvé par son `uid` dans sa législature la plus récente |
 | `comment_a_vote` | `depute: str` (2 à 100 car., requis), `sujet: str \| None = None` (max 200), `scrutin_uid: str \| None = None`, `legislature: int \| None = None` | Position d'un député ; exactement un de `sujet` ou `scrutin_uid` ; jusqu'à 5 scrutins ; nom ambigu : jusqu'à 10 candidats ; la législature se déduit de `scrutin_uid` |
 | `lister_groupes` | aucun | Groupes, sigles et effectifs |

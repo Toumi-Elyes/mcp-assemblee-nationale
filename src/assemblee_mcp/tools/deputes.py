@@ -1,6 +1,7 @@
 """Outils sur les députés, dont « Comment a voté… ? » (position d'un député sur un sujet)."""
 
 import asyncio
+import difflib
 from typing import Annotated
 
 from fastmcp import FastMCP
@@ -26,6 +27,7 @@ from assemblee_mcp.formatting import (
 )
 from assemblee_mcp.limits import COMMENT_MAX_CALLS, CURRENT_LEGISLATURE, DEFAULT_PAGE_SIZE
 from assemblee_mcp.pagination import paginate
+from assemblee_mcp.textutils import fold
 from assemblee_mcp.tools.common import (
     DeputeLegislature,
     GroupeAbbreviation,
@@ -73,15 +75,32 @@ class DeputeTools(ToolSet):
         groupe: Annotated[
             GroupeAbbreviation | None, Field(description="Sigle du groupe, par exemple « RN ».")
         ] = None,
+        departement: Annotated[
+            str | None,
+            Field(
+                description=(
+                    "Département de la circonscription, en toutes lettres, par exemple "
+                    "« Gironde » ou « Côte-d'Or » (accents, tirets et casse ignorés). Pour une "
+                    "ville, indiquez son département."
+                ),
+                min_length=2,
+                max_length=60,
+            ),
+        ] = None,
         legislature: DeputeLegislature = None,
         page: Page = 1,
     ) -> str:
-        """Cherche des députés par nom, groupe ou législature (17e par défaut, 14e à 16e aussi).
+        """Cherche des députés par nom, groupe, département ou législature (17e par défaut).
 
         À utiliser pour retrouver l'identifiant (`uid`) d'un député avant d'appeler
-        obtenir_depute. Sans `nom`, liste les députés (filtrables par groupe). Pour une
-        législature close, le groupe indiqué est le dernier du député dans cette législature.
+        obtenir_depute. Les 14e, 15e et 16e législatures sont couvertes aussi. Sans `nom`,
+        liste les députés (filtrables par groupe et par département). Pour « Qui est mon
+        député ? », passez le département de la personne : la circonscription exacte dépend de
+        l'adresse, ne la devinez pas. Pour une législature close, le groupe indiqué est le
+        dernier du député dans cette législature.
         """
+        if departement is not None:
+            return await self._deputes_of_departement(departement, nom, groupe, legislature, page)
         if nom is None:
             return await self._list_deputes(groupe, legislature, page)
         found = await lookup.find_deputes(self.client, nom, groupe=groupe, legislature=legislature)
@@ -178,6 +197,48 @@ class DeputeTools(ToolSet):
         deputes = list(response.attributes.results)
         hint = pagination_hint(response.pagination, len(deputes), "député(s)")
         return format_deputes(deputes, "Députés", hint)
+
+    async def _deputes_of_departement(
+        self,
+        departement: str,
+        nom: str | None,
+        groupe: str | None,
+        legislature: int | None,
+        page: int,
+    ) -> str:
+        """Députés élus dans un département, par numéro de circonscription."""
+        number = legislature or CURRENT_LEGISLATURE
+        everyone = await self.client.directory_for(number).load()
+        names = {
+            fold(d.circ_departement): d.circ_departement for d in everyone if d.circ_departement
+        }
+        wanted = names.get(fold(departement).strip())
+        if wanted is None:
+            close = difflib.get_close_matches(fold(departement), list(names), n=3, cutoff=0.6)
+            suggestion = (
+                " Vouliez-vous dire : " + ", ".join(f"« {names[key]} »" for key in close) + " ?"
+                if close
+                else " Indiquez le nom du département en toutes lettres, par exemple « Gironde »."
+            )
+            return f"Aucun département « {departement} » parmi les circonscriptions.{suggestion}"
+        abbr = await lookup.resolve_groupe(self.client, groupe, number) if groupe else None
+        found = [
+            d
+            for d in everyone
+            if d.circ_departement == wanted
+            and (abbr is None or d.groupe_abrev == abbr)
+            and (nom is None or all(token in fold(d.full_name) for token in fold(nom).split()))
+        ]
+        found.sort(key=lambda d: (d.circ_num or 0, d.nom))
+        shown, pagination = paginate(found, page, DEFAULT_PAGE_SIZE)
+        hint = pagination_hint(pagination, len(shown), "député(s)")
+        note = (
+            "Une circonscription peut compter plusieurs noms si un député a été remplacé en "
+            "cours de mandat. Pour savoir quelle circonscription correspond à une adresse, "
+            "voir https://www.assemblee-nationale.fr/dyn/vos-deputes."
+        )
+        title = f"Députés du département « {wanted} » ({number}e législature)"
+        return format_deputes(shown, title, f"{hint}\n{note}".strip())
 
     async def _list_archived_deputes(self, legislature: int, abbr: str | None, page: int) -> str:
         """Liste paginée des députés d'une législature close (index embarqué)."""
