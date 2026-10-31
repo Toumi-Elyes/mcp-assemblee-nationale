@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Audience } from "@/components/audience";
 import { SiteFooter } from "@/components/site-footer";
 import { PatternDefs } from "@/components/pattern-defs";
 import { SiteNav } from "@/components/site-nav";
@@ -50,6 +51,7 @@ const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <SiteNav />
         {children}
         <SiteFooter />
+        {process.env.NODE_ENV === "production" ? <Audience /> : null}
       </body>
     </html>
   );
