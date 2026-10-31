@@ -5,7 +5,7 @@ import { GITHUB_ISSUES_URL } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "Confidentialité",
-  description: "Ce site n'utilise aucun cookie ni outil de mesure. Le connecteur ne reçoit que la recherche envoyée par l'assistant.",
+  description: "Ce site n'utilise aucun cookie ; il compte ses visites de façon anonyme. Le connecteur ne reçoit que la recherche envoyée par l'assistant.",
   alternates: { canonical: "/confidentialite" },
 };
 
@@ -13,12 +13,13 @@ const ConfidentialitePage: React.FC = () => {
   return (
     <LegalPage
       title="Confidentialité"
-      intro="En bref : ce site ne vous suit pas, et le connecteur ne lit jamais votre conversation."
+      intro="En bref : ce site compte ses visites sans vous identifier, et le connecteur ne lit jamais votre conversation."
       blocks={[
         {
           title: "Ce site",
           paragraphs: [
-            "Il n'utilise aucun cookie, aucun traceur, aucun outil de mesure d'audience et aucune publicité. Comme il ne dépose rien sur votre appareil, aucune bannière de consentement n'est nécessaire.",
+            "Il n'utilise aucun cookie, aucun traceur publicitaire et aucune publicité. Il ne dépose rien sur votre appareil.",
+            "Pour estimer sa fréquentation et dimensionner le connecteur, il compte les visites avec Vercel Web Analytics, l'outil de mesure de son hébergeur. Cette mesure est anonyme et sans cookie : pour chaque page vue, elle note la page (sans ses paramètres), le site d'où vous venez, le pays et la région, le type d'appareil, le système et le navigateur. Une visite est reconnue sur 24 heures au plus par une empreinte calculée à partir de la requête, qui n'est pas conservée plus longtemps. Rien ne permet de vous identifier ni de vous suivre sur d'autres sites, et les chiffres ne sont consultés que sous forme de totaux.",
             "Les polices de caractères sont servies par ce site, sans appel à un service tiers.",
             "Si vous choisissez un thème dans « Paramètres d'affichage », ce choix est gardé dans le stockage local de votre navigateur (clé « theme »). Il ne quitte jamais votre appareil et n'est pas un cookie.",
           ],

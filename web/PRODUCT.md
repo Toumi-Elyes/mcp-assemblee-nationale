@@ -28,7 +28,7 @@ Traffic from social networks, GitHub, word of mouth, data.gouv.fr *(inferred)*. 
 
 - Live data only: home page ISR every 30 min, client polling every 3 min (`/api/live`), demo and deputy autocomplete through `/api/demo` and `/api/deputes`. Fallback "Données momentanément indisponibles" when CIVIX is down at build.
 - Pages: home, `/scrutins/[uid]`, `/confidentialite`, `/mentions`, 404, error, OG image, sitemap, robots.
-- Security posture already audited: strict CSP (`default-src 'self'`, `font-src 'self'`), cross-site guard on API routes, zod validation, URL allowlist. No external scripts, fonts, images or analytics.
+- Security posture already audited: strict CSP (`default-src 'self'`, `font-src 'self'`), cross-site guard on API routes, zod validation, URL allowlist. No external scripts, fonts or images. Audience measurement: Vercel Web Analytics only (first party, cookieless, page path without query, production only, issue #38).
 - Fonts self-hosted, open licence.
 
 ## Brand Commitments
