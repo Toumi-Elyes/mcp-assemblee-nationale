@@ -10,3 +10,6 @@ dist/
 .DS_Store
 poetry.toml
 .vercel/
+
+# Skills Claude Code personnels : à garder dans ~/.claude/skills, pas dans le dépôt
+.claude/skills/
