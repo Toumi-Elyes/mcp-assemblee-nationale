@@ -27,10 +27,10 @@ const VERSIONS: readonly VideoVersion[] = [
     descriptions: "/video/presentation.descriptions.fr.vtt",
     width: 1920,
     height: 1080,
-    duration: "25 secondes",
-    label: "Présentation du connecteur MCP Assemblée nationale, 25 secondes",
+    duration: "50 secondes",
+    label: "Présentation du connecteur MCP Assemblée nationale, 50 secondes",
     summary:
-      "Sans voix, avec une musique. La vidéo montre le compteur des scrutins de la 17e législature, le tableau de la semaine, un exemple de réponse d'assistant sur le scrutin n° 9203 du 29 octobre 2026, puis l'adresse du connecteur copiée en un clic.",
+      "Sans voix, avec une musique. On y voit le nombre de votes enregistrés depuis 2024, les votes de la semaine, un exemple de réponse d'un assistant sur un vote du 29 octobre 2026, puis l'adresse à copier.",
     transcript: [
       "8 741 scrutins enregistrés sous la 17e législature.",
       "Demandez à Claude, ChatGPT ou Gemini comment ont voté les députés.",
@@ -52,10 +52,10 @@ const VERSIONS: readonly VideoVersion[] = [
     descriptions: "/video/presentation-verticale.descriptions.fr.vtt",
     width: 1080,
     height: 1920,
-    duration: "22 secondes",
-    label: "Présentation du connecteur MCP Assemblée nationale, 22 secondes, format vertical",
+    duration: "47 secondes",
+    label: "Présentation du connecteur MCP Assemblée nationale, 47 secondes, format vertical",
     summary:
-      "Sans voix, avec une musique. La vidéo montre la question « Qui a voté quoi ? », le tableau de la semaine, un exemple de réponse d'assistant sur le scrutin n° 9203 du 29 octobre 2026, puis l'adresse du connecteur à copier.",
+      "Sans voix, avec une musique. On y voit la question « Qui a voté quoi ? », les votes de la semaine, un exemple de réponse d'un assistant sur un vote du 29 octobre 2026, puis l'adresse à copier.",
     transcript: [
       "Qui a voté quoi ?",
       "Les votes des députés à l'Assemblée nationale, scrutin par scrutin.",
@@ -98,16 +98,14 @@ const Player: React.FC<{ version: VideoVersion }> = ({ version }) => {
         <p id={summaryId} className="text-base text-ink-soft">
           {version.summary}
         </p>
-        <details className="group border-t border-line pt-3">
-          <summary className="cursor-pointer list-none font-display text-base font-semibold text-accent transition-colors hover:text-accent-hover">
-            Lire tout le texte de la vidéo
-          </summary>
-          <ol className="mt-3 flex flex-col gap-2 text-sm text-ink-soft">
+        <div className="flex flex-col gap-2 border-t border-line pt-3">
+          <h3 className="font-display text-base font-semibold">Le texte de la vidéo</h3>
+          <ol className="flex list-decimal flex-col gap-2 pl-5 text-sm text-ink-soft">
             {version.transcript.map((line) => (
               <li key={line}>{line}</li>
             ))}
           </ol>
-        </details>
+        </div>
         <p className="text-sm text-muted">
           {version.duration}. Données réelles lues le 30 octobre 2026 ; la réponse d'assistant est un exemple. {MUSIC_CREDIT}.
         </p>
@@ -121,8 +119,11 @@ export const VideoSection: React.FC = () => {
     <section id="video" aria-labelledby="video-titre" className="border-t-2 border-rule py-14 sm:py-20">
       <div className="mx-auto flex w-full max-w-page flex-col gap-8 px-4 sm:px-6">
         <h2 id="video-titre" className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-          Voir le connecteur en vidéo
+          Le connecteur en vidéo
         </h2>
+        <p className="max-w-measure text-base text-ink-soft">
+          Chaque écran reste affiché le temps de le lire. Tout le texte de la vidéo est aussi écrit à côté.
+        </p>
         {VERSIONS.map((version) => (
           <Player key={version.id} version={version} />
         ))}

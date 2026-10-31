@@ -4,11 +4,11 @@ type Benefit = { title: string; text: string };
 const BENEFITS: readonly Benefit[] = [
   {
     title: "Des réponses avec leur source",
-    text: "Chaque scrutin cité renvoie vers la page de l'Assemblée nationale et celle de CIVIX. Vous vérifiez en un clic.",
+    text: "Chaque vote cité renvoie vers sa page sur le site de l'Assemblée nationale. Vous vérifiez en un clic.",
   },
   {
     title: "Les vrais chiffres, pas un souvenir",
-    text: "Les décomptes officiels et le détail par groupe viennent des données ouvertes, lus au moment de la question.",
+    text: "Les nombres de voix et le détail par groupe viennent de l'Assemblée, lus au moment où vous posez la question.",
   },
   {
     title: "Des faits, sans classement",

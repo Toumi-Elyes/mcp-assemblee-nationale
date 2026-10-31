@@ -12,7 +12,7 @@ export const ChatExample: React.FC<{ chat: HeroChat | null; generatedAt: Date }>
   return (
     <figure className="flex flex-col gap-5">
       <p className="border-b-2 border-rule pb-3 font-display text-xl font-semibold tracking-tight">
-        Et dans votre assistant
+        Exemple de réponse
       </p>
       <div className="flex flex-col items-end gap-1">
         <Speaker>Vous</Speaker>
@@ -33,7 +33,7 @@ export const ChatExample: React.FC<{ chat: HeroChat | null; generatedAt: Date }>
             {chat.scrutinTitle}
           </p>
           <a href={`/scrutins/${chat.scrutinUid}`} className={`${LINK_TEXT} self-start text-base font-medium`}>
-            Voir le scrutin et ses sources{" "}
+            Voir le vote et ses sources{" "}
             <ArrowRightIcon aria-hidden="true" size={14} weight="bold" className="inline" />
           </a>
         </div>

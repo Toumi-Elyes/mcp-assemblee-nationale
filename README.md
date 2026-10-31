@@ -18,7 +18,7 @@ Gratuit, en français, avec les sources.
 
 </div>
 
-## Voir en 25 secondes
+## Voir en 50 secondes
 
 <a href="https://github.com/Toumi-Elyes/mcp-assemblee-nationale/blob/main/web/public/video/presentation.mp4"><img src="docs/video-presentation.jpg" alt="Vidéo de présentation : demandez à Claude, ChatGPT ou Gemini comment ont voté les députés (cliquer pour lire)" width="100%"></a>
 

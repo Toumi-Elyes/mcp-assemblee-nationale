@@ -40,7 +40,7 @@ export const ASSISTANTS: readonly AssistantGuide[] = [
     steps: [
       "Ouvrez claude.ai, puis Paramètres, puis Connecteurs.",
       "Cliquez sur « Ajouter un connecteur personnalisé ».",
-      "Nom : Assemblée nationale. URL : collez l'adresse copiée plus haut.",
+      "Nom : Assemblée nationale. Dans le champ « URL », collez l'adresse copiée plus haut.",
       "Cliquez sur « Ajouter ». Aucune connexion n'est demandée.",
       "Dans une nouvelle conversation, ouvrez le bouton + et vérifiez que le connecteur est activé.",
     ],
@@ -51,9 +51,9 @@ export const ASSISTANTS: readonly AssistantGuide[] = [
     name: "ChatGPT",
     availability: "Plans payants, depuis le navigateur sur chatgpt.com",
     steps: [
-      "Dans Paramètres, ouvrez Applications et connecteurs, puis Paramètres avancés, et activez le Mode développeur.",
+      "Dans Paramètres, ouvrez « Applications et connecteurs », puis « Paramètres avancés », et activez le « Mode développeur ». Le nom fait peur, mais c'est simplement l'option qui permet d'ajouter un connecteur.",
       "Revenez dans Applications et connecteurs et cliquez sur Créer.",
-      "Nom : Assemblée nationale. URL du serveur MCP : collez l'adresse. Authentification : Aucune.",
+      "Nom : Assemblée nationale. Dans le champ « URL du serveur MCP », collez l'adresse. Authentification : Aucune.",
       "Cochez la case de confiance, puis validez.",
       "Dans une conversation, cliquez sur + puis Mode développeur, et activez Assemblée nationale.",
     ],
@@ -62,7 +62,7 @@ export const ASSISTANTS: readonly AssistantGuide[] = [
   {
     id: "gemini",
     name: "Gemini",
-    availability: "Gemini CLI uniquement, dans un terminal",
+    availability: "Pour utilisateurs avancés : Gemini CLI uniquement, dans un terminal",
     steps: [
       "Ouvrez le fichier ~/.gemini/settings.json.",
       "Ajoutez le bloc suivant, qui contient l'adresse du connecteur.",
@@ -74,7 +74,7 @@ export const ASSISTANTS: readonly AssistantGuide[] = [
   {
     id: "local",
     name: "En local",
-    availability: "Claude Desktop, Cursor et autres, sur votre ordinateur",
+    availability: "Pour développeurs : Claude Desktop, Cursor et autres, sur votre ordinateur",
     steps: [
       "Installez uv, puis redémarrez votre application pour qu'elle retrouve la commande uvx.",
       "Ajoutez le bloc suivant dans la configuration MCP de l'application.",

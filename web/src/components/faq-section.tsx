@@ -1,11 +1,11 @@
 import { PlusIcon } from "@phosphor-icons/react/dist/ssr";
-import { FAQ } from "@/content/faq";
+import { EN_CLAIR, FAQ } from "@/content/faq";
 
 function faqJsonLd(): string {
   const data = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: FAQ.map((item) => ({
+    mainEntity: [...EN_CLAIR, ...FAQ].map((item) => ({
       "@type": "Question",
       name: item.question,
       acceptedAnswer: { "@type": "Answer", text: item.answer },
@@ -20,7 +20,7 @@ export const FaqSection: React.FC = () => {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd() }} />
       <div className="mx-auto grid w-full max-w-page gap-8 px-4 sm:px-6 lg:grid-cols-12 lg:gap-12">
         <h2 id="faq-titre" className="font-display text-4xl font-semibold tracking-tight sm:text-5xl lg:col-span-4">
-          Questions fréquentes
+          Autres questions
         </h2>
         <ul className="border-t-2 border-rule lg:col-span-8">
           {FAQ.map((item) => (

@@ -7,7 +7,7 @@ import { CopyField } from "./copy-field";
 const STOPS = [
   {
     title: "Copiez l'adresse",
-    text: "Un bouton la copie pour vous. C'est l'adresse du connecteur, rien d'autre.",
+    text: "Un bouton la copie pour vous. C'est l'adresse du connecteur, rien d'autre à installer.",
   },
   {
     title: "Collez l'adresse dans votre assistant",
@@ -28,7 +28,7 @@ export const InstallLine: React.FC<InstallLineProps> = ({ fieldId, headingId, cl
         <h2 id={headingId} className="font-display text-2xl font-semibold tracking-tight">
           {CTA_LABEL} : trois étapes, aucune ligne de code
         </h2>
-        <p className="text-sm text-ink-soft">Gratuit, sans compte, sans clé. Pour Claude et ChatGPT.</p>
+        <p className="text-sm text-ink-soft">Gratuit, sans inscription. Pour Claude et ChatGPT.</p>
       </div>
       <ol className="grid gap-0 lg:grid-cols-[minmax(0,8fr)_minmax(0,5fr)_minmax(0,5fr)]">
         {STOPS.map((stop, index) => {

@@ -3,8 +3,8 @@ import { LINK_TEXT } from "./button-styles";
 
 const ITEMS = [
   { title: "Gratuit", text: "Le connecteur, l'accès aux données et l'hébergement ne coûtent rien." },
-  { title: "Sans compte ni clé", text: "Aucune inscription, aucune clé à générer, aucun cookie." },
-  { title: "Lecture seule", text: "L'assistant peut consulter les données, jamais rien modifier." },
+  { title: "Sans inscription", text: "Aucun compte à créer, aucun mot de passe, aucun cookie." },
+  { title: "Rien ne peut être modifié", text: "L'assistant peut seulement lire les votes, jamais rien changer." },
 ] as const;
 
 export const GuaranteesSection: React.FC = () => {
@@ -30,7 +30,7 @@ export const GuaranteesSection: React.FC = () => {
           <div className="flex flex-col gap-1 border-t border-rule py-4">
             <dt className="font-display text-xl font-semibold">Code ouvert</dt>
             <dd className="text-base text-ink-soft">
-              Chacun peut lire le code, sous licence MIT.{" "}
+              Le code du projet est public : chacun peut vérifier ce qu'il fait.{" "}
               <a href={GITHUB_URL} className={LINK_TEXT}>
                 Voir sur GitHub
               </a>
