@@ -58,7 +58,7 @@ export const InstallSection: React.FC = () => {
     <Section
       id="installer"
       title="Ajoutez le connecteur en deux minutes"
-      intro="Copiez l'adresse, puis suivez les étapes de votre assistant. Aucun compte à créer chez nous, aucune clé à générer."
+      intro="Copiez l'adresse, puis suivez les étapes de votre assistant. Les mots entre guillemets sont ceux que vous verrez à l'écran. Aucun compte à créer chez nous."
     >
       <ol className="flex flex-col">
         <Stop index={1} title="L'adresse du connecteur">

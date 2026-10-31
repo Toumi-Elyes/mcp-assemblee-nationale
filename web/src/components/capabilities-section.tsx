@@ -12,16 +12,17 @@ function frenchSpacing(text: string): string {
   return text.replace(/ ([?!:;»])/g, "\u00a0$1").replace(/« /g, "«\u00a0");
 }
 
-const ROW = "grid gap-x-8 gap-y-1 border-b border-line py-4 md:grid-cols-[minmax(0,5fr)_minmax(0,5fr)_minmax(0,2fr)]";
+const ROW = "grid gap-x-8 gap-y-1 border-b border-line py-4 md:grid-cols-2";
 
 const CapabilityRow: React.FC<{ item: Capability }> = ({ item }) => {
   return (
     <li className={ROW}>
       <p className="text-lg font-medium leading-snug">«&nbsp;{frenchSpacing(item.question)}&nbsp;»</p>
-      <p className="text-sm text-ink-soft">{item.detail}</p>
-      <p className="text-xs text-muted md:text-right">
-        <span className="sr-only">Outil </span>
-        <code className="font-mono text-ink">{item.tool}</code>
+      <p className="flex flex-col gap-1 text-sm text-ink-soft">
+        {item.detail}
+        <span className="text-xs text-muted">
+          Nom technique : <code className="font-mono">{item.tool}</code>
+        </span>
       </p>
     </li>
   );
@@ -40,12 +41,12 @@ export const CapabilitiesSection: React.FC = () => {
   return (
     <Section
       id="possibilites"
-      title={`${TOOL_COUNT} outils, des questions simples`}
-      intro="Vous n'avez pas besoin de connaître leur nom : posez la question, l'assistant choisit l'outil. Tous sont en lecture seule, il ne peut rien modifier."
+      title="Ce que vous pouvez demander"
+      intro={`Quelques exemples de questions. Écrivez la vôtre normalement : l'assistant choisit tout seul parmi les ${TOOL_COUNT} recherches que propose le connecteur. Il peut seulement lire, jamais rien modifier.`}
     >
       <div className="mb-12 grid gap-8 md:grid-cols-2">
-        <Principle title="Chaque analyse se termine par un bloc «&nbsp;Méthode&nbsp;»">
-          Période, taille de l'échantillon, définitions et limites. Vous voyez ce qui a été compté.
+        <Principle title="Chaque analyse explique comment elle a été faite">
+          Période étudiée, nombre de votes pris en compte et limites. Vous voyez ce qui a été compté.
         </Principle>
         <Principle title="Aucun classement de députés ni de groupes">
           Les analyses décrivent les données, sans note, sans palmarès et sans interprétation politique.
@@ -55,11 +56,10 @@ export const CapabilitiesSection: React.FC = () => {
       <div className="flex flex-col gap-2">
         <div
           aria-hidden="true"
-          className="hidden border-b-2 border-rule pb-2 font-display text-sm font-semibold uppercase tracking-wide text-muted md:grid md:grid-cols-[minmax(0,5fr)_minmax(0,5fr)_minmax(0,2fr)] md:gap-x-8"
+          className="hidden border-b-2 border-rule pb-2 font-display text-sm font-semibold uppercase tracking-wide text-muted md:grid md:grid-cols-2 md:gap-x-8"
         >
           <span>Vous demandez</span>
           <span>Le connecteur</span>
-          <span className="text-right">Outil</span>
         </div>
         {CAPABILITY_GROUPS.map((group, index) => (
           <details key={group.id} open={index === 0} className="group">
@@ -69,7 +69,7 @@ export const CapabilitiesSection: React.FC = () => {
                 <span className="text-sm text-ink-soft">{group.intro}</span>
               </span>
               <span className="flex shrink-0 items-center gap-3">
-                <span className="tabular font-display text-base font-semibold">{group.items.length} outils</span>
+                <span className="tabular font-display text-base font-semibold">{group.items.length} exemples</span>
                 <CaretDownIcon aria-hidden="true" size={20} weight="bold" className="transition-transform group-open:rotate-180" />
               </span>
             </summary>
@@ -82,45 +82,51 @@ export const CapabilitiesSection: React.FC = () => {
         ))}
       </div>
 
-      <div className="mt-14 grid gap-8 lg:grid-cols-12">
-        <div className="flex flex-col gap-2 lg:col-span-4">
-          <h3 className="font-display text-2xl font-semibold tracking-tight">Compatibilité recherche approfondie de ChatGPT</h3>
-          <p className="text-base text-ink-soft">
-            Deux outils reprennent les mêmes données au format qu'attend ChatGPT pour sa recherche approfondie.
-          </p>
+      <details className="group/avance mt-14 border-t-2 border-rule">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 font-display text-2xl font-semibold tracking-tight transition-colors hover:text-accent">
+          Pour les utilisateurs avancés
+          <CaretDownIcon aria-hidden="true" size={20} weight="bold" className="shrink-0 transition-transform group-open/avance:rotate-180" />
+        </summary>
+        <div className="mt-6 grid gap-8 lg:grid-cols-12">
+          <div className="flex flex-col gap-2 lg:col-span-4">
+            <h3 className="font-display text-2xl font-semibold tracking-tight">Compatibilité recherche approfondie de ChatGPT</h3>
+            <p className="text-base text-ink-soft">
+              Deux outils reprennent les mêmes données au format qu'attend ChatGPT pour sa recherche approfondie.
+            </p>
+          </div>
+          <ul className="border-t-2 border-rule lg:col-span-8">
+            {CHATGPT_COMPATIBILITY.map((item) => (
+              <CapabilityRow key={item.tool} item={item} />
+            ))}
+          </ul>
         </div>
-        <ul className="border-t-2 border-rule lg:col-span-8">
-          {CHATGPT_COMPATIBILITY.map((item) => (
-            <CapabilityRow key={item.tool} item={item} />
-          ))}
-        </ul>
-      </div>
 
-      <div className="mt-14 grid gap-8 lg:grid-cols-12">
-        <div className="flex flex-col gap-2 lg:col-span-4">
-          <h3 className="font-display text-2xl font-semibold tracking-tight">
-            {READY_PROMPTS.length} demandes prêtes à l'emploi
-          </h3>
-          <p className="text-base text-ink-soft">
-            Le connecteur propose aussi des modèles de demande, accessibles depuis le menu des prompts de votre assistant.
-          </p>
+        <div className="mt-14 grid gap-8 lg:grid-cols-12">
+          <div className="flex flex-col gap-2 lg:col-span-4">
+            <h3 className="font-display text-2xl font-semibold tracking-tight">
+              {READY_PROMPTS.length} demandes prêtes à l'emploi
+            </h3>
+            <p className="text-base text-ink-soft">
+              Le connecteur propose aussi des modèles de demande, accessibles depuis le menu des prompts de votre assistant.
+            </p>
+          </div>
+          <ul className="grid border-t-2 border-rule sm:grid-cols-2 sm:gap-x-8 lg:col-span-8">
+            {READY_PROMPTS.map((prompt) => (
+              <li key={prompt.name} className="flex flex-col gap-1.5 border-b border-line py-4">
+                <p className="flex items-baseline justify-between gap-3">
+                  <span className="font-display text-xl font-semibold leading-tight">{prompt.label}</span>
+                  <span className="text-xs text-muted">
+                    <span className="sr-only">Modèle </span>
+                    <code className="font-mono">{prompt.name}</code>
+                  </span>
+                </p>
+                <p className="text-base">{prompt.example}</p>
+                <p className="text-sm text-ink-soft">{prompt.detail}</p>
+              </li>
+            ))}
+          </ul>
         </div>
-        <ul className="grid border-t-2 border-rule sm:grid-cols-2 sm:gap-x-8 lg:col-span-8">
-          {READY_PROMPTS.map((prompt) => (
-            <li key={prompt.name} className="flex flex-col gap-1.5 border-b border-line py-4">
-              <p className="flex items-baseline justify-between gap-3">
-                <span className="font-display text-xl font-semibold leading-tight">{prompt.label}</span>
-                <span className="text-xs text-muted">
-                  <span className="sr-only">Modèle </span>
-                  <code className="font-mono">{prompt.name}</code>
-                </span>
-              </p>
-              <p className="text-base">{prompt.example}</p>
-              <p className="text-sm text-ink-soft">{prompt.detail}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
+      </details>
     </Section>
   );
 };

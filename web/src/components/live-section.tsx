@@ -11,8 +11,8 @@ export const LiveSection: React.FC<{ view: HomeView }> = ({ view }) => {
   return (
     <Section
       id="tendances"
-      title="Ce que le connecteur lit aujourd'hui"
-      intro="Tirés des données ouvertes de l'Assemblée nationale et mis à jour automatiquement."
+      title="Les derniers chiffres de l'Assemblée"
+      intro="Les mêmes données que celles que lit votre assistant, mises à jour automatiquement."
       tone="surface"
     >
       {nothing ? (

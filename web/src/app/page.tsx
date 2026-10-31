@@ -10,7 +10,10 @@ import { LiveProvider } from "@/components/live-context";
 import { InstallSection } from "@/components/install-section";
 import { LiveSection } from "@/components/live-section";
 import { Problem } from "@/components/problem";
+import { PlainWordsSection } from "@/components/plain-words-section";
 import { Tagline } from "@/components/tagline";
+import { VideoSection } from "@/components/video-section";
+import { WeekBoard } from "@/components/week-board";
 import { GITHUB_URL, MCP_URL, SITE_NAME, SITE_URL } from "@/lib/config";
 import { getHomeView } from "@/lib/data/home-view";
 import { isEmptyView, keepLastGoodVersion } from "@/lib/data/last-good";
@@ -58,6 +61,9 @@ const HomePage = async () => {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: structuredData() }} />
       <LiveProvider initial={buildLiveSnapshot(view)}>
       <Hero chat={view.heroChat} generatedAt={view.generatedAt} />
+      <PlainWordsSection />
+      <VideoSection />
+      <WeekBoard />
       <Problem />
       <Benefits />
       <Tagline />

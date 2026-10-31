@@ -4,17 +4,17 @@ const ROWS = [
   {
     topic: "Les chiffres",
     alone: "Les chiffres peuvent être anciens ou approximatifs.",
-    connected: "Les décomptes viennent des données ouvertes de l'Assemblée.",
+    connected: "Les chiffres viennent directement de l'Assemblée nationale.",
   },
   {
     topic: "La vérification",
     alone: "Aucun lien ne permet de vérifier le vote cité.",
-    connected: "Chaque réponse cite la page du scrutin à ouvrir.",
+    connected: "Chaque réponse donne le lien de la page officielle du vote.",
   },
   {
-    topic: "Le bon scrutin",
-    alone: "Un même texte compte plusieurs scrutins, et il est facile de les confondre.",
-    connected: "Le détail par groupe et par député est lu au moment de la question.",
+    topic: "Le bon vote",
+    alone: "Un même texte est voté plusieurs fois, et il est facile de confondre ces votes.",
+    connected: "Il retrouve le bon vote, avec le détail par groupe et par député.",
   },
 ] as const;
 
@@ -23,7 +23,7 @@ export const Problem: React.FC = () => {
     <Section
       id="pourquoi"
       title="Vérifier un vote prend du temps. Une réponse de mémoire peut être fausse."
-      intro="Il faut chercher sur assemblee-nationale.fr, scrutin par scrutin. Et un assistant IA seul peut répondre avec assurance sans avoir les bons chiffres."
+      intro="Il faut chercher sur assemblee-nationale.fr, vote par vote. Et un assistant IA seul peut répondre avec assurance sans avoir les bons chiffres."
     >
       <table className="w-full border-collapse text-left">
         <caption className="sr-only">Un assistant seul comparé à un assistant avec le connecteur</caption>

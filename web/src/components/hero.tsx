@@ -4,63 +4,70 @@ import type { HeroChat } from "@/lib/data/view-types";
 import { LINK_TEXT } from "./button-styles";
 import { ChatExample } from "./chat-example";
 import { CopyField } from "./copy-field";
-import { HeroProof } from "./hero-proof";
-import { VideoSection } from "./video-section";
-import { WeekSection } from "./week-section";
+
+const Step: React.FC<{ index: number; title: string; children?: React.ReactNode }> = ({ index, title, children }) => {
+  return (
+    <li className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4">
+      <span
+        aria-hidden="true"
+        className="grid size-7 shrink-0 place-items-center rounded-full border-2 border-rule font-display text-sm font-bold"
+      >
+        {index}
+      </span>
+      <div className="flex min-w-0 flex-col gap-2 pt-0.5">
+        <p className="text-lg font-medium leading-snug">
+          <span className="sr-only">Étape {index} : </span>
+          {title}
+        </p>
+        {children}
+      </div>
+    </li>
+  );
+};
 
 type HeroProps = { chat: HeroChat | null; generatedAt: Date };
 
 export const Hero: React.FC<HeroProps> = ({ chat, generatedAt }) => {
   return (
-    <>
-      <section aria-labelledby="titre-principal" className="pb-16 pt-12 sm:pb-20 sm:pt-16">
-        <div className="mx-auto grid w-full max-w-page gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:items-end lg:gap-8">
-          <div className="flex flex-col gap-8 lg:col-span-8">
-            <div className="flex flex-col gap-5">
-              <h1
-                id="titre-principal"
-                className="font-display text-4xl font-semibold leading-none tracking-tight sm:text-6xl lg:text-display"
-              >
-                <span className="lg:block lg:whitespace-nowrap">Sachez comment ont voté</span>{" "}
-                <span className="lg:block lg:whitespace-nowrap">vos députés, source à l'appui</span>
-              </h1>
-              <p className="max-w-measure text-lg text-ink-soft sm:text-xl">
-                Un connecteur gratuit pour votre assistant IA : il consulte les vrais scrutins de l'Assemblée nationale
-                et donne le lien de chacun.
-              </p>
-            </div>
-            <div className="flex max-w-2xl flex-col gap-3">
-              <h2 id="ajouter-titre" className="sr-only">
-                Ajouter le connecteur à mon assistant
-              </h2>
-              <CopyField id="adresse-connecteur" />
-              <p className="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-sm text-ink-soft">
-                <span>Gratuit, sans compte, sans clé.</span>
-                <a href={INSTALL_HREF} className={`${LINK_TEXT} font-medium`}>
-                  Où coller l'adresse, assistant par assistant{" "}
+    <section aria-labelledby="titre-principal" className="pb-16 pt-12 sm:pb-20 sm:pt-16">
+      <div className="mx-auto grid w-full max-w-page gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:gap-12">
+        <div className="flex flex-col gap-10 lg:col-span-7">
+          <div className="flex flex-col gap-5">
+            <h1
+              id="titre-principal"
+              className="font-display text-4xl font-semibold leading-none tracking-tight sm:text-6xl"
+            >
+              <span className="lg:block">Demandez à votre assistant IA</span>{" "}
+              <span className="lg:block">comment ont voté vos députés</span>
+            </h1>
+            <p className="max-w-measure text-lg text-ink-soft sm:text-xl">
+              ChatGPT ou Claude vont chercher le vrai vote dans les données de l'Assemblée nationale, au lieu de répondre
+              de mémoire, et vous donnent le lien pour vérifier. C'est gratuit.
+            </p>
+          </div>
+          <div className="flex max-w-2xl flex-col gap-4">
+            <h2 id="ajouter-titre" className="font-display text-2xl font-semibold tracking-tight">
+              Comment ça marche
+            </h2>
+            <ol className="flex flex-col gap-5">
+              <Step index={1} title="Copiez cette adresse.">
+                <CopyField id="adresse-connecteur" />
+              </Step>
+              <Step index={2} title="Collez l'adresse dans les réglages de ChatGPT ou de Claude, une seule fois.">
+                <a href={INSTALL_HREF} className={`${LINK_TEXT} self-start text-base font-medium`}>
+                  Où la coller, étape par étape{" "}
                   <ArrowDownIcon aria-hidden="true" size={14} weight="bold" className="inline" />
                 </a>
-              </p>
-            </div>
-          </div>
-          <div className="lg:col-span-4 lg:pb-2">
-            <HeroProof />
+              </Step>
+              <Step index={3} title="Posez votre question en français, comme à n'importe qui." />
+            </ol>
+            <p className="text-sm text-ink-soft">Gratuit, sans inscription, sans mot de passe.</p>
           </div>
         </div>
-      </section>
-      <VideoSection />
-      <div id="en-direct" className="border-t-2 border-rule pb-20 pt-14 sm:pb-24">
-        <div className="mx-auto grid w-full max-w-page gap-12 px-4 sm:px-6 lg:grid-cols-12">
-          <div className="lg:col-span-8">
-            <WeekSection />
-          </div>
-          <aside aria-label="Exemple de réponse" className="lg:col-span-4">
-            <div className="lg:sticky lg:top-6">
-              <ChatExample chat={chat} generatedAt={generatedAt} />
-            </div>
-          </aside>
-        </div>
+        <aside aria-label="Exemple de réponse" className="lg:col-span-5">
+          <ChatExample chat={chat} generatedAt={generatedAt} />
+        </aside>
       </div>
-    </>
+    </section>
   );
 };
