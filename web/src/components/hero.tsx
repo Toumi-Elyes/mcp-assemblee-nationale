@@ -41,7 +41,7 @@ export const Hero: React.FC<HeroProps> = ({ chat, generatedAt }) => {
               <span className="lg:block">comment ont voté vos députés</span>
             </h1>
             <p className="max-w-measure text-lg text-ink-soft sm:text-xl">
-              ChatGPT ou Claude vont chercher le vrai vote dans les données de l'Assemblée nationale, au lieu de répondre
+              Claude ou ChatGPT vont chercher le vrai vote dans les données de l'Assemblée nationale, au lieu de répondre
               de mémoire, et vous donnent le lien pour vérifier. C'est gratuit.
             </p>
           </div>
@@ -53,13 +53,13 @@ export const Hero: React.FC<HeroProps> = ({ chat, generatedAt }) => {
               <Step index={1} title="Copiez cette adresse.">
                 <CopyField id="adresse-connecteur" />
               </Step>
-              <Step index={2} title="Collez l'adresse dans les réglages de ChatGPT ou de Claude, une seule fois.">
+              <Step index={2} title="Collez l'adresse dans les réglages de Claude, ou de ChatGPT en formule payante.">
                 <a href={INSTALL_HREF} className={`${LINK_TEXT} self-start text-base font-medium`}>
                   Où la coller, étape par étape{" "}
                   <ArrowDownIcon aria-hidden="true" size={14} weight="bold" className="inline" />
                 </a>
               </Step>
-              <Step index={3} title="Posez votre question en français, comme à n'importe qui." />
+              <Step index={3} title="Activez le connecteur dans la conversation, puis posez votre question en français." />
             </ol>
             <p className="text-sm text-ink-soft">Gratuit, sans inscription, sans mot de passe.</p>
           </div>

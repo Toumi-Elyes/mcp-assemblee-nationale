@@ -10,7 +10,7 @@ import { ThemeSettings } from "./theme-settings";
 type NavItem = { href: string; label: string };
 
 const ITEMS: readonly NavItem[] = [
-  { href: "/#en-clair", label: "Comment ça marche" },
+  { href: "/#en-clair", label: "En clair" },
   { href: "/#demo", label: "Essayer" },
   { href: "/#installer", label: "Installer" },
   { href: "/nouveautes", label: "Nouveautés" },
