@@ -53,7 +53,7 @@ export const Hero: React.FC<HeroProps> = ({ chat, generatedAt }) => {
               <Step index={1} title="Copiez cette adresse.">
                 <CopyField id="adresse-connecteur" />
               </Step>
-              <Step index={2} title="Collez l'adresse dans les réglages de Claude, ou de ChatGPT en formule payante.">
+              <Step index={2} title="Collez l'adresse dans les réglages de Claude (même gratuit) ou de ChatGPT (Pro, Business, Enterprise).">
                 <a href={INSTALL_HREF} className={`${LINK_TEXT} self-start text-base font-medium`}>
                   Où la coller, étape par étape{" "}
                   <ArrowDownIcon aria-hidden="true" size={14} weight="bold" className="inline" />

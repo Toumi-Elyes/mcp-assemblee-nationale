@@ -18,7 +18,7 @@ export const EN_CLAIR: readonly FaqItem[] = [
   {
     question: "Combien ça coûte ?",
     answer:
-      "Rien. Pas d'inscription, pas de carte bancaire, pas de mot de passe. Seul votre abonnement à l'assistant peut être payant : ChatGPT demande une formule payante pour ajouter un connecteur, alors que Claude le permet gratuitement.",
+      "Rien. Pas d'inscription, pas de carte bancaire, pas de mot de passe. Seul votre abonnement à l'assistant peut être payant : Claude le permet même en formule gratuite, alors que ChatGPT demande une formule Pro, Business ou Enterprise.",
   },
   {
     question: "Il faut s'y connaître en informatique ?",
@@ -28,7 +28,7 @@ export const EN_CLAIR: readonly FaqItem[] = [
   {
     question: "Ça marche avec quel assistant ?",
     answer:
-      "Avec Claude, même en version gratuite. Avec ChatGPT, en formule payante et depuis le site chatgpt.com. L'application Gemini ne permet pas encore d'ajouter un connecteur, à notre connaissance.",
+      "Avec Claude, même en formule gratuite. Avec ChatGPT, en formule Pro, Business ou Enterprise, depuis le site chatgpt.com : la formule Plus ne le permet pas. L'application Gemini ne permet pas encore d'ajouter un connecteur, à notre connaissance.",
   },
 ];
 
@@ -51,7 +51,7 @@ export const FAQ: readonly FaqItem[] = [
   {
     question: "Je ne trouve pas l'option dans les réglages de mon assistant",
     answer:
-      "Sur ChatGPT, l'ajout d'un connecteur demande une formule payante et se fait depuis le site chatgpt.com, pas depuis l'application, après avoir activé le « Mode développeur ». Sur Claude, passez par claude.ai, rubrique Connecteurs des paramètres ; sur un compte d'équipe, seul l'administrateur peut l'ajouter. Les menus changent parfois de nom : si vous êtes bloqué, ouvrez un signalement sur GitHub et les étapes seront mises à jour.",
+      "Sur Claude, passez par claude.ai, menu « Customize » puis « Connectors » ; sur un compte d'équipe, seul un propriétaire du compte peut l'ajouter. Sur ChatGPT, il faut une formule Pro, Business ou Enterprise et le site chatgpt.com, pas l'application : passez par « Plugins ». Avec la formule Plus, l'option n'existe pas. Sur Business, seul un administrateur peut l'ajouter. Les menus changent parfois de nom : si vous êtes bloqué, ouvrez un signalement sur GitHub et les étapes seront mises à jour.",
   },
 
 

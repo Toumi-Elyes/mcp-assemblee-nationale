@@ -2,7 +2,6 @@
 
 import type { WeekScrutinView, WeekView } from "@/lib/data/view-types";
 import { formatShortDay } from "@/lib/format";
-import { normalizeSearch } from "@/lib/text";
 import { Flap } from "./flap";
 import { useLive } from "./live-context";
 import { LiveStatus } from "./live-status";
@@ -13,17 +12,10 @@ const ROWS_SHOWN = 5;
 
 type BoardRow = WeekScrutinView & { dossier: string | null };
 
-function dossierLine(label: string | null, title: string): string | null {
-  if (label === null || normalizeSearch(title).includes(normalizeSearch(label))) {
-    return null;
-  }
-  return label;
-}
-
 function boardRows(week: WeekView): BoardRow[] {
   return week.groups
     .flatMap((group) =>
-      group.scrutins.map((scrutin) => ({ ...scrutin, dossier: dossierLine(group.label, scrutin.title) })),
+      group.scrutins.map((scrutin) => ({ ...scrutin, dossier: group.label })),
     )
     .sort((left, right) => (right.date ?? "").localeCompare(left.date ?? ""));
 }
@@ -53,8 +45,8 @@ export const WeekSection: React.FC = () => {
           </h2>
           {week !== null ? (
             <span className="flex items-center gap-2">
-              <Flap value={String(week.total)} label={`${week.total} scrutins`} className="text-3xl font-semibold" />
-              <span className="font-display text-lg font-semibold">scrutins</span>
+              <Flap value={String(week.total)} label={`${week.total} votes`} className="text-3xl font-semibold" />
+              <span className="font-display text-lg font-semibold">votes</span>
             </span>
           ) : null}
         </div>
@@ -76,15 +68,15 @@ export const WeekSection: React.FC = () => {
           {rest.length > 0 ? (
             <details className="group">
               <summary className="cursor-pointer list-none py-2 font-display text-base font-semibold text-accent transition-colors hover:text-accent-hover">
-                <span className="group-open:hidden">Afficher {rest.length} autres scrutins de la semaine</span>
-                <span className="hidden group-open:inline">Masquer les autres scrutins</span>
+                <span className="group-open:hidden">Afficher {rest.length} autres votes de la semaine</span>
+                <span className="hidden group-open:inline">Masquer les autres votes</span>
               </summary>
               <Rows rows={rest} />
             </details>
           ) : null}
           {rows.length < week.total ? (
             <p className="text-sm text-muted">
-              {rows.length} scrutins listés sur {week.total} cette semaine
+              {rows.length} votes listés sur {week.total} cette semaine
               {week.hiddenGroups > 0 ? `, dans ${week.hiddenGroups + week.groups.length} dossiers` : ""}.
             </p>
           ) : null}

@@ -24,7 +24,7 @@ const TRANSCRIPT = [
   "Seul, un assistant IA répond de mémoire. Il peut se tromper sur un vote, et ne donne pas de lien pour vérifier.",
   "Avec ce connecteur gratuit, il va chercher les vrais votes de l'Assemblée nationale. Pour Claude et ChatGPT.",
   "Exemple : « Comment l'Assemblée a voté sur les accompagnants d'élèves en situation de handicap ? » Le texte a été adopté le 29 octobre 2026 (scrutin n° 9203) : 166 pour, 16 contre, 123 abstentions. Source : assemblee-nationale.fr. Il va chercher le vrai vote, et donne le lien pour vérifier.",
-  "Comment l'ajouter : 1. Copiez l'adresse. 2. Collez l'adresse dans les réglages de Claude, ou de ChatGPT en formule payante. 3. Activez le connecteur, puis posez votre question en français.",
+  "Comment l'ajouter : 1. Copiez l'adresse. 2. Collez l'adresse dans les réglages de Claude (même gratuit) ou de ChatGPT (Pro, Business, Enterprise). 3. Activez le connecteur, puis posez votre question en français.",
   "Gratuit. Sans inscription. Chaque réponse avec sa source. Aucun classement de députés, aucun commentaire politique.",
   "MCP Assemblée nationale. Projet indépendant et non officiel.",
 ] as const;
