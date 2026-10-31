@@ -7,6 +7,7 @@ Le même journal est publié sur la landing : https://landing-page-mcp-assemblee
 
 ## 31 octobre 2026
 
+- **Nouveau** · Trouver les députés de son département. « Qui est mon député ? » : la recherche de députés accepte un département, par exemple « Gironde », et liste ses députés par circonscription, de 2012 à aujourd'hui. Accents et fautes de frappe sont tolérés. ([#59](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/pull/59))
 - **Corrigé** · Un lien exact pour chaque vote cité. Les listes de votes donnent maintenant le lien de chaque scrutin vers le site de l'Assemblée nationale. L'assistant n'a plus à deviner une adresse, ce qui menait parfois à une page d'erreur. ([#57](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/pull/57))
 
 ## 30 octobre 2026
