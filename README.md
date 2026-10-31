@@ -33,7 +33,7 @@ Un **connecteur** à ajouter à votre assistant IA. Il lui donne accès aux **do
 - **Gratuit** : pas de compte, pas de clé, pas d'abonnement à ce service.
 - **En lecture seule** : l'IA consulte, elle ne modifie rien.
 - **Neutre** : les chiffres sont transmis tels quels, sans analyse politique.
-- **Sourcé** : chaque réponse renvoie vers la page du scrutin.
+- **Sourcé** : chaque vote cité porte le lien exact de sa page sur assemblee-nationale.fr, pour vérifier.
 
 > Un connecteur, c'est un petit service que l'IA peut appeler pour trouver une information. Celui-ci repose sur MCP, un standard ouvert que Claude, ChatGPT et Gemini CLI savent utiliser.
 
@@ -50,32 +50,36 @@ https://mcp-assemblee-nationale.vercel.app/mcp
 **2. Collez-la dans votre assistant.** Ouvrez le bloc qui correspond au vôtre :
 
 <details>
-<summary><b>Claude</b> (claude.ai et application) : plan gratuit inclus</summary>
+<summary><b>Claude</b> (claude.ai et application) : toutes les formules, y compris la gratuite</summary>
 
-1. Ouvrez [claude.ai](https://claude.ai), puis **Paramètres → Connecteurs**.
-2. Cliquez sur **Ajouter un connecteur personnalisé**.
-3. Nom : `Assemblée nationale`. URL : collez l'adresse copiée.
-4. Cliquez sur **Ajouter**. Aucune connexion n'est demandée.
-5. Dans une nouvelle conversation, cliquez sur **+** (ou sur l'icône des réglages de la conversation) et vérifiez que **Assemblée nationale** est activé.
+1. Sur [claude.ai](https://claude.ai), ouvrez **Customize** (Personnaliser), puis **Connectors** (Connecteurs).
+2. Cliquez sur **+ Add**, puis **Add custom connector** (ajouter un connecteur personnalisé).
+3. Nom : `Assemblée nationale`. Collez l'adresse copiée, puis cliquez sur **Continue** deux fois.
+4. Pour la connexion, choisissez **No sign in** (aucune connexion), puis cliquez sur **Add**.
+5. Dans une conversation, cliquez sur le bouton **+** en bas à gauche, puis **Connectors**, et activez **Assemblée nationale**.
 
-Le connecteur est ensuite disponible sur ordinateur et sur téléphone.
+Le connecteur est ensuite disponible sur ordinateur et sur téléphone. Les menus s'affichent en français ou en anglais selon votre langue.
 
-> Le plan gratuit autorise un connecteur personnalisé, les plans payants en autorisent plusieurs. Sur un compte Team ou Enterprise, c'est l'administrateur qui l'ajoute pour l'organisation.
+> La formule gratuite autorise un connecteur personnalisé, les formules payantes en autorisent plusieurs. Sur un compte Team ou Enterprise, c'est un propriétaire du compte qui l'ajoute pour l'organisation (**Organization settings → Connectors**), puis chacun l'active.
+>
+> Étapes tirées de l'[aide officielle de Claude](https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp) (octobre 2026).
 
 </details>
 
 <details>
-<summary><b>ChatGPT</b> : plans payants, depuis le navigateur</summary>
+<summary><b>ChatGPT</b> : formules Pro, Business et Enterprise, depuis le navigateur</summary>
 
-Il faut un abonnement payant (Plus, Pro, Business, Enterprise ou Edu). Tout se fait sur **chatgpt.com**.
+Il faut une formule **Pro**, **Business** ou **Enterprise/Edu** : les formules gratuite et Plus ne permettent pas d'ajouter un connecteur. Sur Business, seul un administrateur peut l'ajouter. Tout se fait sur **chatgpt.com**, pas dans l'application mobile.
 
-1. Ouvrez **Paramètres → Applications et connecteurs → Paramètres avancés** et activez le **Mode développeur**. *Selon la version, ce réglage peut aussi se trouver dans **Paramètres → Sécurité**.*
-2. Revenez dans **Applications et connecteurs** et cliquez sur **Créer**.
-3. Nom : `Assemblée nationale`. URL du serveur MCP : collez l'adresse copiée. Authentification : **Aucune**.
-4. Cochez la case de confiance, puis validez.
-5. Dans une conversation, cliquez sur **+ → Mode développeur** et activez **Assemblée nationale**.
+1. Ouvrez **Plugins**.
+2. Cliquez sur **+**, puis **Add custom MCP server** (c'est le nom technique d'un connecteur).
+3. Nom : `Assemblée nationale`. Sous **Connection**, collez l'adresse copiée. Authentification : aucune.
+4. Cochez **I understand and want to continue**, puis cliquez sur **Create as a plugin**.
+5. Dans une nouvelle conversation, tapez **@** dans la zone de saisie et choisissez **Assemblée nationale**.
 
-> ChatGPT affiche « non vérifié par OpenAI » pour toute application ajoutée soi-même : c'est normal. Ce connecteur ne fait que lire des données publiques.
+> ChatGPT affiche un avertissement pour tout connecteur ajouté soi-même : c'est normal. Ce connecteur ne fait que lire des données publiques.
+>
+> Étapes tirées de l'[aide officielle d'OpenAI](https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt) (octobre 2026). Le « Mode développeur » n'est plus nécessaire.
 
 </details>
 
@@ -129,14 +133,14 @@ Le plus simple reste l'adresse ci-dessus : Claude Desktop reprend vos connecteur
 
 **Partout**
 
-- Le connecteur doit être **activé dans la conversation en cours** (bouton **+**). L'ajouter dans les réglages ne suffit pas.
+- Le connecteur doit être **activé dans la conversation en cours** (bouton **+** sur Claude, **@** sur ChatGPT). L'ajouter dans les réglages ne suffit pas.
 - Demandez-le explicitement : « Utilise le connecteur Assemblée nationale pour… ». Sans cela, l'IA répond parfois de mémoire.
-- Les noms des menus changent d'une version à l'autre. Si vous ne trouvez pas **Connecteurs** ou **Applications et connecteurs**, cherchez « connecteur », « MCP » ou « développeur » dans les paramètres.
+- Les noms des menus changent d'une version à l'autre. Si vous ne trouvez pas **Connectors** (Claude) ou **Plugins** (ChatGPT), cherchez « connecteur », « connector », « plugin » ou « MCP » dans les paramètres.
 - Vérifiez l'adresse : elle doit se terminer par `/mcp`, sans espace ni guillemet.
 
 **Claude** : le plan gratuit n'autorise qu'**un seul** connecteur personnalisé. Retirez-en un autre pour ajouter celui-ci. Sur un compte d'organisation, seul l'administrateur peut en ajouter.
 
-**ChatGPT** : il faut un plan payant et le **Mode développeur**, depuis le navigateur (pas l'application mobile). Le connecteur n'est actif que dans les conversations où vous l'avez choisi via **+ → Mode développeur**.
+**ChatGPT** : il faut une formule Pro, Business ou Enterprise, depuis le navigateur (pas l'application mobile). Avec la formule Plus, l'option n'existe pas. Sur Business, seul un administrateur peut ajouter le connecteur. Il n'est utilisé que dans les messages où vous l'avez choisi avec **@**.
 
 **Gemini** : l'application grand public ne prend pas en charge les connecteurs personnalisés, à notre connaissance. Utilisez Gemini CLI. Si `/mcp` ne liste rien, vérifiez que le texte collé est valide et relancez Gemini CLI.
 
@@ -158,6 +162,7 @@ Posez vos questions normalement, en français.
 | **Suivre un député** | « Comment a voté [nom du député] sur la loi de finances ? » |
 | | « Donne-moi le bilan des votes de [député] ce mois-ci. » |
 | | « [Député A] et [député B] votent-ils souvent pareil ? » |
+| | « Qui sont les députés de la Gironde ? » |
 | **Comparer les groupes** | « Quels groupes ont voté contre le dernier budget ? » |
 | | « Sur les 30 derniers jours, quels groupes votent le plus souvent ensemble ? » |
 | **Voir les tendances** | « Quels textes ont été le plus votés cette semaine ? » |
@@ -202,7 +207,7 @@ flowchart LR
 
 ## Ce que l'IA peut faire
 
-25 fonctions, rangées par besoin. Toutes sont en lecture seule et sourcées. Les analyses portent sur un échantillon limité, annoncé dans leur bloc **Méthode**. Le nom entre accents graves est celui de la fonction, utile surtout si vous voulez la demander explicitement.
+27 fonctions, rangées par besoin. Toutes sont en lecture seule et sourcées. Les analyses portent sur un échantillon limité, annoncé dans leur bloc **Méthode**. Le nom entre accents graves est celui de la fonction, utile surtout si vous voulez la demander explicitement.
 
 ### Suivre un vote
 
@@ -275,6 +280,7 @@ Ce projet n'est affilié ni à l'Assemblée nationale, ni à CIVIX.
 - Il n'enregistre pas les conversations, n'utilise aucun cookie et ne demande aucun compte.
 - Les réponses de CIVIX (données publiques, jamais votre question) sont gardées 10 minutes, ou 24 h pour un scrutin ancien, en mémoire et dans le cache partagé de Vercel, puis oubliées.
 - Votre assistant applique sa propre politique de confidentialité. L'hébergeur (Vercel) peut tenir des journaux techniques d'accès : ce code n'y écrit pas vos questions.
+- La [page de démo](https://landing-page-mcp-assemblee-national.vercel.app) compte ses visites avec Vercel Web Analytics : mesure anonyme, sans cookie, qui ne garde que le chemin de la page. Elle respecte le signal Global Privacy Control et se refuse en un clic sur sa [page Confidentialité](https://landing-page-mcp-assemblee-national.vercel.app/confidentialite). Le connecteur, lui, ne mesure rien.
 
 **Limites**
 
@@ -318,7 +324,7 @@ Une faille de sécurité ne se signale **pas** en issue publique : utilisez le [
 <details>
 <summary>Est-ce gratuit ?</summary>
 
-Oui. Le connecteur, l'API CIVIX et l'hébergement sont gratuits. Seul l'abonnement à votre assistant (ChatGPT par exemple) peut être payant.
+Oui. Le connecteur, l'API CIVIX et l'hébergement sont gratuits. Seul l'abonnement à votre assistant peut être payant : Claude fonctionne même en formule gratuite, ChatGPT demande une formule Pro, Business ou Enterprise.
 
 </details>
 
@@ -412,6 +418,9 @@ src/assemblee_mcp/
 ├── analytics/        analyses pures : échantillons (gather), calculs (stats/), rendu avec bloc « Méthode » (render/), exports CSV/JSON
 ├── tools/            outils MCP, une classe par famille d'outils (ToolSet) ; analyses/ regroupe les outils de tendance
 ├── formatting/       mise en forme des réponses en français (scrutins, votes, députés, déclarations, sources)
+├── data/             index des députés des 14e à 16e et scrutins des 14e et 15e, embarqués
+├── links.py          liens publics vers CIVIX et l'Assemblée nationale (un lien exact par scrutin cité)
+├── urls.py           liste des domaines autorisés pour les liens repris de CIVIX
 ├── limits.py         budgets, délais, tailles de page et plafonds de période, chacun commenté
 ├── prompts.py        questions prêtes à l'emploi
 ├── config.py         réglages lus dans les variables d'environnement
@@ -427,7 +436,7 @@ web/                  page de démo (Next.js)
 <details>
 <summary><b>Modèles Pydantic</b></summary>
 
-Fichier `src/assemblee_mcp/civix/models.py`. Tous héritent de `CivixModel` : champs inconnus ignorés, modèles immuables.
+Dossier `src/assemblee_mcp/civix/models/` (un module par famille). Tous héritent de `CivixModel` : champs inconnus ignorés, modèles immuables.
 
 - **Enveloppe générique** `CivixResponse[AttributesT]` : `answer`, `summary`, `canonical_url`, `meta` (avec `Pagination`), `source`, `citation` et `data` (`Data[AttributesT]`, dont le bloc `attributes`).
 - **Modèles par point d'accès**, en alias : `ScrutinListResponse`, `ScrutinResponse`, `ScrutinVotesResponse`, `StatementsResponse`, `DeputeListResponse`, `DeputeDetailResponse`, `GroupeListResponse`, `GroupeDetailResponse`, `SearchResponse`.
@@ -574,11 +583,11 @@ Une règle : **des faits sourcés, aucune interprétation politique**.
 A connector (an [MCP](https://modelcontextprotocol.io) server) that lets Claude, ChatGPT or Gemini answer questions about **French National Assembly votes**, using the open [CIVIX API](https://www.data.gouv.fr/dataservices/api-publique-civix). Free, no account, read-only, every answer links its source.
 
 - **Live demo**: [landing page](https://landing-page-mcp-assemblee-national.vercel.app)
-- **Remote URL** (Claude custom connectors, ChatGPT developer mode, Gemini CLI `httpUrl`): `https://mcp-assemblee-nationale.vercel.app/mcp`
+- **Remote URL** (Claude custom connectors on every plan including Free, ChatGPT Plugins › « Add custom MCP server » on Pro, Business and Enterprise/Edu, Gemini CLI `httpUrl`): `https://mcp-assemblee-nationale.vercel.app/mcp`
 - **Local**: `uvx --from git+https://github.com/Toumi-Elyes/mcp-assemblee-nationale mcp-assemblee-nationale` (stdio), or `--http` for streamable HTTP.
-- **Tools**: 25 read-only tools and 6 prompts (vote tracking, trends, group agreement and cohesion, per-deputy summary, CSV/JSON exports). Every analysis ends with a « Méthode » block (period, sample, limits) and nothing ranks deputies. Outputs are in French.
+- **Tools**: 27 read-only tools and 6 prompts (vote tracking, deputies by name or department, trends, group agreement and cohesion, per-deputy summary, CSV/JSON exports). Every vote cited carries its exact link. Every analysis ends with a « Méthode » block (period, sample, limits) and nothing ranks deputies. Outputs are in French.
 - **Scope**: National Assembly only (no Senate).
-- **Privacy**: only the tool query is received; no conversation history, no cookies; CIVIX responses are cached for 10 minutes (24 h for settled votes), in memory and in Vercel's shared Runtime Cache.
+- **Privacy**: only the tool query is received; no conversation history, no cookies; CIVIX responses are cached for 10 minutes (24 h for settled votes), in memory and in Vercel's shared Runtime Cache. The landing page counts visits with cookieless Vercel Web Analytics (path only, honours Global Privacy Control, opt-out on its privacy page).
 - **Security**: per-call CIVIX request cap, rate limiting at the hosting firewall, third-party text quoted and marked, links allow-listed. Report vulnerabilities via [SECURITY.md](SECURITY.md).
 - **Stack**: Python 3.14+, FastMCP 4, Pydantic v2, httpx, Poetry, hosted on Vercel (Paris).
 - **Not official**: independent project, not affiliated with the Assemblée nationale or CIVIX.

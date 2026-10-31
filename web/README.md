@@ -27,7 +27,7 @@ Si CIVIX ne répond pas, le build réussit et les blocs de données affichent «
 
 ## Données en direct
 
-Toutes les données viennent de CIVIX, jamais de valeurs écrites à la main. L'accueil est régénéré toutes les 30 minutes (`revalidate = 1800`), les pages `/scrutins/[uid]` toutes les 6 heures, la démo et l'autocomplétion passent par `/api/demo` et `/api/deputes` (cache 10 minutes).
+Toutes les données viennent de CIVIX, jamais de valeurs écrites à la main. Dans le tableau de la semaine, `src/lib/plain-title.ts` reformule le titre officiel en langage courant (« Vote sur une modification (amendement n° 1432) », « Budget de l'État pour 2027 ») ; le titre officiel reste au survol et sur la page du scrutin. L'accueil est régénéré toutes les 30 minutes (`revalidate = 1800`), les pages `/scrutins/[uid]` toutes les 6 heures, la démo et l'autocomplétion passent par `/api/demo` et `/api/deputes` (cache 10 minutes).
 
 Appels CIVIX par régénération de l'accueil, au pire : jusqu'à 10 pages de scrutins, 1 total de législature, 1 liste des groupes, 1 recherche des votes sur l'ensemble, jusqu'à 5 vérifications de sujets, 1 liste de votes (députés présents), 1 page de députés, jusqu'à 15 détails de scrutins. L'exemple du hero réutilise des appels déjà faits. La page d'un scrutin charge le vote, les groupes, les déclarations, puis l'annuaire complet des députés (environ 12 pages) pour afficher le groupe de chacun.
 
@@ -44,9 +44,27 @@ Appels CIVIX par régénération de l'accueil, au pire : jusqu'à 10 pages de sc
 
 La limitation de débit est faite au pare feu de l'hébergeur (60 requêtes par minute et par IP sur `/api/*` et `/scrutins/*`), pas dans ce code.
 
+## Vidéos de présentation
+
+Les vidéos (`public/video/presentation.mp4` en paysage, `presentation-verticale.mp4` en vertical) sont accompagnées de leurs images d'aperçu, de sous-titres (`.fr.vtt`) et d'une audiodescription (`.descriptions.fr.vtt`). Le texte affiché à côté du lecteur est dans `src/components/video-section.tsx`.
+
+`/video/*` est servi avec un cache d'un an marqué immuable : après un nouveau montage, changer `VIDEO_VERSION` dans `video-section.tsx`, sinon les navigateurs garderont l'ancienne vidéo. La source du montage (page HTML rendue image par image, musique originale) n'est pas versionnée.
+
+## Mesure d'audience
+
+La page compte ses visites avec Vercel Web Analytics (`@vercel/analytics`, `src/components/audience.tsx`), en production seulement :
+
+- sans cookie ; le script et l'envoi passent par le domaine du site, donc la CSP reste `'self'` ;
+- `beforeSend` ne garde que le chemin de la page (ni paramètres, ni ancre) ;
+- rien n'est envoyé si le navigateur envoie Global Privacy Control, ou si la personne a refusé la mesure sur `/confidentialite` (clé `mesure-audience` du stockage local, logique dans `src/lib/audience.ts`).
+
+La mesure doit être activée une fois dans Vercel (projet de la landing, onglet **Analytics → Enable**) ; sans cela, le script n'est pas servi et rien ne casse. Ces chiffres comptent les visiteurs de la page, pas les appels au connecteur : pour mesurer ces appels, voir l'onglet **Observability** du projet du connecteur.
+
 ## Déploiement sur Vercel
+
+Les déploiements passent par GitHub Actions, pas par l'intégration Git de Vercel : voir la section « Déploiement » de [CONTRIBUTING.md](../CONTRIBUTING.md). Pour créer le projet la première fois :
 
 1. Importer le dépôt dans un nouveau projet Vercel.
 2. Dans **Settings, General, Root Directory**, choisir `web`. Framework : Next.js (détecté).
 3. Définir `NEXT_PUBLIC_MCP_URL` si l'adresse du connecteur diffère de la valeur par défaut.
-4. Déployer. Aucune base de données, aucun secret.
+4. Activer **Analytics** (voir plus haut). Aucune base de données, aucun secret.
