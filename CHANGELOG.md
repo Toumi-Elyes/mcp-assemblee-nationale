@@ -7,6 +7,8 @@ Le même journal est publié sur la landing : https://landing-page-mcp-assemblee
 
 ## 31 octobre 2026
 
+- **Amélioré** · Les votes de la semaine en langage courant. Chaque vote dit ce qui a été voté (le texte entier, un article, une modification) et sur quel sujet, par exemple « Budget de l'État pour 2027 ». La vidéo de présentation, refaite, laisse le temps de lire chaque écran. Les étapes d'installation suivent l'aide officielle d'octobre 2026 : avec ChatGPT, il faut une formule Pro, Business ou Enterprise. ([#60](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/pull/60))
+- **Amélioré** · Une page d'accueil en langage simple. Le premier écran explique le service en trois étapes, avec un exemple de réponse. Une section « En clair » répond aux questions de base, avec un lexique et des questions à copier. ([#55](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/pull/55))
 - **Nouveau** · Trouver les députés de son département. « Qui est mon député ? » : la recherche de députés accepte un département, par exemple « Gironde », et liste ses députés par circonscription, de 2012 à aujourd'hui. Accents et fautes de frappe sont tolérés. ([#59](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/pull/59))
 - **Corrigé** · Un lien exact pour chaque vote cité. Les listes de votes donnent maintenant le lien de chaque scrutin vers le site de l'Assemblée nationale. L'assistant n'a plus à deviner une adresse, ce qui menait parfois à une page d'erreur. ([#57](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/pull/57))
 

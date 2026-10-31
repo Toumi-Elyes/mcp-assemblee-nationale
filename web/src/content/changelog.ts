@@ -33,6 +33,20 @@ export const CHANGELOG: readonly ChangelogDay[] = [
     date: "2026-10-31",
     changes: [
       {
+        kind: "amelioration",
+        title: "Les votes de la semaine en langage courant",
+        detail:
+          "Chaque vote dit ce qui a été voté (le texte entier, un article, une modification) et sur quel sujet, par exemple « Budget de l'État pour 2027 ». La vidéo de présentation, refaite, laisse le temps de lire chaque écran. Les étapes d'installation suivent l'aide officielle d'octobre 2026 : avec ChatGPT, il faut une formule Pro, Business ou Enterprise.",
+        pr: 60,
+      },
+      {
+        kind: "amelioration",
+        title: "Une page d'accueil en langage simple",
+        detail:
+          "Le premier écran explique le service en trois étapes, avec un exemple de réponse. Une section « En clair » répond aux questions de base, avec un lexique et des questions à copier.",
+        pr: 55,
+      },
+      {
         kind: "nouveau",
         title: "Trouver les députés de son département",
         detail:
