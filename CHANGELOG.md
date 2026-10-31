@@ -5,6 +5,10 @@ Le même journal est publié sur la landing : https://landing-page-mcp-assemblee
 
 <!-- Fichier généré à partir de web/src/content/changelog.ts : modifier ce fichier, puis lancer `pnpm changelog` dans web/. -->
 
+## 31 octobre 2026
+
+- **Corrigé** · Un lien exact pour chaque vote cité. Les listes de votes donnent maintenant le lien de chaque scrutin vers le site de l'Assemblée nationale. L'assistant n'a plus à deviner une adresse, ce qui menait parfois à une page d'erreur. ([#57](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/pull/57))
+
 ## 30 octobre 2026
 
 - **Nouveau** · Comparer de 3 à 5 députés. Pour chaque paire de députés, la part de scrutins votés de la même façon, avec le nombre de scrutins comparés. ([#49](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/pull/49))

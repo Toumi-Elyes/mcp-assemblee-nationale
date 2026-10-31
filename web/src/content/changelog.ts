@@ -30,6 +30,18 @@ export const CHANGE_LABELS: Readonly<Record<ChangeKind, string>> = {
 
 export const CHANGELOG: readonly ChangelogDay[] = [
   {
+    date: "2026-10-31",
+    changes: [
+      {
+        kind: "correction",
+        title: "Un lien exact pour chaque vote cité",
+        detail:
+          "Les listes de votes donnent maintenant le lien de chaque scrutin vers le site de l'Assemblée nationale. L'assistant n'a plus à deviner une adresse, ce qui menait parfois à une page d'erreur.",
+        pr: 57,
+      },
+    ],
+  },
+  {
     date: "2026-10-30",
     changes: [
       {
