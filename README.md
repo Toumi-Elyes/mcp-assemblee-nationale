@@ -18,11 +18,11 @@ Gratuit, en français, avec les sources.
 
 </div>
 
-## Voir en 50 secondes
+## Voir en une minute
 
 <a href="https://github.com/Toumi-Elyes/mcp-assemblee-nationale/blob/main/web/public/video/presentation.mp4"><img src="docs/video-presentation.jpg" alt="Vidéo de présentation : demandez à Claude, ChatGPT ou Gemini comment ont voté les députés (cliquer pour lire)" width="100%"></a>
 
-<sub>▶ Cliquez sur l'image pour lire la vidéo. Elle montre le tableau des votes de la semaine, un exemple de réponse construit avec les données réelles du scrutin n° 9203, puis l'adresse à copier. Version verticale pour les réseaux sociaux : <a href="https://github.com/Toumi-Elyes/mcp-assemblee-nationale/blob/main/web/public/video/presentation-verticale.mp4">presentation-verticale.mp4</a>. Musique : Sascha Ende, ende.app (CC BY 4.0).</sub>
+<sub>▶ Cliquez sur l'image pour lire la vidéo. Elle explique le service en langage simple, montre un exemple de réponse construit avec les données réelles du scrutin n° 9203, puis les trois étapes pour ajouter le connecteur. Version verticale pour les réseaux sociaux : <a href="https://github.com/Toumi-Elyes/mcp-assemblee-nationale/blob/main/web/public/video/presentation-verticale.mp4">presentation-verticale.mp4</a>. Musique originale composée pour la vidéo.</sub>
 
 ---
 
