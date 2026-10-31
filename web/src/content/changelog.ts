@@ -33,6 +33,13 @@ export const CHANGELOG: readonly ChangelogDay[] = [
     date: "2026-10-31",
     changes: [
       {
+        kind: "nouveau",
+        title: "Trouver les députés de son département",
+        detail:
+          "« Qui est mon député ? » : la recherche de députés accepte un département, par exemple « Gironde », et liste ses députés par circonscription, de 2012 à aujourd'hui. Accents et fautes de frappe sont tolérés.",
+        pr: 59,
+      },
+      {
         kind: "correction",
         title: "Un lien exact pour chaque vote cité",
         detail:
