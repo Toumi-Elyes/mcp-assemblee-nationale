@@ -113,8 +113,8 @@ export const CAPABILITY_GROUPS: readonly CapabilityGroup[] = [
     items: [
       {
         tool: "rechercher_deputes",
-        question: "Quels députés s'appelaient Martin sous la 15e législature ?",
-        detail: "Retrouve un député par son nom, sans tenir compte des accents ni de la casse, de la 14e législature (2012) à aujourd'hui.",
+        question: "Qui sont les députés de la Gironde ?",
+        detail: "Retrouve un député par son nom ou par le département où il a été élu, sans tenir compte des accents ni de la casse, de la 14e législature (2012) à aujourd'hui.",
       },
       {
         tool: "obtenir_depute",
