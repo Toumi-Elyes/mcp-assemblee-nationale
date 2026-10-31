@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AudienceChoice } from "@/components/audience-choice";
 import { LINK_TEXT } from "@/components/button-styles";
 import { LegalPage } from "@/components/legal-page";
 import { GITHUB_ISSUES_URL } from "@/lib/config";
@@ -20,6 +21,8 @@ const ConfidentialitePage: React.FC = () => {
           paragraphs: [
             "Il n'utilise aucun cookie, aucun traceur publicitaire et aucune publicité. Il ne dépose rien sur votre appareil.",
             "Pour estimer sa fréquentation et dimensionner le connecteur, il compte les visites avec Vercel Web Analytics, l'outil de mesure de son hébergeur. Cette mesure est anonyme et sans cookie : pour chaque page vue, elle note la page (sans ses paramètres), le site d'où vous venez, le pays et la région, le type d'appareil, le système et le navigateur. Une visite est reconnue sur 24 heures au plus par une empreinte calculée à partir de la requête, qui n'est pas conservée plus longtemps. Rien ne permet de vous identifier ni de vous suivre sur d'autres sites, et les chiffres ne sont consultés que sous forme de totaux.",
+            "Vous pouvez refuser cette mesure : votre choix est gardé dans le stockage local de votre navigateur (clé « mesure-audience »), et plus rien n'est envoyé. Si votre navigateur envoie le signal « Global Privacy Control », vos visites ne sont jamais mesurées.",
+            <AudienceChoice key="choix-mesure" />,
             "Les polices de caractères sont servies par ce site, sans appel à un service tiers.",
             "Si vous choisissez un thème dans « Paramètres d'affichage », ce choix est gardé dans le stockage local de votre navigateur (clé « theme »). Il ne quitte jamais votre appareil et n'est pas un cookie.",
           ],
