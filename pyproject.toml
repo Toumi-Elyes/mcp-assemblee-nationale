@@ -27,7 +27,7 @@ packages = [{ include = "assemblee_mcp", from = "src" }]
 pytest = ">=9.0,<9.2"
 pytest-asyncio = ">=1.4.1,<1.4.2"
 respx = ">=0.23,<1.0"
-ruff = ">=0.16,<0.17.3"
+ruff = ">=0.17.3,<0.17.4"
 mypy = ">=2.3,<2.4.1"
 
 [build-system]
