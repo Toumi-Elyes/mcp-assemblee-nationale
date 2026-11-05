@@ -30,6 +30,18 @@ export const CHANGE_LABELS: Readonly<Record<ChangeKind, string>> = {
 
 export const CHANGELOG: readonly ChangelogDay[] = [
   {
+    date: "2026-11-05",
+    changes: [
+      {
+        kind: "correction",
+        title: "L'adresse du connecteur lisible en entier sur téléphone",
+        detail:
+          "Sur un petit écran, l'adresse à copier était coupée dans son cadre. Elle s'affiche maintenant en entier, sur deux lignes si besoin.",
+        pr: 79,
+      },
+    ],
+  },
+  {
     date: "2026-10-31",
     changes: [
       {
