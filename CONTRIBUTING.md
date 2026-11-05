@@ -53,6 +53,19 @@ Pour signaler un bug, une donnée incorrecte ou proposer une amélioration, util
 
 Dans une pull request, indiquez `Closes #<numéro>` : la carte du tableau passe alors en « In Review » à l'ouverture et en « Done » à la fusion.
 
+## Versions
+
+Les versions sont automatiques. Après la CI verte d'un push sur `main`, le workflow « Versions » (`.github/workflows/release.yml`) crée le tag `vX.Y.Z` et la [release GitHub](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/releases), dont les notes listent les PR fusionnées (et donc les issues qu'elles ferment).
+
+Le numéro dépend des titres de commits arrivés sur `main` depuis le dernier tag ([Conventional Commits](https://www.conventionalcommits.org/fr/)). Donnez donc à la PR un titre de ce format, puisqu'il devient le titre du commit :
+
+- `feat: …` : nouvelle version mineure (0.1.0 → 0.2.0) ;
+- `fix: …` ou `perf: …` : correctif (0.1.0 → 0.1.1) ;
+- `type!: …`, ou `BREAKING CHANGE` dans le corps : version majeure ;
+- `docs:`, `chore:`, `ci:`, `test:`, `refactor:` : pas de nouvelle version.
+
+Le tag fait foi : la version de `pyproject.toml` n'est pas mise à jour.
+
 ## Déploiement
 
 Les déploiements passent par GitHub Actions (`.github/workflows/deploy.yml`), pas par l'intégration Git de Vercel, coupée dans `vercel.json` et `web/vercel.json` : elle redéployait les deux projets à chaque push de PR et épuisait le quota du plan Hobby (100 déploiements par jour).
