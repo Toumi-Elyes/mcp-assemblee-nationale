@@ -5,6 +5,10 @@ Le même journal est publié sur la landing : https://landing-page-mcp-assemblee
 
 <!-- Fichier généré à partir de web/src/content/changelog.ts : modifier ce fichier, puis lancer `pnpm changelog` dans web/. -->
 
+## 5 novembre 2026
+
+- **Corrigé** · L'adresse du connecteur lisible en entier sur téléphone. Sur un petit écran, l'adresse à copier était coupée dans son cadre. Elle s'affiche maintenant en entier, sur deux lignes si besoin. ([#79](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/pull/79))
+
 ## 31 octobre 2026
 
 - **Amélioré** · Les votes de la semaine en langage courant. Chaque vote dit ce qui a été voté (le texte entier, un article, une modification) et sur quel sujet, par exemple « Budget de l'État pour 2027 ». La vidéo de présentation, refaite, laisse le temps de lire chaque écran. Les étapes d'installation suivent l'aide officielle d'octobre 2026 : avec ChatGPT, il faut une formule Pro, Business ou Enterprise. ([#60](https://github.com/Toumi-Elyes/mcp-assemblee-nationale/pull/60))
