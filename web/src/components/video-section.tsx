@@ -1,4 +1,5 @@
 import { cn } from "@/lib/cn";
+import { PosterVideo } from "./poster-video";
 
 // Les fichiers de /video sont servis avec un cache d'un an marqué immuable : changer cette
 // version à chaque nouveau montage donne une nouvelle adresse, que les navigateurs rechargent.
@@ -12,6 +13,8 @@ type VideoVersion = {
   id: string;
   src: string;
   poster: string;
+  /** Same breakpoint as `className`: the media query under which this version is shown. */
+  media: string;
   captions: string;
   descriptions: string;
   width: number;
@@ -42,6 +45,7 @@ const VERSIONS: readonly VideoVersion[] = [
     id: "video-paysage",
     src: videoFile("presentation.mp4"),
     poster: videoFile("presentation.jpg"),
+    media: "(min-width: 48rem)",
     captions: videoFile("presentation.fr.vtt"),
     descriptions: videoFile("presentation.descriptions.fr.vtt"),
     width: 1920,
@@ -57,6 +61,7 @@ const VERSIONS: readonly VideoVersion[] = [
     id: "video-portrait",
     src: videoFile("presentation-verticale.mp4"),
     poster: videoFile("presentation-verticale.jpg"),
+    media: "not all and (min-width: 48rem)",
     captions: videoFile("presentation-verticale.fr.vtt"),
     descriptions: videoFile("presentation-verticale.descriptions.fr.vtt"),
     width: 1080,
@@ -76,7 +81,8 @@ const Player: React.FC<{ version: VideoVersion }> = ({ version }) => {
     <div className={cn("gap-8 lg:grid-cols-12 lg:items-start lg:gap-12", version.className)}>
       <div className="lg:order-2 lg:col-span-8">
         <div className={cn("overflow-hidden border border-rule bg-surface", version.frameClassName)}>
-          <video
+          <PosterVideo
+            media={version.media}
             controls
             preload="none"
             playsInline
@@ -91,7 +97,7 @@ const Player: React.FC<{ version: VideoVersion }> = ({ version }) => {
             <track kind="captions" src={version.captions} srcLang="fr" label="Français" />
             <track kind="descriptions" src={version.descriptions} srcLang="fr" label="Description" />
             <a href={version.src}>Télécharger la vidéo ({version.duration})</a>
-          </video>
+          </PosterVideo>
         </div>
       </div>
       <div className="flex flex-col gap-4 lg:order-1 lg:col-span-4">
